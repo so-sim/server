@@ -1,4 +1,4 @@
-package com.sosim.server.jwt;
+package com.sosim.server.jwt.util;
 
 import com.sosim.server.user.User;
 import io.jsonwebtoken.Claims;
