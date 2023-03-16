@@ -1,2 +1,2 @@
 # so-sim
-Sosim Server
+This repository is so-sim's Server Repository
