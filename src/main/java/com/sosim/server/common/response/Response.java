@@ -16,15 +16,15 @@ public class Response<T> {
     private T content;
 
     @Getter
-    @NoArgsConstructor
+    @AllArgsConstructor
     private static class Status {
-        private String code;
+        private int code;
         private String message;
     }
 
-    public static <T> Response<?> create(T content) {
+    public static <T> Response<?> create(ResponseType responseType, T content) {
         return Response.builder()
-                .status(new Status())
+                .status(new Status(responseType.getCode(), responseType.getMessage()))
                 .content(content)
                 .build();
     }
