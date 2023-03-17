@@ -1,0 +1,8 @@
+jwt:
+  access:
+    key: "access_sosim"
+    expiration: 1800000 # 30분 - 30 * 60 * 1000
+
+  refresh:
+    key: "refresh_sosim"
+    expiration: 2592000000 # 30일 - 60 * 60 * 24 * 30 * 1000
