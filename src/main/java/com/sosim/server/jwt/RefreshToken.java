@@ -17,4 +17,10 @@ public class RefreshToken {
 
     @Indexed
     private String refreshToken;
+
+    public static RefreshToken create(String refreshToken) {
+        return RefreshToken.builder()
+                .refreshToken(refreshToken)
+                .build();
+    }
 }
