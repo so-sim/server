@@ -14,8 +14,8 @@ public class KakaoUserRequest extends OAuthUserRequest {
     }
 
     @Override
-    public String getOAuth2Id() {
-        return String.valueOf(super.attributes.get("id"));
+    public Long OAuthId() {
+        return (Long) super.attributes.get("id");
     }
 
     @Override
