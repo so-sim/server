@@ -1,11 +1,9 @@
 package com.sosim.server.jwt;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-@Repository
-public interface JwtRepository extends JpaRepository<RefreshToken, String> {
+public interface JwtRepository extends CrudRepository<RefreshToken, String> {
     Optional<RefreshToken> findByRefreshToken(String refreshToken);
 }
