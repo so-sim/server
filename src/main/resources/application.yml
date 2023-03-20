@@ -3,13 +3,3 @@ spring:
     import:
       - classpath:/application-jwt.yml
       - classpath:/application-oauth.yml
-
-  redis:
-    host: localhost
-    port: 6379
-
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:~/sosim;NON_KEYWORDS=USER
-    username: sa
-    password:
