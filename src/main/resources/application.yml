@@ -3,3 +3,6 @@ spring:
     import:
       - classpath:/application-jwt.yml
       - classpath:/application-oauth.yml
+
+  profiles:
+    default: dev
