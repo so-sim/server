@@ -5,4 +5,4 @@ jwt:
 
   refresh:
     key: ${JWT_REFRESH}
-    expiration: 2592000000 # 30일 - 60 * 60 * 24 * 30 * 1000
+    expiration: 1209600000 # (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h) * 24L(h -> 하루) * 14(2주))
