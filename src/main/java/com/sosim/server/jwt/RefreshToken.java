@@ -8,18 +8,19 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
-@RedisHash
+@RedisHash("refreshToken")
 @Builder(access = AccessLevel.PRIVATE)
 public class RefreshToken {
 
     @Id
-    private String id;
+    private Long userId;
 
     @Indexed
     private String refreshToken;
 
-    public static RefreshToken create(String refreshToken) {
+    public static RefreshToken create(Long userId, String refreshToken) {
         return RefreshToken.builder()
+                .userId(userId)
                 .refreshToken(refreshToken)
                 .build();
     }

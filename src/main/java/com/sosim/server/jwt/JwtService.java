@@ -15,7 +15,7 @@ public class JwtService {
 
     public JwtResponse createToken(User user) {
         String refreshToken = jwtFactory.createRefreshToken();
-        jwtRepository.save(RefreshToken.create(refreshToken));
+        jwtRepository.save(RefreshToken.create(user.getId(), refreshToken));
 
         return JwtResponse.create(jwtFactory.createAccessToken(user), refreshToken);
     }
