@@ -20,7 +20,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable() // csrf
+                .httpBasic().disable()
+                .formLogin().disable()
                 .headers().frameOptions().disable();
+
+        http
+                .cors();
 
         // 세션 STATELESS 설정
         http
@@ -29,7 +34,7 @@ public class SecurityConfig {
         // 요청에 대한 권한 체크 파트
         http
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/**", "/api/group/{groupId}").permitAll()
                 .antMatchers("/api/**").authenticated();
 
         http
