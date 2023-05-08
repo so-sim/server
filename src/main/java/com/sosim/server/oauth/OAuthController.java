@@ -3,7 +3,7 @@ package com.sosim.server.oauth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.common.response.ResponseType;
-import com.sosim.server.common.util.HeaderUtil;
+import com.sosim.server.common.util.CookieUtil;
 import com.sosim.server.jwt.dto.response.JwtResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +20,11 @@ public class OAuthController {
 
     private final OAuthService oAuthService;
 
-    @PostMapping("/login/oauth2/code/{social}")
-    public ResponseEntity<?> login(@PathVariable("social") String social, @RequestParam("code") String code,
+    @PostMapping("/auth/{socialType}")
+    public ResponseEntity<?> login(@PathVariable("socialType") String social, @RequestParam("code") String code,
                                    HttpServletResponse response) throws JsonProcessingException {
         JwtResponse jwtResponse = oAuthService.login(social, code);
-        HeaderUtil.setHeaderRefreshToken(response, jwtResponse.getRefreshToken());
+        CookieUtil.setCookieRefreshToken(response, jwtResponse.getRefreshToken());
         ResponseType successLogin = ResponseType.SUCCESS_LOGIN;
 
         return new ResponseEntity<>(Response.create(successLogin, jwtResponse), successLogin.getHttpStatus());
