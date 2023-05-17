@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.core.NestedRuntimeException;
 
+@Getter
 public class CustomException extends NestedRuntimeException {
 
     private ResponseCode responseCode;
