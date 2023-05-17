@@ -11,7 +11,7 @@ import javax.persistence.*;
 
 @Getter
 @Entity
-@Table(name = "`USER`")
+@Table(name = "USER")
 @NoArgsConstructor
 public class User {
     @Id
@@ -20,20 +20,23 @@ public class User {
 
     private String email;
 
+    @Enumerated(EnumType.STRING)
     private Social social;
 
     private Long socialId;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private User(Social social, Long socialId) {
+    private User(String email, Social social, Long socialId) {
+        this.email = email;
         this.social = social;
         this.socialId = socialId;
     }
 
     public static User create(OAuthUserRequest oAuthUserRequest) {
         return User.builder()
+                .email(oAuthUserRequest.getEmail())
                 .social(oAuthUserRequest.getOAuthSocial())
-                .socialId(oAuthUserRequest.OAuthId())
+                .socialId(oAuthUserRequest.getOAuthId())
                 .build();
     }
 
