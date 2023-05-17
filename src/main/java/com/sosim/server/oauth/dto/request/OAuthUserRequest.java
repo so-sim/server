@@ -11,7 +11,7 @@ public abstract class OAuthUserRequest {
         this.attributes = attributes;
     }
 
-    public abstract Long OAuthId();
+    public abstract Long getOAuthId();
 
     public abstract String getEmail();
 

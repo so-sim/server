@@ -22,9 +22,9 @@ public class Response<T> {
         private String message;
     }
 
-    public static <T> Response<?> create(ResponseType responseType, T content) {
+    public static <T> Response<?> create(ResponseCode responseCode, T content) {
         return Response.builder()
-                .status(new Status(responseType.getCode(), responseType.getMessage()))
+                .status(new Status(responseCode.getCode(), responseCode.getMessage()))
                 .content(content)
                 .build();
     }

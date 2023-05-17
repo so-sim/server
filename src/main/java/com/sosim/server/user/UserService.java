@@ -1,5 +1,7 @@
 package com.sosim.server.user;
 
+import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,11 +13,20 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    public User save(OAuthUserRequest oAuthUserRequest) {
+        if (userRepository.findBySocialAndSocialId(
+                oAuthUserRequest.getOAuthSocial(), oAuthUserRequest.getOAuthId()).isPresent()) {
+            throw new CustomException(ResponseCode.USER_ALREADY_EXIST);
+        }
+
+        return userRepository.save(User.create(oAuthUserRequest));
+    }
+
     @Transactional
-    public User saveOrUpdate(OAuthUserRequest oAuthUserRequest) {
+    public User update(OAuthUserRequest oAuthUserRequest) {
         User user = userRepository.findBySocialAndSocialId(
-                oAuthUserRequest.getOAuthSocial(), oAuthUserRequest.OAuthId())
-                .orElse(User.create(oAuthUserRequest));
+                oAuthUserRequest.getOAuthSocial(), oAuthUserRequest.getOAuthId())
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_USER));
 
         user.setEmail(oAuthUserRequest.getEmail());
         return user;

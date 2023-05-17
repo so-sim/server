@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.jwt.JwtService;
 import com.sosim.server.jwt.dto.response.JwtResponse;
 import com.sosim.server.oauth.dto.request.OAuthTokenRequest;
+import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -33,12 +34,24 @@ public class OAuthService {
     private final UserService userService;
     private final JwtService jwtService;
 
-    public JwtResponse login(String social, String code) throws JsonProcessingException {
-        // SocialType(kakao,google,naver) 에 따라 다른 inMemory 사용
-        ClientRegistration clientRegistration = inMemoryRepository.findByRegistrationId(social);
+    public JwtResponse signUp(String social, String code) throws JsonProcessingException {
+        OAuthUserRequest oAuthUserInfo = getOAuthUserInfo(social, code);
+        User user = userService.save(oAuthUserInfo);
+        return jwtService.createToken(user);
+    }
 
+    public JwtResponse login(String social, String code) throws JsonProcessingException {
+        OAuthUserRequest oAuthUserInfo = getOAuthUserInfo(social, code);
+        User user = userService.update(oAuthUserInfo);
+        return jwtService.createToken(user);
+    }
+
+    public OAuthUserRequest getOAuthUserInfo(String social, String code) throws JsonProcessingException {
+        ClientRegistration clientRegistration = inMemoryRepository.findByRegistrationId(social);
         OAuthTokenRequest oAuth2Token = getOAuthToken(clientRegistration, code);
-        return  jwtService.createToken(getUserEntity(social, oAuth2Token, clientRegistration));
+        Map<String, Object> oAuthAttributes = getOAuthAttributes(clientRegistration, oAuth2Token);
+
+        return OAuthUserFactory.getOAuthUser(social, oAuthAttributes);
     }
 
     private OAuthTokenRequest getOAuthToken(ClientRegistration type, String authorizationCode) throws JsonProcessingException {
@@ -58,10 +71,6 @@ public class OAuthService {
         formData.add("client_secret", type.getClientSecret());
         formData.add("client_id", type.getClientId());
         return formData;
-    }
-
-    private User getUserEntity(String social, OAuthTokenRequest token, ClientRegistration type) throws JsonProcessingException {
-        return userService.saveOrUpdate(OAuthUserFactory.getOAuthUser(social, getOAuthAttributes(type, token)));
     }
 
     private Map<String, Object> getOAuthAttributes(ClientRegistration type, OAuthTokenRequest token) throws JsonProcessingException {
