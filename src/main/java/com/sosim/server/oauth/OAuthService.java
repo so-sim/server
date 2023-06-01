@@ -37,13 +37,13 @@ public class OAuthService {
     public JwtResponse signUp(String social, String code) throws JsonProcessingException {
         OAuthUserRequest oAuthUserInfo = getOAuthUserInfo(social, code);
         User user = userService.save(oAuthUserInfo);
-        return jwtService.createToken(user);
+        return jwtService.createToken(user.getId());
     }
 
     public JwtResponse login(String social, String code) throws JsonProcessingException {
         OAuthUserRequest oAuthUserInfo = getOAuthUserInfo(social, code);
         User user = userService.update(oAuthUserInfo);
-        return jwtService.createToken(user);
+        return jwtService.createToken(user.getId());
     }
 
     public OAuthUserRequest getOAuthUserInfo(String social, String code) throws JsonProcessingException {

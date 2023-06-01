@@ -1,6 +1,5 @@
 package com.sosim.server.jwt.util;
 
-import com.sosim.server.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -35,9 +34,9 @@ public class JwtFactory {
         encodeRefreshKey = Base64.getEncoder().encodeToString(refreshKey.getBytes());
     }
 
-    public String createAccessToken(User user){
+    public String createAccessToken(Long userId){
 
-        Claims claims = Jwts.claims().setSubject(user.getId().toString());
+        Claims claims = Jwts.claims().setSubject(userId.toString());
 
         Date now = new Date();
 

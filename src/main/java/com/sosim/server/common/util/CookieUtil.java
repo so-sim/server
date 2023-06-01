@@ -1,9 +1,13 @@
 package com.sosim.server.common.util;
 
+import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.response.ResponseCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component
@@ -29,5 +33,15 @@ public class CookieUtil {
                 .build();
 
         response.addHeader(SET_COOKIE, cookie.toString());
+    }
+
+    public static String getRefreshToken(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(REFRESH_HEADER)) {
+                return cookie.getValue();
+            }
+        }
+        throw new CustomException(ResponseCode.NOT_EXIST_TOKEN_COOKIE);
     }
 }
