@@ -24,6 +24,10 @@ public class JwtService {
     }
 
     public JwtResponse refresh(String refreshToken) {
+        if (refreshToken == null) {
+            throw new CustomException(ResponseCode.NOT_EXIST_TOKEN_COOKIE);
+        }
+
         RefreshToken refreshTokenEntity = getRefreshTokenEntity(refreshToken);
 
         if (jwtProvider.checkRenewRefreshToken(refreshToken, 3L)) {
@@ -31,6 +35,11 @@ public class JwtService {
         }
 
         return JwtResponse.create(jwtFactory.createAccessToken(refreshTokenEntity.getUserId()), refreshToken);
+    }
+
+    public void delete(String refreshToken) {
+        if (refreshToken == null) return;
+        jwtRepository.deleteById(getRefreshTokenEntity(refreshToken).getUserId());
     }
 
     private RefreshToken getRefreshTokenEntity(String refreshToken) {
