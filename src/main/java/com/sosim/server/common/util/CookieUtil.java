@@ -24,15 +24,11 @@ public class CookieUtil {
     }
 
     public static void setCookieRefreshToken(HttpServletResponse response, String refreshToken) {
-        ResponseCookie cookie = ResponseCookie.from(REFRESH_HEADER, refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
-                .maxAge(refreshExpiration / 1000)
-                .path("/")
-                .build();
+        setCookie(refreshToken, refreshExpiration / 1000, response);
+    }
 
-        response.addHeader(SET_COOKIE, cookie.toString());
+    public static void deleteRefreshToken(HttpServletResponse response) {
+        setCookie("", 0, response);
     }
 
     public static String getRefreshToken(HttpServletRequest request) {
@@ -42,6 +38,18 @@ public class CookieUtil {
                 return cookie.getValue();
             }
         }
-        throw new CustomException(ResponseCode.NOT_EXIST_TOKEN_COOKIE);
+        return null;
+    }
+
+    private static void setCookie(String value, long maxAge, HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from(REFRESH_HEADER, value)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .maxAge(maxAge)
+                .path("/")
+                .build();
+
+        response.addHeader(SET_COOKIE, cookie.toString());
     }
 }
