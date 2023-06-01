@@ -42,6 +42,6 @@ public class CookieUtil {
                 return cookie.getValue();
             }
         }
-        throw new CustomException(ResponseCode.NOT_EXIST_TOKEN_COOKIE);
+        return null;
     }
 }
