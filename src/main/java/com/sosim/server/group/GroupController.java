@@ -96,6 +96,17 @@ public class GroupController {
         return new ResponseEntity<>(Response.create(intoGroup, null), intoGroup.getHttpStatus());
     }
 
+    @PatchMapping("/group/{groupId}/admin")
+    public ResponseEntity<?> modifyAdmin(@AuthenticationPrincipal AuthUser authUser,
+                                         @PathVariable("groupId") Long groupId,
+                                         @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
+
+        groupService.modifyAdmin(authUser.getId(), groupId, participantNicknameRequest);
+        ResponseCode modifyGroupAdmin = ResponseCode.MODIFY_GROUP_ADMIN;
+
+        return new ResponseEntity<>(Response.create(modifyGroupAdmin, null), modifyGroupAdmin.getHttpStatus());
+    }
+
     private void bindingError(BindingResult bindingResult) {
         throw new CustomException(ResponseCode.BINDING_ERROR, bindingResult.getFieldError().getField(),
                 bindingResult.getFieldError().getDefaultMessage());
