@@ -4,6 +4,7 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.Group;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
+import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,10 @@ public class ParticipantService {
         Participant participantEntity = getParticipantEntity(user, group);
         participantEntity.modifyNickname(participantNicknameRequest);
         return participantEntity;
+    }
+
+    public GetNicknameResponse getMyNickname(User user, Group group) {
+        return GetNicknameResponse.create(getParticipantEntity(user, group));
     }
 
     public void saveParticipantEntity(Participant participant) {
