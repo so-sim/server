@@ -25,7 +25,7 @@ public class GetGroupResponse {
     private String adminNickname;
 
     @JsonProperty("isAdmin")
-    private boolean isAdmin;
+    private Boolean isAdmin;
 
     @JsonProperty("size")
     private int size;
