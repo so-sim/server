@@ -43,8 +43,7 @@ public class GroupService {
 
         try {
             if (userId != 0) {
-                isInto = participantService.getParticipantEntity(
-                        userService.getUserEntity(userId), groupEntity) != null;
+                isInto = participantService.getParticipantEntity(userId, groupId) != null;
             }
         } catch (CustomException ignored) {}
 
@@ -63,7 +62,7 @@ public class GroupService {
 
         if (!groupEntity.getAdminId().equals(userId)) {
             String nickname = participantService.getParticipantEntity(
-                    userService.getUserEntity(userId), groupEntity).getNickname();
+                    userId, groupId).getNickname();
             Collections.swap(nicknameList, 0, nicknameList.indexOf(nickname));
         }
         Collections.sort(nicknameList.subList(1, nicknameList.size()));
@@ -95,11 +94,11 @@ public class GroupService {
             throw new CustomException(ResponseCode.NONE_ZERO_PARTICIPANT);
         }
 
-        participantService.deleteParticipant(userService.getUserEntity(userId), groupEntity);
+        participantService.deleteParticipant(userId, groupId);
         groupEntity.delete();
     }
 
-    public void intoGroup(Long userId, Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
+    public void intoGroup(Long userId,Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
         participantService.creteParticipant(userService.getUserEntity(userId), getGroupEntity(groupId),
                 participantNicknameRequest.getNickname());
     }
