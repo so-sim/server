@@ -51,7 +51,7 @@ public class ParticipantService {
         participantRepository.save(participant);
     }
 
-    private Participant getParticipantEntity(User user, Group group) {
+    public Participant getParticipantEntity(User user, Group group) {
         return participantRepository.findByUserAndGroup(user, group)
                 .orElseThrow(() -> new CustomException(ResponseCode.NONE_PARTICIPANT));
     }
