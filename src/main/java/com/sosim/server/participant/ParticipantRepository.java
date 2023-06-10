@@ -4,7 +4,10 @@ import com.sosim.server.user.User;
 import com.sosim.server.group.Group;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
     boolean existsByUserAndGroup(User user, Group group);
     boolean existsByGroupAndNickname(Group group, String nickname);
+    Optional<Participant> findByUserAndGroup(User user, Group group);
 }
