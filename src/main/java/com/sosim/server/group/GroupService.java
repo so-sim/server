@@ -82,6 +82,22 @@ public class GroupService {
         return GroupIdResponse.create(groupEntity);
     }
 
+    public void deleteGroup(Long userId, Long groupId) {
+        Group groupEntity = getGroupEntity(groupId);
+
+        if (!groupEntity.getAdminId().equals(userId)) {
+            throw new CustomException(ResponseCode.NONE_ADMIN);
+        }
+
+        if (groupEntity.getParticipantList().stream()
+                .filter(p -> p.getStatus().equals(Status.ACTIVE)).count() > 1) {
+            throw new CustomException(ResponseCode.NONE_ZERO_PARTICIPANT);
+        }
+
+        participantService.deleteParticipant(userService.getUserEntity(userId), groupEntity);
+        groupEntity.delete();
+    }
+
     public Group saveGroupEntity(Group group) {
         return groupRepository.save(group);
     }
