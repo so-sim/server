@@ -103,6 +103,24 @@ public class GroupService {
                 participantNicknameRequest.getNickname());
     }
 
+    public void modifyAdmin(Long userId, Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
+        Group groupEntity = getGroupEntity(groupId);
+
+        if (!groupEntity.getAdminId().equals(userId)) {
+            throw new CustomException(ResponseCode.NONE_ADMIN);
+        }
+
+        Participant participantEntity = participantService
+                .getParticipantEntity(participantNicknameRequest.getNickname(), groupId);
+
+        if (groupEntity.getParticipantList().stream()
+                .noneMatch(p -> p.getId().equals(participantEntity.getId()))) {
+            throw new CustomException(ResponseCode.NONE_PARTICIPANT);
+        }
+
+        groupEntity.modifyAdmin(participantEntity);
+    }
+
     public Group saveGroupEntity(Group group) {
         return groupRepository.save(group);
     }

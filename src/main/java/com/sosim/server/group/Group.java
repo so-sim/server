@@ -66,4 +66,9 @@ public class Group extends BaseTimeEntity {
         this.groupType = updateGroupRequest.getGroupType();
         this.coverColor = updateGroupRequest.getCoverColorType();
     }
+
+    public void modifyAdmin(Participant participant) {
+        adminId = participant.getUser().getId();
+        adminNickname = participant.getNickname();
+    }
 }
