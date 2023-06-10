@@ -1,6 +1,7 @@
 package com.sosim.server.participant;
 
 import com.sosim.server.common.auditing.BaseTimeEntity;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.Group;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.user.User;
@@ -37,6 +38,7 @@ public class Participant extends BaseTimeEntity {
         this.user = user;
         this.group = group;
         this.nickname = nickname;
+        status = Status.ACTIVE;
     }
 
     public static Participant create(User user, Group group, String nickname) {

@@ -1,6 +1,7 @@
 package com.sosim.server.user;
 
 import com.sosim.server.common.auditing.BaseTimeEntity;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.oauth.Social;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import lombok.AccessLevel;
@@ -31,6 +32,7 @@ public class User extends BaseTimeEntity {
         this.email = email;
         this.social = social;
         this.socialId = socialId;
+        status = Status.ACTIVE;
     }
 
     public static User create(OAuthUserRequest oAuthUserRequest) {

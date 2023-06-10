@@ -1,6 +1,7 @@
 package com.sosim.server.group;
 
 import com.sosim.server.common.auditing.BaseTimeEntity;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.participant.Participant;
 import lombok.AccessLevel;
@@ -46,6 +47,7 @@ public class Group extends BaseTimeEntity {
         this.adminNickname = adminNickname;
         this.coverColor = coverColor;
         this.groupType = groupType;
+        status = Status.ACTIVE;
     }
 
     public static Group create(Long adminId, CreateGroupRequest createGroupRequest) {
