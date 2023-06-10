@@ -1,5 +1,6 @@
 package com.sosim.server.participant;
 
+import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.group.Group;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.user.User;
@@ -14,7 +15,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @Table(name = "PARTICIPANT")
-public class Participant {
+public class Participant extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PARTICIPANT_ID")

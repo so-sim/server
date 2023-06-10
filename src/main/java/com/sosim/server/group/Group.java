@@ -1,5 +1,6 @@
 package com.sosim.server.group;
 
+import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @Table(name = "GROUP")
-public class Group {
+public class Group extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "GROUP_ID")

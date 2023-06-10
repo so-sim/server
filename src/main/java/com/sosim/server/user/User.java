@@ -1,5 +1,6 @@
 package com.sosim.server.user;
 
+import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.oauth.Social;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import lombok.AccessLevel;
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @Table(name = "USER")
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
