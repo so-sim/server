@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Getter
 @Entity
-@Table(name = "USER")
+@Getter
 @NoArgsConstructor
+@Table(name = "USER")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
