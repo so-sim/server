@@ -32,7 +32,7 @@ public class UserService {
         return user;
     }
 
-    public User getUser(Long id) {
+    public User getUserEntity(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_USER));
     }
 }
