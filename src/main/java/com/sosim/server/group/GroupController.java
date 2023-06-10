@@ -4,7 +4,8 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
-import com.sosim.server.group.dto.response.CreateGroupResponse;
+import com.sosim.server.group.dto.request.UpdateGroupRequest;
+import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.security.AuthUser;
@@ -27,14 +28,13 @@ public class GroupController {
                                          @Validated @RequestBody CreateGroupRequest createGroupRequest,
                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new CustomException(ResponseCode.BINDING_ERROR, bindingResult.getFieldError().getField(),
-                    bindingResult.getFieldError().getDefaultMessage());
+            bindingError(bindingResult);
         }
 
-        CreateGroupResponse createGroupResponse = groupService.createGroup(authUser.getId(), createGroupRequest);
+        GroupIdResponse groupIdResponse = groupService.createGroup(authUser.getId(), createGroupRequest);
         ResponseCode createGroup = ResponseCode.CREATE_GROUP;
 
-        return new ResponseEntity<>(Response.create(createGroup, createGroupResponse), createGroup.getHttpStatus());
+        return new ResponseEntity<>(Response.create(createGroup, groupIdResponse), createGroup.getHttpStatus());
     }
 
     @GetMapping("/group/{groupId}")
@@ -54,5 +54,25 @@ public class GroupController {
         ResponseCode getParticipants = ResponseCode.GET_PARTICIPANTS;
 
         return new ResponseEntity<>(Response.create(getParticipants, getGroupParticipants), getParticipants.getHttpStatus());
+    }
+
+    @PatchMapping("/group/{groupId}")
+    public ResponseEntity<?> modifyGroup(@AuthenticationPrincipal AuthUser authUser,
+                                         @PathVariable("groupId") Long groupId,
+                                         @Validated @RequestBody UpdateGroupRequest updateGroupRequest,
+                                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            bindingError(bindingResult);
+        }
+
+        GroupIdResponse groupIdResponse = groupService.updateGroup(authUser.getId(), groupId, updateGroupRequest);
+        ResponseCode modifyGroup = ResponseCode.MODIFY_GROUP;
+
+        return new ResponseEntity<>(Response.create(modifyGroup, groupIdResponse), modifyGroup.getHttpStatus());
+    }
+
+    private void bindingError(BindingResult bindingResult) {
+        throw new CustomException(ResponseCode.BINDING_ERROR, bindingResult.getFieldError().getField(),
+                bindingResult.getFieldError().getDefaultMessage());
     }
 }
