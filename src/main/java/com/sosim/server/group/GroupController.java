@@ -116,6 +116,16 @@ public class GroupController {
         return new ResponseEntity<>(Response.create(withdrawGroup, null), withdrawGroup.getHttpStatus());
     }
 
+    @PatchMapping("/group/{groupId}/participant")
+    public ResponseEntity<?> modifyNickname(@AuthenticationPrincipal AuthUser authUser,
+                                            @PathVariable ("groupId") Long groupId,
+                                            @Validated @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
+        groupService.modifyNickname(authUser.getId(), groupId, participantNicknameRequest);
+        ResponseCode modifyNickname = ResponseCode.MODIFY_NICKNAME;
+
+        return new ResponseEntity<>(Response.create(modifyNickname, null), modifyNickname.getHttpStatus());
+    }
+
     private void bindingError(BindingResult bindingResult) {
         throw new CustomException(ResponseCode.BINDING_ERROR, bindingResult.getFieldError().getField(),
                 bindingResult.getFieldError().getDefaultMessage());
