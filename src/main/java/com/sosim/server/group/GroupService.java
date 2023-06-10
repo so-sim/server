@@ -121,6 +121,14 @@ public class GroupService {
         groupEntity.modifyAdmin(participantEntity);
     }
 
+    public void withdrawGroup(Long userId, Long groupId) {
+        Group groupEntity = getGroupEntity(groupId);
+        participantService.deleteParticipant(userId, groupId);
+        if (groupEntity.getParticipantList().stream().noneMatch(p -> p.getStatus().equals(Status.ACTIVE))) {
+            groupEntity.delete();
+        }
+    }
+
     public Group saveGroupEntity(Group group) {
         return groupRepository.save(group);
     }
