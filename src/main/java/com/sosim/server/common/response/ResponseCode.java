@@ -20,14 +20,16 @@ public enum ResponseCode {
     NOT_EXIST_TOKEN_COOKIE(1200, HttpStatus.BAD_REQUEST, "리프레시 토큰이 존재하지 않습니다."),
 
     NOT_FOUND_USER(1100, HttpStatus.BAD_REQUEST, "존재하지 않는 회원 정보입니다."),
-    USER_ALREADY_EXIST(1101, HttpStatus.BAD_REQUEST, "이미 존재하는 회원 정보입니다.");
+    USER_ALREADY_EXIST(1101, HttpStatus.BAD_REQUEST, "이미 존재하는 회원 정보입니다."),
 
+    ALREADY_USE_NICKNAME(1004, HttpStatus.BAD_REQUEST, "모임에서 이미 사용중인 닉네임입니다."),
+    ALREADY_INTO_GROUP(1006, HttpStatus.BAD_REQUEST, "이미 참여중인 모임입니다.");
 
     private int code;
     private HttpStatus httpStatus;
     private String message;
 
     private static int successCode() {
-        return 1000;
+        return 900;
     }
 }
