@@ -5,16 +5,14 @@ import com.sosim.server.common.response.Response;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.response.CreateGroupResponse;
+import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,5 +34,15 @@ public class GroupController {
         ResponseCode createGroup = ResponseCode.CREATE_GROUP;
 
         return new ResponseEntity<>(Response.create(createGroup, createGroupResponse), createGroup.getHttpStatus());
+    }
+
+    @GetMapping("/group/{groupId}")
+    public ResponseEntity<?> getGroup(@AuthenticationPrincipal AuthUser authUser,
+                                      @PathVariable("groupId") Long groupId) {
+        GetGroupResponse getGroupResponse = groupService.getGroup(
+                authUser != null ? authUser.getId() : 0, groupId);
+        ResponseCode getGroup = ResponseCode.GET_GROUP;
+
+        return new ResponseEntity<>(Response.create(getGroup, getGroupResponse), getGroup.getHttpStatus());
     }
 }
