@@ -3,9 +3,11 @@ package com.sosim.server.participant;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.Group;
+import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,17 @@ public class ParticipantService {
         }
 
         saveParticipantEntity(Participant.create(userEntity, groupEntity, nickname));
+    }
+
+    @Transactional
+    public Participant modifyNickname(User user, Group group, ParticipantNicknameRequest participantNicknameRequest) {
+        if (participantRepository.existsByGroupAndNickname(group, participantNicknameRequest.getNickname())) {
+            throw new CustomException(ResponseCode.ALREADY_USE_NICKNAME);
+        }
+
+        Participant participantEntity = getParticipantEntity(user, group);
+        participantEntity.modifyNickname(participantNicknameRequest);
+        return participantEntity;
     }
 
     public void saveParticipantEntity(Participant participant) {

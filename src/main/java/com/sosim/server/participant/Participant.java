@@ -1,6 +1,7 @@
 package com.sosim.server.participant;
 
 import com.sosim.server.group.Group;
+import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -43,5 +44,9 @@ public class Participant {
                 .group(group)
                 .nickname(nickname)
                 .build();
+    }
+
+    public void modifyNickname(ParticipantNicknameRequest participantNicknameRequest) {
+        this.nickname = participantNicknameRequest.getNickname();
     }
 }
