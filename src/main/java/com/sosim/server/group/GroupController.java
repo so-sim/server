@@ -6,6 +6,7 @@ import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.response.CreateGroupResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
+import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -44,5 +45,14 @@ public class GroupController {
         ResponseCode getGroup = ResponseCode.GET_GROUP;
 
         return new ResponseEntity<>(Response.create(getGroup, getGroupResponse), getGroup.getHttpStatus());
+    }
+
+    @GetMapping("/group/{groupId}/participants")
+    public ResponseEntity<?> getGroupParticipants(@AuthenticationPrincipal AuthUser authUser,
+                                                  @PathVariable("groupId") Long groupId) {
+        GetParticipantListResponse getGroupParticipants = groupService.getGroupParticipants(authUser.getId(), groupId);
+        ResponseCode getParticipants = ResponseCode.GET_PARTICIPANTS;
+
+        return new ResponseEntity<>(Response.create(getParticipants, getGroupParticipants), getParticipants.getHttpStatus());
     }
 }
