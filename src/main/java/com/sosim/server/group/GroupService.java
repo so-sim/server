@@ -9,6 +9,7 @@ import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantService;
+import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserService;
@@ -96,6 +97,11 @@ public class GroupService {
 
         participantService.deleteParticipant(userService.getUserEntity(userId), groupEntity);
         groupEntity.delete();
+    }
+
+    public void intoGroup(Long userId, Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
+        participantService.creteParticipant(userService.getUserEntity(userId), getGroupEntity(groupId),
+                participantNicknameRequest.getNickname());
     }
 
     public Group saveGroupEntity(Group group) {

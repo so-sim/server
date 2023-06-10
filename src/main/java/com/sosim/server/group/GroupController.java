@@ -7,6 +7,7 @@ import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.UpdateGroupRequest;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
+import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.security.AuthUser;
 import lombok.RequiredArgsConstructor;
@@ -78,6 +79,21 @@ public class GroupController {
         ResponseCode deleteGroup = ResponseCode.DELETE_GROUP;
 
         return new ResponseEntity<>(Response.create(deleteGroup, null), deleteGroup.getHttpStatus());
+    }
+
+    @PostMapping("/group/{groupId}/participant")
+    public ResponseEntity<?> intoGroup(@AuthenticationPrincipal AuthUser authUser,
+                                       @PathVariable("groupId") Long groupId,
+                                       @Validated @RequestBody ParticipantNicknameRequest participantNicknameRequest,
+                                       BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            bindingError(bindingResult);
+        }
+
+        groupService.intoGroup(authUser.getId(), groupId, participantNicknameRequest);
+        ResponseCode intoGroup = ResponseCode.INTO_GROUP;
+
+        return new ResponseEntity<>(Response.create(intoGroup, null), intoGroup.getHttpStatus());
     }
 
     private void bindingError(BindingResult bindingResult) {
