@@ -19,7 +19,8 @@ public enum ResponseCode {
     MODIFY_GROUP(successCode(), HttpStatus.OK, "모임이 성공적으로 수정되었습니다."),
     DELETE_GROUP(successCode(), HttpStatus.OK, "모임이 성공적으로 삭제되었습니다."),
     INTO_GROUP(successCode(), HttpStatus.CREATED, "모임에 성공적으로 참가되었습니다."),
-    MODIFY_GROUP_ADMIN(successCode(), HttpStatus.OK, "모임이 성공적으로 수정되었습니다."),
+    MODIFY_GROUP_ADMIN(successCode(), HttpStatus.OK, "관리자가 성공적으로 변경되었습니다."),
+    WITHDRAW_GROUP(successCode(), HttpStatus.OK, "성공적으로 모임에서 탈퇴되었습니다."),
 
     BINDING_ERROR(2000, HttpStatus.BAD_REQUEST, "입력값 중 검증에 실패한 값이 있습니다"),
 

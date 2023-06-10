@@ -107,6 +107,15 @@ public class GroupController {
         return new ResponseEntity<>(Response.create(modifyGroupAdmin, null), modifyGroupAdmin.getHttpStatus());
     }
 
+    @DeleteMapping("/group/{groupId}/participant")
+    public ResponseEntity<?> withdrawGroup(@AuthenticationPrincipal AuthUser authUser,
+                                           @PathVariable("groupId") Long groupId) {
+        groupService.withdrawGroup(authUser.getId(), groupId);
+        ResponseCode withdrawGroup = ResponseCode.WITHDRAW_GROUP;
+
+        return new ResponseEntity<>(Response.create(withdrawGroup, null), withdrawGroup.getHttpStatus());
+    }
+
     private void bindingError(BindingResult bindingResult) {
         throw new CustomException(ResponseCode.BINDING_ERROR, bindingResult.getFieldError().getField(),
                 bindingResult.getFieldError().getDefaultMessage());
