@@ -1,5 +1,8 @@
 package com.sosim.server.group;
 
+import com.sosim.server.group.dto.request.CreateGroupRequest;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +19,7 @@ public class Group {
     private Long id;
 
     @Column(name = "TITLE")
-    private Long title;
+    private String title;
 
     @Column(name = "ADMIN_ID")
     private Long adminId;
@@ -29,4 +32,23 @@ public class Group {
 
     @Column(name = "GROUP_TYPE")
     private String groupType;
+
+    @Builder(access = AccessLevel.PRIVATE)
+    private Group(String title, Long adminId, String adminNickname, String coverColor, String groupType) {
+        this.title = title;
+        this.adminId = adminId;
+        this.adminNickname = adminNickname;
+        this.coverColor = coverColor;
+        this.groupType = groupType;
+    }
+
+    public static Group create(Long adminId, CreateGroupRequest createGroupRequest) {
+        return Group.builder()
+                .title(createGroupRequest.getTitle())
+                .adminId(adminId)
+                .adminNickname(createGroupRequest.getNickname())
+                .groupType(createGroupRequest.getGroupType())
+                .coverColor(createGroupRequest.getCoverColor())
+                .build();
+    }
 }
