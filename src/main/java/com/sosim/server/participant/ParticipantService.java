@@ -28,6 +28,10 @@ public class ParticipantService {
         saveParticipantEntity(Participant.create(userEntity, groupEntity, nickname));
     }
 
+    public void deleteParticipant(User user, Group group) {
+        getParticipantEntity(user, group).delete();
+    }
+
     @Transactional
     public Participant modifyNickname(User user, Group group, ParticipantNicknameRequest participantNicknameRequest) {
         if (participantRepository.existsByGroupAndNickname(group, participantNicknameRequest.getNickname())) {
