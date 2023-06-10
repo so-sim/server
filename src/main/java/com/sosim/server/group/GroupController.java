@@ -71,6 +71,15 @@ public class GroupController {
         return new ResponseEntity<>(Response.create(modifyGroup, groupIdResponse), modifyGroup.getHttpStatus());
     }
 
+    @DeleteMapping("/group/{groupId}")
+    public ResponseEntity<?> deleteGroup(@AuthenticationPrincipal AuthUser authUser,
+                                         @PathVariable("groupId") Long groupId) {
+        groupService.deleteGroup(authUser.getId(), groupId);
+        ResponseCode deleteGroup = ResponseCode.DELETE_GROUP;
+
+        return new ResponseEntity<>(Response.create(deleteGroup, null), deleteGroup.getHttpStatus());
+    }
+
     private void bindingError(BindingResult bindingResult) {
         throw new CustomException(ResponseCode.BINDING_ERROR, bindingResult.getFieldError().getField(),
                 bindingResult.getFieldError().getDefaultMessage());
