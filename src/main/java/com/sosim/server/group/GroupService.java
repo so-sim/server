@@ -79,6 +79,10 @@ public class GroupService {
         }
         groupEntity.update(updateGroupRequest);
 
+        if (updateGroupRequest.getNickname() != null) {
+            modifyNickname(userId, groupId, new ParticipantNicknameRequest(updateGroupRequest.getNickname()));
+        }
+
         return GroupIdResponse.create(groupEntity);
     }
 
@@ -126,6 +130,15 @@ public class GroupService {
         participantService.deleteParticipant(userId, groupId);
         if (groupEntity.getParticipantList().stream().noneMatch(p -> p.getStatus().equals(Status.ACTIVE))) {
             groupEntity.delete();
+        }
+    }
+
+    public void modifyNickname(Long userId, Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
+        Group groupEntity = getGroupEntity(groupId);
+        Participant participant = participantService.modifyNickname(userId, groupId, participantNicknameRequest);
+
+        if (groupEntity.getAdminId().equals(userId)) {
+            groupEntity.modifyAdmin(participant);
         }
     }
 
