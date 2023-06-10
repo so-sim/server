@@ -4,7 +4,8 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
-import com.sosim.server.group.dto.response.CreateGroupResponse;
+import com.sosim.server.group.dto.request.UpdateGroupRequest;
+import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantService;
@@ -13,6 +14,7 @@ import com.sosim.server.user.User;
 import com.sosim.server.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,12 +28,12 @@ public class GroupService {
     private final UserService userService;
     private final ParticipantService participantService;
 
-    public CreateGroupResponse createGroup(Long userId, CreateGroupRequest createGroupRequest) {
+    public GroupIdResponse createGroup(Long userId, CreateGroupRequest createGroupRequest) {
         User userEntity = userService.getUserEntity(userId);
         Group groupEntity = saveGroupEntity(Group.create(userId, createGroupRequest));
         participantService.creteParticipant(userEntity, groupEntity, createGroupRequest.getNickname());
 
-        return CreateGroupResponse.create(groupEntity);
+        return GroupIdResponse.create(groupEntity);
     }
 
     public GetGroupResponse getGroup(Long userId, Long groupId) {
@@ -66,6 +68,18 @@ public class GroupService {
         Collections.sort(nicknameList.subList(1, nicknameList.size()));
 
         return GetParticipantListResponse.create(groupEntity, nicknameList);
+    }
+
+    @Transactional
+    public GroupIdResponse updateGroup(Long userId, Long groupId, UpdateGroupRequest updateGroupRequest) {
+        Group groupEntity = getGroupEntity(groupId);
+
+        if (!groupEntity.getAdminId().equals(userId)) {
+            throw new CustomException(ResponseCode.NONE_ADMIN);
+        }
+        groupEntity.update(updateGroupRequest);
+
+        return GroupIdResponse.create(groupEntity);
     }
 
     public Group saveGroupEntity(Group group) {
