@@ -8,12 +8,12 @@ import lombok.Getter;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
-public class CreateGroupResponse {
+public class GroupIdResponse {
     @JsonProperty("groupId")
     private Long groupId;
 
-    public static CreateGroupResponse create(Group group) {
-        return CreateGroupResponse.builder()
+    public static GroupIdResponse create(Group group) {
+        return GroupIdResponse.builder()
                 .groupId(group.getId())
                 .build();
     }
