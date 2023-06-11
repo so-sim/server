@@ -5,6 +5,7 @@ import com.sosim.server.common.response.Response;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.UpdateGroupRequest;
+import com.sosim.server.group.dto.response.GetGroupListResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
@@ -124,6 +125,19 @@ public class GroupController {
         ResponseCode modifyNickname = ResponseCode.MODIFY_NICKNAME;
 
         return new ResponseEntity<>(Response.create(modifyNickname, null), modifyNickname.getHttpStatus());
+    }
+
+    @GetMapping("/groups")
+    public ResponseEntity<?> getMyGroups(@AuthenticationPrincipal AuthUser authUser,
+                                         @RequestParam("index") Long index) {
+        if (index == null) {
+            throw new CustomException(ResponseCode.BINDING_ERROR);
+        }
+
+        GetGroupListResponse groupList = groupService.getMyGroups(index, authUser.getId());
+        ResponseCode getGroups = ResponseCode.GET_GROUPS;
+
+        return new ResponseEntity<>(Response.create(getGroups, groupList), getGroups.getHttpStatus());
     }
 
     private void bindingError(BindingResult bindingResult) {
