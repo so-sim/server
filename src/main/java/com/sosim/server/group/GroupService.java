@@ -69,7 +69,10 @@ public class GroupService {
                     userId, groupId).getNickname();
             Collections.swap(nicknameList, 0, nicknameList.indexOf(nickname));
         }
-        Collections.sort(nicknameList.subList(1, nicknameList.size()));
+
+        if (nicknameList.size() > 0) {
+            Collections.sort(nicknameList.subList(1, nicknameList.size()));
+        }
 
         return GetParticipantListResponse.create(groupEntity, nicknameList);
     }
@@ -90,6 +93,7 @@ public class GroupService {
         return GroupIdResponse.create(groupEntity);
     }
 
+    @Transactional
     public void deleteGroup(Long userId, Long groupId) {
         Group groupEntity = getGroupEntity(groupId);
 
@@ -111,6 +115,7 @@ public class GroupService {
                 participantNicknameRequest.getNickname());
     }
 
+    @Transactional
     public void modifyAdmin(Long userId, Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
         Group groupEntity = getGroupEntity(groupId);
 
@@ -129,6 +134,7 @@ public class GroupService {
         groupEntity.modifyAdmin(participantEntity);
     }
 
+    @Transactional
     public void withdrawGroup(Long userId, Long groupId) {
         Group groupEntity = getGroupEntity(groupId);
         participantService.deleteParticipant(userId, groupId);

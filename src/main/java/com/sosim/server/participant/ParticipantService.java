@@ -1,6 +1,7 @@
 package com.sosim.server.participant;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.Group;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
@@ -19,24 +20,26 @@ public class ParticipantService {
     private final ParticipantRepository participantRepository;
 
     public void creteParticipant(User user, Group group, String nickname) {
-        if (participantRepository.existsByUserIdAndGroupId(user.getId(), group.getId())) {
+        if (participantRepository.existsByUserIdAndGroupIdAndStatus(user.getId(), group.getId(), Status.ACTIVE)) {
             throw new CustomException(ResponseCode.ALREADY_INTO_GROUP);
         }
 
-        if (participantRepository.existsByGroupIdAndNickname(group.getId(), nickname)) {
+        if (participantRepository.existsByGroupIdAndNicknameAndStatus(group.getId(), nickname, Status.ACTIVE)) {
             throw new CustomException(ResponseCode.ALREADY_USE_NICKNAME);
         }
 
         saveParticipantEntity(Participant.create(user, group, nickname));
     }
 
+    @Transactional
     public void deleteParticipant(Long userId, Long groupId) {
         getParticipantEntity(userId, groupId).delete();
     }
 
     @Transactional
     public Participant modifyNickname(Long userId, Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
-        if (participantRepository.existsByGroupIdAndNickname(groupId, participantNicknameRequest.getNickname())) {
+        if (participantRepository.existsByGroupIdAndNicknameAndStatus(groupId,
+                participantNicknameRequest.getNickname(), Status.ACTIVE)) {
             throw new CustomException(ResponseCode.ALREADY_USE_NICKNAME);
         }
 
