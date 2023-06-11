@@ -7,6 +7,8 @@ import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,5 +61,12 @@ public class ParticipantService {
     public Participant getParticipantEntity(String nickname, Long groupId) {
         return participantRepository.findByNicknameAndGroupId(nickname, groupId)
                 .orElseThrow(() -> new CustomException(ResponseCode.NONE_PARTICIPANT));
+    }
+
+    public Slice<Participant> getParticipantSlice(Long index, Long userId) {
+        if (index == 0) {
+            return participantRepository.findByUserIdOrderByIdDesc(userId, PageRequest.ofSize(17));
+        }
+        return participantRepository.findByIdLessThanAndUserIdOrderByIdDesc(index, userId, PageRequest.ofSize(18));
     }
 }
