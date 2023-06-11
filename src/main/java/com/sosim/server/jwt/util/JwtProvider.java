@@ -25,7 +25,7 @@ public class JwtProvider {
     }
 
     public Long getUserId(String accessToken) {
-        return Long.valueOf(getClaims(accessToken, accessToken).getSubject());
+        return Long.valueOf(getClaims(accessKey, accessToken).getSubject());
     }
 
     private Claims getClaims(String key, String token){

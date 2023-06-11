@@ -1,5 +1,7 @@
 package com.sosim.server.user;
 
+import com.sosim.server.common.auditing.BaseTimeEntity;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.oauth.Social;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import lombok.AccessLevel;
@@ -9,11 +11,11 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Getter
 @Entity
-@Table(name = "USER")
+@Getter
 @NoArgsConstructor
-public class User {
+@Table(name = "USER")
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,6 +32,7 @@ public class User {
         this.email = email;
         this.social = social;
         this.socialId = socialId;
+        status = Status.ACTIVE;
     }
 
     public static User create(OAuthUserRequest oAuthUserRequest) {

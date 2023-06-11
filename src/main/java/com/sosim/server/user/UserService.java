@@ -31,4 +31,8 @@ public class UserService {
         user.setEmail(oAuthUserRequest.getEmail());
         return user;
     }
+
+    public User getUserEntity(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_USER));
+    }
 }
