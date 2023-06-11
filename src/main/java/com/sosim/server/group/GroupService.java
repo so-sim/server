@@ -5,6 +5,7 @@ import com.sosim.server.common.auditing.Status;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.UpdateGroupRequest;
+import com.sosim.server.group.dto.response.GetGroupListResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.participant.Participant;
@@ -14,9 +15,11 @@ import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -140,6 +143,26 @@ public class GroupService {
         if (groupEntity.getAdminId().equals(userId)) {
             groupEntity.modifyAdmin(participant);
         }
+    }
+
+    public GetGroupListResponse getMyGroups(Long index, Long userId) {
+        Slice<Participant> slice = participantService.getParticipantSlice(index, userId);
+        List<Participant> participantList = slice.getContent();
+
+        if (participantList.isEmpty()) {
+            throw new CustomException(ResponseCode.NO_MORE_GROUP);
+        }
+
+        List<GetGroupResponse> groupList = new ArrayList<>();
+        for (Participant participant : participantList) {
+            Group group = participant.getGroup();
+            groupList.add(GetGroupResponse.create(group, group.getAdminId().equals(userId),
+                    (int) group.getParticipantList().stream()
+                            .filter(p -> p.getStatus().equals(Status.ACTIVE)).count(),true));
+        }
+
+        return GetGroupListResponse.create(participantList.get(participantList.size() - 1).getId(),
+                slice.hasNext(), groupList);
     }
 
     public Group saveGroupEntity(Group group) {
