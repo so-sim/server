@@ -6,6 +6,7 @@ import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.UpdateGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
+import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.security.WithMockCustomUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,8 +43,6 @@ class GroupControllerTest {
     WebApplicationContext was;
 
     ObjectMapper om;
-
-
 
     @BeforeEach
     public void init() {
@@ -448,6 +447,83 @@ class GroupControllerTest {
         //when
         String url = URI_PREFIX.concat(String.format("/%d", groupId));
         ResultActions resultActions = mvc.perform(delete(url));
+
+        //then
+        resultActions.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status.code").value(NONE_PARTICIPANT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NONE_PARTICIPANT.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("내 모임 조회 / 성공")
+    @Test
+    void get_my_groups() throws Exception {
+        //TODO: 리팩토링 후 작성
+    }
+
+    @WithMockCustomUser
+    @DisplayName("관리자 변경 / 성공")
+    @Test
+    void modify_admin() throws Exception {
+        //given
+        String nickname = "변경닉네임";
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d/admin", groupId));
+        ResultActions resultActions = mvc.perform(patch(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(request)));
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.status.code").value(MODIFY_GROUP_ADMIN.getCode()))
+                .andExpect(jsonPath("$.status.message").value(MODIFY_GROUP_ADMIN.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("관리자 변경 / 관리자가 아닌 유저의 요청인 경우")
+    @Test
+    void modify_admin_not_admin_user() throws Exception {
+        //given
+        String nickname = "변경닉네임";
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
+
+        CustomException e = new CustomException(NONE_ADMIN);
+        doThrow(e).when(groupService).modifyAdmin(userId, groupId, request);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d/admin", groupId));
+        ResultActions resultActions = mvc.perform(patch(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(request)));
+
+        //then
+        //TODO 403 Forbbiden 건의
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("관리자 변경 / 해당 유저의 참가 기록이 없는 경우")
+    @Test
+    void modify_admin_no_participant_data() throws Exception {
+        //given
+        String nickname = "변경닉네임";
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
+
+        CustomException e = new CustomException(NONE_PARTICIPANT);
+        doThrow(e).when(groupService).modifyAdmin(userId, groupId, request);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d/admin", groupId));
+        ResultActions resultActions = mvc.perform(patch(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(request)));
 
         //then
         resultActions.andExpect(status().isNotFound())
