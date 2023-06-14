@@ -379,6 +379,83 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$.content.field").value("coverColorType"));
     }
 
+    @WithMockCustomUser
+    @DisplayName("그룹 삭제 / 성공")
+    @Test
+    void delete_group() throws Exception {
+        //given
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d", groupId));
+        ResultActions resultActions = mvc.perform(delete(url));
+
+        //then
+        //TODO : 204로 변경 체크
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.status.code").value(DELETE_GROUP.getCode()))
+                .andExpect(jsonPath("$.status.message").value(DELETE_GROUP.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+
+        verify(groupService, times(1)).deleteGroup(userId, groupId);
+    }
+
+    @WithMockCustomUser
+    @DisplayName("그룹 삭제 / Admin이 아닌 경우")
+    @Test
+    void delete_group_not_admin() throws Exception {
+        //given
+        CustomException e = new CustomException(NONE_ADMIN);
+        doThrow(e).when(groupService).deleteGroup(userId, groupId);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d", groupId));
+        ResultActions resultActions = mvc.perform(delete(url));
+
+        //then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("그룹 삭제 / 그룹 인원이 1명 이상인 경우")
+    @Test
+    void delete_group_more_than_1_participants() throws Exception {
+        //given
+        CustomException e = new CustomException(NONE_ZERO_PARTICIPANT);
+        doThrow(e).when(groupService).deleteGroup(userId, groupId);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d", groupId));
+        ResultActions resultActions = mvc.perform(delete(url));
+
+        //then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status.code").value(NONE_ZERO_PARTICIPANT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NONE_ZERO_PARTICIPANT.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("그룹 삭제 / 해당 참가자가 없는 경우")
+    @Test
+    void delete_group_has_no_participant() throws Exception {
+        //given
+        CustomException e = new CustomException(NONE_PARTICIPANT);
+        doThrow(e).when(groupService).deleteGroup(userId, groupId);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d", groupId));
+        ResultActions resultActions = mvc.perform(delete(url));
+
+        //then
+        resultActions.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status.code").value(NONE_PARTICIPANT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NONE_PARTICIPANT.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
     //--- Private Method ---
 
     private UpdateGroupRequest makeUpdateRequest(String title, String nickname, String type, String color) {
@@ -390,7 +467,6 @@ class GroupControllerTest {
                 .build();
     }
 
-
     private GetGroupResponse makeGetGroupResponse() {
         return GetGroupResponse.builder()
                 .id(groupId)
@@ -398,6 +474,7 @@ class GroupControllerTest {
                 .isInto(true)
                 .build();
     }
+
     private CreateGroupRequest makeCreateRequest(String title, String nickname, String groupType, String color) {
         return CreateGroupRequest.builder()
                 .title(title)
