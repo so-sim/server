@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,9 +40,9 @@ public class Group extends BaseTimeEntity {
     private String groupType;
 
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
-    private List<Participant> participantList;
+    private List<Participant> participantList = new ArrayList<>();
 
-    @Builder(access = AccessLevel.PRIVATE)
+    @Builder(access = AccessLevel.PUBLIC)
     private Group(String title, Long adminId, String adminNickname, String coverColor, String groupType) {
         this.title = title;
         this.adminId = adminId;
