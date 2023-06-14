@@ -1,5 +1,6 @@
 package com.sosim.server.event;
 
+import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.group.Group;
 import com.sosim.server.user.User;
 import lombok.Builder;
@@ -51,5 +52,16 @@ public class Event {
         this.situation = situation;
         this.group = group;
         this.user = user;
+    }
+
+    public static Event create(Group group, User user, CreateEventRequest createEventRequest) {
+        return Event.builder()
+                .amount(createEventRequest.getAmount())
+                .ground(createEventRequest.getGround())
+                .memo(createEventRequest.getMemo())
+                .situation(createEventRequest.getSituation())
+                .group(group)
+                .user(user)
+                .build();
     }
 }
