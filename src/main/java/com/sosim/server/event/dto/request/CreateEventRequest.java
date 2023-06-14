@@ -1,5 +1,6 @@
 package com.sosim.server.event.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
@@ -13,6 +14,7 @@ public class CreateEventRequest {
     @JsonProperty("nickname")
     private String nickname;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
     @JsonProperty("date")
     private LocalDate date;
 
