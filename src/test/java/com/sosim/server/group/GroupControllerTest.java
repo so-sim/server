@@ -171,6 +171,29 @@ class GroupControllerTest {
     }
 
     @WithMockCustomUser
+    @DisplayName("그룹 생성 / User 없는 경우")
+    @Test
+    void create_group_no_user() throws Exception {
+        //given
+        CreateGroupRequest request = makeCreateRequest("그루비룸", "닉네임", "스터디", "색");
+        CustomException e = new CustomException(NOT_FOUND_USER);
+
+        doThrow(e).when(groupService).createGroup(userId, request);
+
+        //when
+        ResultActions resultActions = mvc.perform(post(URI_PREFIX)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(request)));
+
+        //then
+        //TODO : Status Not_Found 변경
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status.code").value(NOT_FOUND_USER.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NOT_FOUND_USER.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
     @DisplayName("그룹 조회 / 성공")
     @Test
     void get_group() throws Exception {
@@ -207,11 +230,14 @@ class GroupControllerTest {
         ResultActions resultActions = mvc.perform(get(url));
 
         //then
+        //TODO : Status Not_Found 변경
         resultActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
     }
+
+    //--- Private Method ---
 
     private GetGroupResponse makeGetGroupResponse() {
         return GetGroupResponse.builder()
@@ -220,9 +246,7 @@ class GroupControllerTest {
                 .isInto(true)
                 .build();
     }
-
-    //--- Private Method ---
-    private static CreateGroupRequest makeCreateRequest(String title, String nickname, String groupType, String color) {
+    private CreateGroupRequest makeCreateRequest(String title, String nickname, String groupType, String color) {
         return CreateGroupRequest.builder()
                 .title(title)
                 .nickname(nickname)
