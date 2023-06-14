@@ -35,6 +35,9 @@ public class Event {
     @Column(name = "SITUATION")
     private String situation;
 
+    @Column(name = "NICKNAME")
+    private String nickname;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "GROUP_ID")
     private Group group;
@@ -45,11 +48,12 @@ public class Event {
 
     @Builder
     private Event(LocalDate date, int amount, String ground, String memo, String situation,
-                  Group group, User user) {
+                  String nickname, Group group, User user) {
         this.amount = amount;
         this.ground = ground;
         this.memo = memo;
         this.situation = situation;
+        this.nickname = nickname;
         this.group = group;
         this.user = user;
     }
@@ -60,6 +64,7 @@ public class Event {
                 .ground(createEventRequest.getGround())
                 .memo(createEventRequest.getMemo())
                 .situation(createEventRequest.getSituation())
+                .nickname(createEventRequest.getNickname())
                 .group(group)
                 .user(user)
                 .build();
