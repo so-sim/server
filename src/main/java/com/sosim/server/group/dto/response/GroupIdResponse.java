@@ -2,12 +2,11 @@ package com.sosim.server.group.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sosim.server.group.Group;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 public class GroupIdResponse {
     @JsonProperty("groupId")
     private Long groupId;
