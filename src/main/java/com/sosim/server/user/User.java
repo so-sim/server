@@ -18,14 +18,21 @@ import javax.persistence.*;
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "USER_ID")
     private Long id;
 
+    @Column(name = "EMAIL")
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "SOCIAL")
     private Social social;
 
+    @Column(name = "SOCIAL_ID")
     private Long socialId;
+
+    @Column(name = "WITHDRAW_REASON")
+    private String withdrawReason;
 
     @Builder(access = AccessLevel.PRIVATE)
     private User(String email, Social social, Long socialId) {

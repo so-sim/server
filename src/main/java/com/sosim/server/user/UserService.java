@@ -1,17 +1,24 @@
 package com.sosim.server.user;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.common.response.ResponseCode;
+import com.sosim.server.group.Group;
+import com.sosim.server.group.GroupRepository;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
 
     public User save(OAuthUserRequest oAuthUserRequest) {
         if (userRepository.findBySocialAndSocialId(
@@ -30,6 +37,15 @@ public class UserService {
 
         user.setEmail(oAuthUserRequest.getEmail());
         return user;
+    }
+
+    public void withdrawInfo(Long id) {
+        List<Group> groupList = groupRepository.findListByAdminId(id);
+        for (Group group : groupList) {
+            if (group.getParticipantList().stream().filter(p -> p.getStatus().equals(Status.ACTIVE)).count() > 1) {
+                throw new CustomException(ResponseCode.CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
+            }
+        }
     }
 
     public User getUserEntity(Long id) {
