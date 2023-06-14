@@ -53,4 +53,9 @@ public class User extends BaseTimeEntity {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public void delete(String reason) {
+        super.delete();
+        this.withdrawReason = reason;
+    }
 }
