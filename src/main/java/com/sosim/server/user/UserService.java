@@ -6,6 +6,7 @@ import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
+import com.sosim.server.user.dto.request.WithdrawRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +47,13 @@ public class UserService {
                 throw new CustomException(ResponseCode.CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
             }
         }
+    }
+
+    @Transactional
+    public void withdrawUser(Long id, WithdrawRequest withdrawRequest) {
+        withdrawInfo(id);
+        User userEntity = getUserEntity(id);
+        userEntity.delete(withdrawRequest.getWithdrawReason());
     }
 
     public User getUserEntity(Long id) {
