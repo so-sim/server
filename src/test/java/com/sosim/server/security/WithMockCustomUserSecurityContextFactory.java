@@ -8,7 +8,7 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 
 public class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
 
-    private static final long USER_ID = 1L;
+    public static final long USER_ID = 1L;
 
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser annotation) {
