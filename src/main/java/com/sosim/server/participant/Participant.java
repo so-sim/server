@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "PARTICIPANT")
+@Table(name = "PARTICIPANTS")
 public class Participant extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
