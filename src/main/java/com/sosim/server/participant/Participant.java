@@ -5,7 +5,6 @@ import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.Group;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.user.User;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +14,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "PARTICIPANT")
+@Table(name = "PARTICIPANTS")
 public class Participant extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +32,7 @@ public class Participant extends BaseTimeEntity {
     @Column(name = "NICKNAME")
     private String nickname;
 
-    @Builder(access = AccessLevel.PRIVATE)
+    @Builder
     private Participant(User user, Group group, String nickname) {
         this.user = user;
         this.group = group;

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ParticipantRepository extends JpaRepository<Participant, java.lang.Long> {
@@ -28,4 +29,11 @@ public interface ParticipantRepository extends JpaRepository<Participant, java.l
    @Query("select p from Participant p where p.id < :participantId " +
            "and p.user.id = :userId and p.status = 'ACTIVE' order by p.id desc")
    Slice<Participant> findByIdLessThanAndUserIdOrderByIdDesc(@Param("participantId")Long participantId, @Param("userId")Long userId, Pageable pageable);
+
+    @Query("SELECT p FROM Participant p " +
+            "WHERE p.group.id = :groupId " +
+            "AND p.nickname != :adminNickname " +
+            "AND p.status = 'ACTIVE' " +
+            "ORDER BY p.nickname ASC")
+    List<Participant> findGroupNormalParticipants(@Param("groupId") long groupId, @Param("adminNickname") String adminNickname);
 }

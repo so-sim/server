@@ -5,18 +5,19 @@ import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.UpdateGroupRequest;
 import com.sosim.server.participant.Participant;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "GROUP")
+@Table(name = "GROUPS")
 public class Group extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,10 +39,11 @@ public class Group extends BaseTimeEntity {
     @Column(name = "GROUP_TYPE")
     private String groupType;
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
-    private List<Participant> participantList;
+    private List<Participant> participantList = new ArrayList<>();
 
-    @Builder(access = AccessLevel.PRIVATE)
+    @Builder
     private Group(String title, Long adminId, String adminNickname, String coverColor, String groupType) {
         this.title = title;
         this.adminId = adminId;
