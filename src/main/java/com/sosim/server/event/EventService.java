@@ -39,7 +39,17 @@ public class EventService {
     public GetEventResponse getEvent(long userId, long eventId) {
         Event eventEntity = getEventEntity(eventId);
 
-        return GetEventResponse.toDto(eventEntity, eventEntity.getGroup().getAdminId().equals(userId));
+        return GetEventResponse.toDto(eventEntity, isAdmin(eventEntity, userId));
+    }
+
+    public EventIdResponse modifyEvent(long userId, long eventId) {
+        Event eventEntity = getEventEntity(eventId);
+
+        if (!isAdmin(eventEntity, userId)) {
+            throw new CustomException(ResponseCode.NONE_ADMIN);
+        }
+
+        return EventIdResponse.create(eventEntity);
     }
 
     private Event saveEventEntity(Event event) {
@@ -49,5 +59,9 @@ public class EventService {
     private Event getEventEntity(long eventId) {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_EVENT));
+    }
+
+    private boolean isAdmin(Event event, long userId) {
+        return event.getGroup().getAdminId().equals(userId);
     }
 }

@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/event/penalty")
 public class EventController {
 
     private final EventService eventService;
 
-    @PostMapping("/event/penalty")
+    @PostMapping
     public ResponseEntity<?> createEvent(@AuthenticationPrincipal AuthUser authUser,
                                          @Validated @RequestBody CreateEventRequest createEventRequest) {
         EventIdResponse eventIdResponse = eventService.createEvent(authUser.getId(), createEventRequest);
@@ -31,11 +31,19 @@ public class EventController {
         return new ResponseEntity<>(Response.create(createEvent, eventIdResponse), createEvent.getHttpStatus());
     }
 
-    @GetMapping("/event/penalty/{eventId}")
+    @GetMapping("/{eventId}")
     public ResponseEntity<?> getEvent(@AuthUserId long userId, @PathVariable("eventId") long eventId) {
         GetEventResponse getEventResponse = eventService.getEvent(userId, eventId);
         ResponseCode getEvent = ResponseCode.GET_GROUP;
 
         return new ResponseEntity<>(Response.create(getEvent, getEventResponse), getEvent.getHttpStatus());
+    }
+
+    @PatchMapping("/{eventId}")
+    public ResponseEntity<?> modifyEvent(@AuthUserId long userId, @PathVariable("eventId") long eventId) {
+        EventIdResponse eventIdResponse = eventService.modifyEvent(userId, eventId);
+        ResponseCode modifyEvent = ResponseCode.MODIFY_EVENT;
+
+        return new ResponseEntity<>(Response.create(modifyEvent, eventIdResponse), modifyEvent.getHttpStatus());
     }
 }
