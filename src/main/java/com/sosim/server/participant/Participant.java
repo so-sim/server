@@ -3,7 +3,7 @@ package com.sosim.server.participant;
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.Group;
-import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
+import com.sosim.server.participant.dto.request.CreateParticipantRequest;
 import com.sosim.server.user.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,15 +40,19 @@ public class Participant extends BaseTimeEntity {
         status = Status.ACTIVE;
     }
 
-    public static Participant create(User user, Group group, String nickname) {
+    public static Participant create(User user, String nickname) {
         return Participant.builder()
                 .user(user)
-                .group(group)
                 .nickname(nickname)
                 .build();
     }
 
-    public void modifyNickname(ParticipantNicknameRequest participantNicknameRequest) {
-        this.nickname = participantNicknameRequest.getNickname();
+    public void modifyNickname(CreateParticipantRequest createParticipantRequest) {
+        this.nickname = createParticipantRequest.getNickname();
+    }
+
+    public void addGroup(Group group) {
+        group.getParticipantList().add(this);
+        this.group = group;
     }
 }

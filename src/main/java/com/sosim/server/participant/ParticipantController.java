@@ -2,14 +2,14 @@ package com.sosim.server.participant;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
+import com.sosim.server.participant.dto.request.CreateParticipantRequest;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import static com.sosim.server.common.response.ResponseCode.*;
 import static com.sosim.server.common.response.ResponseCode.GET_PARTICIPANTS;
 
 @RequiredArgsConstructor
@@ -25,20 +25,13 @@ public class ParticipantController {
         return new ResponseEntity<>(Response.create(GET_PARTICIPANTS, getGroupParticipants), GET_PARTICIPANTS.getHttpStatus());
     }
 
-//    @PostMapping("/participant")
-//    public ResponseEntity<?> intoGroup(@AuthUserId long userId,
-//                                       @PathVariable("groupId") long groupId,
-//                                       @Validated @RequestBody ParticipantNicknameRequest participantNicknameRequest,
-//                                       BindingResult bindingResult) {
-//        if (bindingResult.hasErrors()) {
-//            bindingError(bindingResult);
-//        }
-//
-//        groupService.intoGroup(userId, groupId, participantNicknameRequest);
-//        ResponseCode intoGroup = ResponseCode.INTO_GROUP;
-//
-//        return new ResponseEntity<>(Response.create(intoGroup, null), intoGroup.getHttpStatus());
-//    }
+    @PostMapping("/participant")
+    public ResponseEntity<?> intoGroup(@AuthUserId long userId, @PathVariable("groupId") long groupId,
+                                       @Validated @RequestBody CreateParticipantRequest participantRequest) {
+        participantService.createParticipant(userId, groupId, participantRequest.getNickname());
+
+        return new ResponseEntity<>(Response.create(INTO_GROUP, null), INTO_GROUP.getHttpStatus());
+    }
 
 //    @PatchMapping("/admin")
 //    public ResponseEntity<?> modifyAdmin(@AuthUserId long userId,

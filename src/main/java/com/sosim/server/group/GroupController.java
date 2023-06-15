@@ -9,7 +9,7 @@ import com.sosim.server.group.dto.request.UpdateGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupListResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
-import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
+import com.sosim.server.participant.dto.request.CreateParticipantRequest;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.security.AuthUser;
 import lombok.RequiredArgsConstructor;
@@ -60,22 +60,22 @@ public class GroupController {
         return new ResponseEntity<>(Response.create(deleteGroup, null), deleteGroup.getHttpStatus());
     }
 
-    @PostMapping("/group/{groupId}/participant")
-    public ResponseEntity<?> intoGroup(@AuthenticationPrincipal AuthUser authUser,
-                                       @PathVariable("groupId") long groupId,
-                                       @Validated @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
-        groupService.intoGroup(authUser.getId(), groupId, participantNicknameRequest);
-        ResponseCode intoGroup = ResponseCode.INTO_GROUP;
-
-        return new ResponseEntity<>(Response.create(intoGroup, null), intoGroup.getHttpStatus());
-    }
+//    @PostMapping("/group/{groupId}/participant")
+//    public ResponseEntity<?> intoGroup(@AuthenticationPrincipal AuthUser authUser,
+//                                       @PathVariable("groupId") long groupId,
+//                                       @Validated @RequestBody CreateParticipantRequest createParticipantRequest) {
+//        groupService.intoGroup(authUser.getId(), groupId, createParticipantRequest);
+//        ResponseCode intoGroup = ResponseCode.INTO_GROUP;
+//
+//        return new ResponseEntity<>(Response.create(intoGroup, null), intoGroup.getHttpStatus());
+//    }
 
     @PatchMapping("/group/{groupId}/admin")
     public ResponseEntity<?> modifyAdmin(@AuthenticationPrincipal AuthUser authUser,
                                          @PathVariable("groupId") long groupId,
-                                         @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
+                                         @RequestBody CreateParticipantRequest createParticipantRequest) {
 
-        groupService.modifyAdmin(authUser.getId(), groupId, participantNicknameRequest);
+        groupService.modifyAdmin(authUser.getId(), groupId, createParticipantRequest);
         ResponseCode modifyGroupAdmin = ResponseCode.MODIFY_GROUP_ADMIN;
 
         return new ResponseEntity<>(Response.create(modifyGroupAdmin, null), modifyGroupAdmin.getHttpStatus());
@@ -93,8 +93,8 @@ public class GroupController {
     @PatchMapping("/group/{groupId}/participant")
     public ResponseEntity<?> modifyNickname(@AuthenticationPrincipal AuthUser authUser,
                                             @PathVariable ("groupId") long groupId,
-                                            @Validated @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
-        groupService.modifyNickname(authUser.getId(), groupId, participantNicknameRequest);
+                                            @Validated @RequestBody CreateParticipantRequest createParticipantRequest) {
+        groupService.modifyNickname(authUser.getId(), groupId, createParticipantRequest);
         ResponseCode modifyNickname = ResponseCode.MODIFY_NICKNAME;
 
         return new ResponseEntity<>(Response.create(modifyNickname, null), modifyNickname.getHttpStatus());

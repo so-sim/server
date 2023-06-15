@@ -36,4 +36,5 @@ public interface ParticipantRepository extends JpaRepository<Participant, java.l
             "AND p.status = 'ACTIVE' " +
             "ORDER BY p.nickname ASC")
     List<Participant> findGroupNormalParticipants(@Param("groupId") long groupId, @Param("adminNickname") String adminNickname);
+
 }

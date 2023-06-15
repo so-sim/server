@@ -6,11 +6,11 @@ import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.UpdateGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupListResponse;
-import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
+import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantService;
-import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
+import com.sosim.server.participant.dto.request.CreateParticipantRequest;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserService;
@@ -33,7 +33,7 @@ public class GroupService {
     public GroupIdResponse createGroup(Long userId, CreateGroupRequest createGroupRequest) {
         User userEntity = userService.getUserEntity(userId);
         Group groupEntity = saveGroupEntity(Group.create(userId, createGroupRequest));
-        participantService.creteParticipant(userEntity, groupEntity, createGroupRequest.getNickname());
+        participantService.createParticipant(userId, groupEntity.getId(), createGroupRequest.getNickname());
 
         return GroupIdResponse.create(groupEntity);
     }
@@ -63,7 +63,7 @@ public class GroupService {
         groupEntity.update(updateGroupRequest);
 
         if (updateGroupRequest.getNickname() != null) {
-            modifyNickname(userId, groupId, new ParticipantNicknameRequest(updateGroupRequest.getNickname()));
+            modifyNickname(userId, groupId, new CreateParticipantRequest(updateGroupRequest.getNickname()));
         }
 
         return GroupIdResponse.create(groupEntity);
@@ -86,13 +86,12 @@ public class GroupService {
         groupEntity.delete();
     }
 
-    public void intoGroup(Long userId,Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
-        participantService.creteParticipant(userService.getUserEntity(userId), getGroupEntity(groupId),
-                participantNicknameRequest.getNickname());
-    }
+//    public void intoGroup(Long userId, Long groupId, CreateParticipantRequest createParticipantRequest) {
+//        participantService.createParticipant(userId, groupId, createParticipantRequest.getNickname());
+//    }
 
     @Transactional
-    public void modifyAdmin(Long userId, Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
+    public void modifyAdmin(Long userId, Long groupId, CreateParticipantRequest createParticipantRequest) {
         Group groupEntity = getGroupEntity(groupId);
 
         if (!groupEntity.getAdminId().equals(userId)) {
@@ -100,7 +99,7 @@ public class GroupService {
         }
 
         Participant participantEntity = participantService
-                .getParticipantEntity(participantNicknameRequest.getNickname(), groupId);
+                .getParticipantEntity(createParticipantRequest.getNickname(), groupId);
 
         if (groupEntity.getParticipantList().stream()
                 .noneMatch(p -> p.getId().equals(participantEntity.getId()))) {
@@ -119,9 +118,9 @@ public class GroupService {
         }
     }
 
-    public void modifyNickname(Long userId, Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
+    public void modifyNickname(Long userId, Long groupId, CreateParticipantRequest createParticipantRequest) {
         Group groupEntity = getGroupEntity(groupId);
-        Participant participant = participantService.modifyNickname(userId, groupId, participantNicknameRequest);
+        Participant participant = participantService.modifyNickname(userId, groupId, createParticipantRequest);
 
         if (groupEntity.getAdminId().equals(userId)) {
             groupEntity.modifyAdmin(participant);
