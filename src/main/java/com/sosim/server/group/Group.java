@@ -8,6 +8,7 @@ import com.sosim.server.participant.Participant;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "GROUP")
+@Table(name = "GROUPS")
 public class Group extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +39,7 @@ public class Group extends BaseTimeEntity {
     @Column(name = "GROUP_TYPE")
     private String groupType;
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<Participant> participantList = new ArrayList<>();
 
