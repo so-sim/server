@@ -5,7 +5,6 @@ import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.UpdateGroupRequest;
 import com.sosim.server.participant.Participant;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,7 +41,7 @@ public class Group extends BaseTimeEntity {
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<Participant> participantList = new ArrayList<>();
 
-    @Builder(access = AccessLevel.PUBLIC)
+    @Builder
     private Group(String title, Long adminId, String adminNickname, String coverColor, String groupType) {
         this.title = title;
         this.adminId = adminId;
