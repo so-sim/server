@@ -1,6 +1,7 @@
 package com.sosim.server.group;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
@@ -27,24 +28,21 @@ public class GroupController {
     private final GroupService groupService;
 
     @PostMapping("/group")
-    public ResponseEntity<?> createGroup(@AuthenticationPrincipal AuthUser authUser,
-                                         @Validated @RequestBody CreateGroupRequest createGroupRequest,
+    public ResponseEntity<?> createGroup(@AuthUserId long userId, @Validated @RequestBody CreateGroupRequest createGroupRequest,
                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             bindingError(bindingResult);
         }
 
-        GroupIdResponse groupIdResponse = groupService.createGroup(authUser.getId(), createGroupRequest);
+        GroupIdResponse groupIdResponse = groupService.createGroup(userId, createGroupRequest);
         ResponseCode createGroup = ResponseCode.CREATE_GROUP;
 
         return new ResponseEntity<>(Response.create(createGroup, groupIdResponse), createGroup.getHttpStatus());
     }
 
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<?> getGroup(@AuthenticationPrincipal AuthUser authUser,
-                                      @PathVariable("groupId") Long groupId) {
-        GetGroupResponse getGroupResponse = groupService.getGroup(
-                authUser != null ? authUser.getId() : 0, groupId);
+    public ResponseEntity<?> getGroup(@AuthUserId long userId, @PathVariable("groupId") Long groupId) {
+        GetGroupResponse getGroupResponse = groupService.getGroup(userId, groupId);
         ResponseCode getGroup = ResponseCode.GET_GROUP;
 
         return new ResponseEntity<>(Response.create(getGroup, getGroupResponse), getGroup.getHttpStatus());
@@ -60,7 +58,7 @@ public class GroupController {
     }
 
     @PatchMapping("/group/{groupId}")
-    public ResponseEntity<?> modifyGroup(@AuthenticationPrincipal AuthUser authUser,
+    public ResponseEntity<?> modifyGroup(@AuthUserId long userId,
                                          @PathVariable("groupId") Long groupId,
                                          @Validated @RequestBody UpdateGroupRequest updateGroupRequest,
                                          BindingResult bindingResult) {
@@ -68,16 +66,16 @@ public class GroupController {
             bindingError(bindingResult);
         }
 
-        GroupIdResponse groupIdResponse = groupService.updateGroup(authUser.getId(), groupId, updateGroupRequest);
+        GroupIdResponse groupIdResponse = groupService.updateGroup(userId, groupId, updateGroupRequest);
         ResponseCode modifyGroup = ResponseCode.MODIFY_GROUP;
 
         return new ResponseEntity<>(Response.create(modifyGroup, groupIdResponse), modifyGroup.getHttpStatus());
     }
 
     @DeleteMapping("/group/{groupId}")
-    public ResponseEntity<?> deleteGroup(@AuthenticationPrincipal AuthUser authUser,
+    public ResponseEntity<?> deleteGroup(@AuthUserId long userId,
                                          @PathVariable("groupId") Long groupId) {
-        groupService.deleteGroup(authUser.getId(), groupId);
+        groupService.deleteGroup(userId, groupId);
         ResponseCode deleteGroup = ResponseCode.DELETE_GROUP;
 
         return new ResponseEntity<>(Response.create(deleteGroup, null), deleteGroup.getHttpStatus());
