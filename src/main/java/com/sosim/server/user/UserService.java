@@ -40,7 +40,7 @@ public class UserService {
         return user;
     }
 
-    public void withdrawInfo(Long id) {
+    public void checkCanWithdraw(Long id) {
         List<Group> groupList = groupRepository.findListByAdminId(id);
         for (Group group : groupList) {
             if (group.getParticipantList().stream().filter(p -> p.getStatus().equals(Status.ACTIVE)).count() > 1) {
@@ -51,7 +51,7 @@ public class UserService {
 
     @Transactional
     public void withdrawUser(Long id, WithdrawRequest withdrawRequest) {
-        withdrawInfo(id);
+        checkCanWithdraw(id);
         User userEntity = getUserEntity(id);
         userEntity.delete(withdrawRequest.getWithdrawReason());
     }
