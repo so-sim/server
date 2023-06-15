@@ -41,16 +41,15 @@ public class GroupController {
     }
 
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<?> getGroup(@AuthUserId long userId, @PathVariable("groupId") Long groupId) {
+    public ResponseEntity<?> getGroup(@AuthUserId long userId, @PathVariable("groupId") long groupId) {
         GetGroupResponse getGroupResponse = groupService.getGroup(userId, groupId);
         ResponseCode getGroup = ResponseCode.GET_GROUP;
 
         return new ResponseEntity<>(Response.create(getGroup, getGroupResponse), getGroup.getHttpStatus());
     }
 
-    @GetMapping("/group/{groupId}/participants")
-    public ResponseEntity<?> getGroupParticipants(@AuthenticationPrincipal AuthUser authUser,
-                                                  @PathVariable("groupId") Long groupId) {
+//    @GetMapping("/group/{groupId}/participants")
+    public ResponseEntity<?> getGroupParticipants(@AuthenticationPrincipal AuthUser authUser, @PathVariable("groupId") long groupId) {
         GetParticipantListResponse getGroupParticipants = groupService.getGroupParticipants(authUser.getId(), groupId);
         ResponseCode getParticipants = ResponseCode.GET_PARTICIPANTS;
 
@@ -59,7 +58,7 @@ public class GroupController {
 
     @PatchMapping("/group/{groupId}")
     public ResponseEntity<?> modifyGroup(@AuthUserId long userId,
-                                         @PathVariable("groupId") Long groupId,
+                                         @PathVariable("groupId") long groupId,
                                          @Validated @RequestBody UpdateGroupRequest updateGroupRequest,
                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -74,7 +73,7 @@ public class GroupController {
 
     @DeleteMapping("/group/{groupId}")
     public ResponseEntity<?> deleteGroup(@AuthUserId long userId,
-                                         @PathVariable("groupId") Long groupId) {
+                                         @PathVariable("groupId") long groupId) {
         groupService.deleteGroup(userId, groupId);
         ResponseCode deleteGroup = ResponseCode.DELETE_GROUP;
 
@@ -83,7 +82,7 @@ public class GroupController {
 
     @PostMapping("/group/{groupId}/participant")
     public ResponseEntity<?> intoGroup(@AuthenticationPrincipal AuthUser authUser,
-                                       @PathVariable("groupId") Long groupId,
+                                       @PathVariable("groupId") long groupId,
                                        @Validated @RequestBody ParticipantNicknameRequest participantNicknameRequest,
                                        BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -98,7 +97,7 @@ public class GroupController {
 
     @PatchMapping("/group/{groupId}/admin")
     public ResponseEntity<?> modifyAdmin(@AuthenticationPrincipal AuthUser authUser,
-                                         @PathVariable("groupId") Long groupId,
+                                         @PathVariable("groupId") long groupId,
                                          @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
 
         groupService.modifyAdmin(authUser.getId(), groupId, participantNicknameRequest);
@@ -109,7 +108,7 @@ public class GroupController {
 
     @DeleteMapping("/group/{groupId}/participant")
     public ResponseEntity<?> withdrawGroup(@AuthenticationPrincipal AuthUser authUser,
-                                           @PathVariable("groupId") Long groupId) {
+                                           @PathVariable("groupId") long groupId) {
         groupService.withdrawGroup(authUser.getId(), groupId);
         ResponseCode withdrawGroup = ResponseCode.WITHDRAW_GROUP;
 
@@ -118,7 +117,7 @@ public class GroupController {
 
     @PatchMapping("/group/{groupId}/participant")
     public ResponseEntity<?> modifyNickname(@AuthenticationPrincipal AuthUser authUser,
-                                            @PathVariable ("groupId") Long groupId,
+                                            @PathVariable ("groupId") long groupId,
                                             @Validated @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
         groupService.modifyNickname(authUser.getId(), groupId, participantNicknameRequest);
         ResponseCode modifyNickname = ResponseCode.MODIFY_NICKNAME;
@@ -141,7 +140,7 @@ public class GroupController {
 
     @GetMapping("/group/{groupId}/participant")
     public ResponseEntity<?> getMyNickname(@AuthenticationPrincipal AuthUser authUser,
-                                           @PathVariable("groupId") Long groupId) {
+                                           @PathVariable("groupId") long groupId) {
         GetNicknameResponse getNicknameResponse = groupService.getMyNickname(authUser.getId(), groupId);
         ResponseCode getNickname = ResponseCode.GET_NICKNAME;
 

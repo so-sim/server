@@ -74,7 +74,7 @@ public class GroupService {
             Collections.sort(nicknameList.subList(1, nicknameList.size()));
         }
 
-        return GetParticipantListResponse.create(groupEntity, nicknameList);
+        return GetParticipantListResponse.toDto(groupEntity, nicknameList);
     }
 
     @Transactional
