@@ -15,6 +15,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     List<Group> findListByAdminId(@Param("adminId") Long id);
 
     @Query("select g from Group g " +
-            "join fetch g.participantList where g.adminId in (:adminId) and g.status = 'ACTIVE'")
+            "join fetch g.participantList p where g.adminId in (:adminId) and g.status = 'ACTIVE' " +
+            "and p.status = 'ACTIVE'")
     List<Group> findFetchJoinGroupByAdminId(@Param("adminId") Long groupId);
 }

@@ -43,7 +43,7 @@ public class UserService {
     public void checkCanWithdraw(Long id) {
         List<Group> groupList = groupRepository.findFetchJoinGroupByAdminId(id);
         for (Group group : groupList) {
-            if (group.getParticipantList().stream().filter(p -> p.getStatus().equals(Status.ACTIVE)).count() > 1) {
+            if (group.getParticipantList().size() > 1) {
                 throw new CustomException(ResponseCode.CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
             }
         }
