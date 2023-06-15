@@ -12,7 +12,6 @@ import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantService;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
-import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,27 +51,6 @@ public class GroupService {
         return GetGroupResponse.create(groupEntity, groupEntity.getAdminId().equals(userId),
                 (int) groupEntity.getParticipantList().stream()
                         .filter(p -> p.getStatus().equals(Status.ACTIVE)).count(), isInto);
-    }
-
-    public GetParticipantListResponse getGroupParticipants(Long userId, Long groupId) {
-        Group groupEntity = getGroupEntity(groupId);
-        List<String> nicknameList = groupEntity.getParticipantList().stream()
-                .filter(p -> p.getStatus().equals(Status.ACTIVE) &&
-                        !p.getNickname().equals(groupEntity.getAdminNickname()))
-                .map(Participant::getNickname)
-                .collect(Collectors.toList());
-
-        if (!groupEntity.getAdminId().equals(userId)) {
-            String nickname = participantService.getParticipantEntity(
-                    userId, groupId).getNickname();
-            Collections.swap(nicknameList, 0, nicknameList.indexOf(nickname));
-        }
-
-        if (nicknameList.size() > 0) {
-            Collections.sort(nicknameList.subList(1, nicknameList.size()));
-        }
-
-        return GetParticipantListResponse.toDto(groupEntity, nicknameList);
     }
 
     @Transactional
