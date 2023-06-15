@@ -1,11 +1,11 @@
 package com.sosim.server.participant;
 
+import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
-import com.sosim.server.group.dto.request.CreateGroupRequest;
-import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.user.User;
+import com.sosim.server.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,14 +15,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.sosim.server.common.auditing.Status.ACTIVE;
+import static com.sosim.server.common.response.ResponseCode.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ParticipantServiceTest {
@@ -38,6 +39,9 @@ class ParticipantServiceTest {
 
     @Mock
     GroupRepository groupRepository;
+
+    @Mock
+    UserRepository userRepository;
 
     @DisplayName("모임 참가자 리스트 조회 / 응답 테스트")
     @Test
@@ -119,6 +123,118 @@ class ParticipantServiceTest {
         //then
         assertThat(response.getNicknameList())
                 .containsExactly(requestUserName, "1", "2", "4", "5");
+    }
+
+    @DisplayName("참가자 가입 / 정상")
+    @Test
+    void create_participant() {
+        //given
+        User user = makeUser();
+        Group group = makeGroup();
+        String nickname = "닉네임";
+
+        doReturn(Optional.of(user)).when(userRepository).findById(userId);
+        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(false).when(participantRepository)
+                .existsByUserIdAndGroupIdAndStatus(userId, groupId, ACTIVE);
+        doReturn(false).when(participantRepository)
+                .existsByGroupIdAndNicknameAndStatus(groupId, nickname, ACTIVE);
+
+        //when
+        participantService.createParticipant(userId, groupId, nickname);
+
+        //then
+        verify(participantRepository, times(1)).save(any(Participant.class));
+    }
+
+    @DisplayName("참가자 가입 / 유저가 없는 경우 CustomException(NOT_FOUND_USER)")
+    @Test
+    void create_participant_no_user() {
+        //given
+        String nickname = "닉네임";
+
+        doReturn(Optional.empty()).when(userRepository).findById(userId);
+
+        //when
+        CustomException exception = assertThrows(CustomException.class, () ->
+                participantService.createParticipant(userId, groupId, nickname));
+
+        //then
+        assertThat(exception.getResponseCode()).isEqualTo(NOT_FOUND_USER);
+    }
+
+    @DisplayName("참가자 가입 / 모임이 없는 경우 CustomException(NOT_FOUND_GROUP)")
+    @Test
+    void create_participant_no_group() {
+        //given
+        User user = makeUser();
+        String nickname = "닉네임";
+
+        doReturn(Optional.of(user)).when(userRepository).findById(userId);
+        doReturn(Optional.empty()).when(groupRepository).findById(groupId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () ->
+                participantService.createParticipant(userId, groupId, nickname));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_GROUP);
+    }
+
+    @DisplayName("참가자 가입 / 이미 가입한 경우 CustomException(ALREADY_INTO_GROUP)")
+    @Test
+    void create_participant_already_into() {
+        //given
+        User user = makeUser();
+        Group group = makeGroup();
+        String nickname = "닉네임";
+
+        doReturn(Optional.of(user)).when(userRepository).findById(userId);
+        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(true).when(participantRepository)
+                .existsByUserIdAndGroupIdAndStatus(userId, groupId, ACTIVE);
+
+        //when
+        CustomException exception = assertThrows(CustomException.class, () ->
+                participantService.createParticipant(userId, groupId, nickname));
+
+        //then
+        assertThat(exception.getResponseCode()).isEqualTo(ALREADY_INTO_GROUP);
+    }
+
+    @DisplayName("참가자 가입 / 중복된 Nickname인 경우 CustomException(ALREADY_USE_NICKNAME)")
+    @Test
+    void create_participant_duplicate_nickname() {
+        //given
+        User user = makeUser();
+        Group group = makeGroup();
+        String nickname = "닉네임";
+
+        doReturn(Optional.of(user)).when(userRepository).findById(userId);
+        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(false).when(participantRepository)
+                .existsByUserIdAndGroupIdAndStatus(userId, groupId, ACTIVE);
+        doReturn(true).when(participantRepository)
+                .existsByGroupIdAndNicknameAndStatus(groupId, nickname, ACTIVE);
+
+        //when
+        CustomException exception = assertThrows(CustomException.class, () ->
+                participantService.createParticipant(userId, groupId, nickname));
+
+        //then
+        assertThat(exception.getResponseCode()).isEqualTo(ALREADY_USE_NICKNAME);
+    }
+
+    private Group makeGroup() {
+        Group group = Group.builder().build();
+        ReflectionTestUtils.setField(group, "id", groupId);
+        return group;
+    }
+
+    private User makeUser() {
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        return user;
     }
 
     private Participant makeParticipant(long id, String nickname) {
