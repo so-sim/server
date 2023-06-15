@@ -25,20 +25,10 @@ public class EventController {
 
     @PostMapping("/event/penalty")
     public ResponseEntity<?> createEvent(@AuthenticationPrincipal AuthUser authUser,
-                                         @Validated @RequestBody CreateEventRequest createEventRequest,
-                                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            bindingError(bindingResult);
-        }
-
+                                         @Validated @RequestBody CreateEventRequest createEventRequest) {
         EventIdResponse eventIdResponse = eventService.createEvent(authUser.getId(), createEventRequest);
         ResponseCode createEvent = ResponseCode.CREATE_EVENT;
 
         return new ResponseEntity<>(Response.create(createEvent, eventIdResponse), createEvent.getHttpStatus());
-    }
-
-    private void bindingError(BindingResult bindingResult) {
-        throw new CustomException(ResponseCode.BINDING_ERROR, bindingResult.getFieldError().getField(),
-                bindingResult.getFieldError().getDefaultMessage());
     }
 }
