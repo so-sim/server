@@ -40,11 +40,12 @@ public class ParticipantService {
         saveParticipantEntity(Participant.create(user, group, nickname));
     }
 
+    @Transactional(readOnly = true)
     public GetParticipantListResponse getGroupParticipants(long userId, long groupId) {
         Group group = getGroupEntity(groupId);
         List<Participant> normalParticipants = participantRepository.findGroupNormalParticipants(groupId, group.getAdminNickname());
-        if (isNotAdminUser(userId, group)) {
-            changeUserToFirstOrder(userId, normalParticipants);
+        if (requestUserIsNotAdmin(userId, group)) {
+            changeRequestUserOrderToFirst(userId, normalParticipants);
         }
         return GetParticipantListResponse.toDto(group, toNicknameList(normalParticipants));
     }
@@ -55,7 +56,7 @@ public class ParticipantService {
                 .collect(Collectors.toList());
     }
 
-    private void changeUserToFirstOrder(long userId, List<Participant> participants) {
+    private void changeRequestUserOrderToFirst(long userId, List<Participant> participants) {
         int index = getParticipantIndexOfUser(userId, participants);
         Participant participantOfUser = participants.remove(index);
         participants.add(0, participantOfUser);
@@ -75,7 +76,7 @@ public class ParticipantService {
         return participant.getUser().getId().equals(userId);
     }
 
-    private boolean isNotAdminUser(long userId, Group group) {
+    private boolean requestUserIsNotAdmin(long userId, Group group) {
         return !group.getAdminId().equals(userId);
     }
 
