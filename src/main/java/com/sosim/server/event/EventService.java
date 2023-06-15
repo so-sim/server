@@ -4,6 +4,7 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.response.EventIdResponse;
+import com.sosim.server.event.dto.response.GetEventResponse;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.participant.Participant;
@@ -35,7 +36,18 @@ public class EventService {
         return EventIdResponse.create(eventEntity);
     }
 
+    public GetEventResponse getEvent(long userId, long eventId) {
+        Event eventEntity = getEventEntity(eventId);
+
+        return GetEventResponse.toDto(eventEntity, eventEntity.getGroup().getAdminId().equals(userId));
+    }
+
     private Event saveEventEntity(Event event) {
         return eventRepository.save(event);
+    }
+
+    private Event getEventEntity(long eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_EVENT));
     }
 }
