@@ -49,6 +49,13 @@ public class EventService {
         return EventIdResponse.create(eventEntity);
     }
 
+    public void deleteEvent(long userId, long eventId) {
+        Event eventEntity = getEventEntity(eventId);
+        isAdmin(eventEntity, userId, true);
+
+        eventEntity.delete();
+    }
+
     private Event saveEventEntity(Event event) {
         return eventRepository.save(event);
     }

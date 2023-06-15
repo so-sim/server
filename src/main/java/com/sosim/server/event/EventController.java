@@ -46,4 +46,12 @@ public class EventController {
 
         return new ResponseEntity<>(Response.create(modifyEvent, eventIdResponse), modifyEvent.getHttpStatus());
     }
+
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<?> deleteEvent(@AuthUserId long userId, @PathVariable("eventId") long eventId) {
+        eventService.deleteEvent(userId, eventId);
+        ResponseCode deleteEvent = ResponseCode.DELETE_EVENT;
+
+        return new ResponseEntity<>(Response.create(deleteEvent, null), deleteEvent.getHttpStatus());
+    }
 }
