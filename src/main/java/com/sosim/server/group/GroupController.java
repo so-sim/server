@@ -15,7 +15,6 @@ import com.sosim.server.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,12 +26,7 @@ public class GroupController {
     private final GroupService groupService;
 
     @PostMapping("/group")
-    public ResponseEntity<?> createGroup(@AuthUserId long userId, @Validated @RequestBody CreateGroupRequest createGroupRequest,
-                                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            bindingError(bindingResult);
-        }
-
+    public ResponseEntity<?> createGroup(@AuthUserId long userId, @Validated @RequestBody CreateGroupRequest createGroupRequest) {
         GroupIdResponse groupIdResponse = groupService.createGroup(userId, createGroupRequest);
         ResponseCode createGroup = ResponseCode.CREATE_GROUP;
 
@@ -50,12 +44,7 @@ public class GroupController {
     @PatchMapping("/group/{groupId}")
     public ResponseEntity<?> modifyGroup(@AuthUserId long userId,
                                          @PathVariable("groupId") long groupId,
-                                         @Validated @RequestBody UpdateGroupRequest updateGroupRequest,
-                                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            bindingError(bindingResult);
-        }
-
+                                         @Validated @RequestBody UpdateGroupRequest updateGroupRequest) {
         GroupIdResponse groupIdResponse = groupService.updateGroup(userId, groupId, updateGroupRequest);
         ResponseCode modifyGroup = ResponseCode.MODIFY_GROUP;
 
@@ -74,12 +63,7 @@ public class GroupController {
     @PostMapping("/group/{groupId}/participant")
     public ResponseEntity<?> intoGroup(@AuthenticationPrincipal AuthUser authUser,
                                        @PathVariable("groupId") long groupId,
-                                       @Validated @RequestBody ParticipantNicknameRequest participantNicknameRequest,
-                                       BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            bindingError(bindingResult);
-        }
-
+                                       @Validated @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
         groupService.intoGroup(authUser.getId(), groupId, participantNicknameRequest);
         ResponseCode intoGroup = ResponseCode.INTO_GROUP;
 
@@ -136,10 +120,5 @@ public class GroupController {
         ResponseCode getNickname = ResponseCode.GET_NICKNAME;
 
         return new ResponseEntity<>(Response.create(getNickname, getNicknameResponse), getNickname.getHttpStatus());
-    }
-
-    private void bindingError(BindingResult bindingResult) {
-        throw new CustomException(ResponseCode.BINDING_ERROR, bindingResult.getFieldError().getField(),
-                bindingResult.getFieldError().getDefaultMessage());
     }
 }
