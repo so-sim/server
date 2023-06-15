@@ -1,5 +1,6 @@
 package com.sosim.server.event;
 
+import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.group.Group;
 import com.sosim.server.user.User;
@@ -13,8 +14,8 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "EVENT")
-public class Event {
+@Table(name = "EVENTS")
+public class Event extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EVENT_ID")
