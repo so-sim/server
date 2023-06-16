@@ -41,7 +41,7 @@ public class ParticipantController {
     }
 
     @PatchMapping("/participant")
-    public ResponseEntity<?> modifyNickname(@AuthUserId long userId, @PathVariable ("groupId") long groupId,
+    public ResponseEntity<?> modifyNickname(@AuthUserId long userId, @PathVariable long groupId,
                                             @Validated @RequestBody ParticipantNicknameRequest request) {
         participantService.modifyNickname(userId, groupId, request.getNickname());
 

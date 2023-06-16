@@ -286,6 +286,100 @@ class ParticipantControllerTest {
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
+    @WithMockCustomUser
+    @DisplayName("참가자 닉네임 변경 / 성공")
+    @Test
+    void modify_participant() throws Exception {
+        //given
+        String newNickname = "새닉네임";
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(newNickname);
+        doNothing().when(participantService).modifyNickname(userId, groupId, newNickname);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d/participant", groupId));
+        ResultActions resultActions = mvc.perform(patch(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(request)));
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.status.code").value(MODIFY_NICKNAME.getCode()))
+                .andExpect(jsonPath("$.status.message").value(MODIFY_NICKNAME.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("참가자 닉네임 변경 / 그룹이 없는 경우 NOT_FOUND_GROUP")
+    @Test
+    void modify_participant_no_group() throws Exception {
+        //given
+        String newNickname = "새닉네임";
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(newNickname);
+
+        CustomException e = new CustomException(NOT_FOUND_GROUP);
+        doThrow(e).when(participantService).modifyNickname(userId, groupId, newNickname);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d/participant", groupId));
+        ResultActions resultActions = mvc.perform(patch(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(request)));
+
+        //then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("참가자 닉네임 변경 / 참가자가 없는 경우 NONE_PARTICIPANT")
+    @Test
+    void modify_participant_no_participant() throws Exception {
+        //given
+        String newNickname = "새닉네임";
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(newNickname);
+
+        CustomException e = new CustomException(NONE_PARTICIPANT);
+        doThrow(e).when(participantService).modifyNickname(userId, groupId, newNickname);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d/participant", groupId));
+        ResultActions resultActions = mvc.perform(patch(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(request)));
+
+        //then
+        resultActions.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status.code").value(NONE_PARTICIPANT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NONE_PARTICIPANT.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("참가자 닉네임 변경 / 중복된 닉네임인 경우 ALREADY_USE_NICKNAME")
+    @Test
+    void modify_participant_already_used_nickname() throws Exception {
+        //given
+        String newNickname = "새닉네임";
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(newNickname);
+
+        CustomException e = new CustomException(ALREADY_USE_NICKNAME);
+        doThrow(e).when(participantService).modifyNickname(userId, groupId, newNickname);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d/participant", groupId));
+        ResultActions resultActions = mvc.perform(patch(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(request)));
+
+        //then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status.code").value(ALREADY_USE_NICKNAME.getCode()))
+                .andExpect(jsonPath("$.status.message").value(ALREADY_USE_NICKNAME.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
     private static GetParticipantListResponse makeGetParticipantsResponse(String adminNickname) {
         return GetParticipantListResponse.builder()
                 .adminNickname(adminNickname)
