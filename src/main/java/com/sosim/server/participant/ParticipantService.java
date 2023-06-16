@@ -62,7 +62,7 @@ public class ParticipantService {
     public Participant modifyNickname(Long userId, Long groupId, CreateParticipantRequest createParticipantRequest) {
         if (participantRepository.existsByGroupIdAndNicknameAndStatus(groupId,
                 createParticipantRequest.getNickname(), Status.ACTIVE)) {
-            throw new CustomException(ResponseCode.ALREADY_USE_NICKNAME);
+            throw new CustomException(ALREADY_USE_NICKNAME);
         }
 
         Participant participantEntity = findParticipant(userId, groupId);
@@ -76,12 +76,12 @@ public class ParticipantService {
 
     public Participant findParticipant(Long userId, Long groupId) {
         return participantRepository.findByUserIdAndGroupId(userId, groupId)
-                .orElseThrow(() -> new CustomException(ResponseCode.NONE_PARTICIPANT));
+                .orElseThrow(() -> new CustomException(NONE_PARTICIPANT));
     }
 
     public Participant findParticipant(String nickname, Long groupId) {
         return participantRepository.findByNicknameAndGroupId(nickname, groupId)
-                .orElseThrow(() -> new CustomException(ResponseCode.NONE_PARTICIPANT));
+                .orElseThrow(() -> new CustomException(NONE_PARTICIPANT));
     }
 
     public Slice<Participant> getParticipantSlice(Long index, Long userId) {
@@ -101,13 +101,13 @@ public class ParticipantService {
 
     private void checkUsedNickname(Group group, String nickname) {
         if (participantRepository.existsByGroupIdAndNicknameAndStatus(group.getId(), nickname, Status.ACTIVE)) {
-            throw new CustomException(ResponseCode.ALREADY_USE_NICKNAME);
+            throw new CustomException(ALREADY_USE_NICKNAME);
         }
     }
 
     private void checkAlreadyIntoGroup(User user, Group group) {
         if (participantRepository.existsByUserIdAndGroupIdAndStatus(user.getId(), group.getId(), Status.ACTIVE)) {
-            throw new CustomException(ResponseCode.ALREADY_INTO_GROUP);
+            throw new CustomException(ALREADY_INTO_GROUP);
         }
     }
 
