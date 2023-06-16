@@ -3,14 +3,20 @@ package com.sosim.server.event;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.event.dto.request.CreateEventRequest;
+import com.sosim.server.event.dto.request.ModifyEventRequest;
+import com.sosim.server.event.dto.request.ModifySituationRequest;
 import com.sosim.server.event.dto.response.EventIdResponse;
 import com.sosim.server.event.dto.response.GetEventResponse;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
+import com.sosim.server.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -42,13 +48,24 @@ public class EventService {
         return GetEventResponse.toDto(eventEntity, isAdmin(eventEntity, userId, false));
     }
 
-    public EventIdResponse modifyEvent(long userId, long eventId) {
+    @Transactional
+    public EventIdResponse modifyEvent(long userId, long eventId, ModifyEventRequest modifyEventRequest) {
         Event eventEntity = getEventEntity(eventId);
         isAdmin(eventEntity, userId, true);
+
+        User userEntity = null;
+        if (!eventEntity.getNickname().equals(modifyEventRequest.getNickname())) {
+            userEntity = participantRepository.findByNicknameAndGroupId(
+                            modifyEventRequest.getNickname(), eventEntity.getGroup().getId())
+                    .orElseThrow(() -> new CustomException(ResponseCode.NONE_PARTICIPANT)).getUser();
+        }
+
+        eventEntity.modify(userEntity, modifyEventRequest);
 
         return EventIdResponse.create(eventEntity);
     }
 
+    @Transactional
     public void deleteEvent(long userId, long eventId) {
         Event eventEntity = getEventEntity(eventId);
         isAdmin(eventEntity, userId, true);

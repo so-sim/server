@@ -25,11 +25,11 @@ public enum ResponseCode {
     GET_GROUPS(successCode(), HttpStatus.OK, "성공적으로 참가한 모임들이 조회되었습니다"),
     GET_NICKNAME(successCode(), HttpStatus.OK , "성공적으로 닉네임이 조회되었습니다."),
 
-    CREATE_EVENT(successCode(), HttpStatus.CREATED, "상세 내역이 성공적으로 생성되었습니다."),
-
     CAN_WITHDRAW(successCode(), HttpStatus.OK, "회원 탈퇴가 가능한 상태입니다."),
     SUCCESS_WITHDRAW(successCode(), HttpStatus.OK, "회원 탈퇴가 성공적으로 이루어졌습니다."),
 
+    CREATE_EVENT(successCode(), HttpStatus.CREATED, "상세 내역이 성공적으로 생성되었습니다."),
+    GET_EVENT(successCode(), HttpStatus.OK, "상세 내역이 성공적으로 조회되었습니다."),
     MODIFY_EVENT(successCode(), HttpStatus.OK, "상세 내역이 성공적으로 수정되었습니다."),
     DELETE_EVENT(successCode(), HttpStatus.OK, "상세 내역이 성공적으로 삭제되었습니다."),
 

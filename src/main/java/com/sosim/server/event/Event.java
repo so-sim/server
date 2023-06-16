@@ -2,6 +2,7 @@ package com.sosim.server.event;
 
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.event.dto.request.CreateEventRequest;
+import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.group.Group;
 import com.sosim.server.user.User;
 import lombok.Builder;
@@ -69,5 +70,16 @@ public class Event extends BaseTimeEntity {
                 .group(group)
                 .user(user)
                 .build();
+    }
+
+    public void modify(User user, ModifyEventRequest modifyEventRequest) {
+        if (user != null) {
+            this.nickname = modifyEventRequest.getNickname();
+            this.user = user;
+        }
+        this.amount = modifyEventRequest.getAmount();
+        this.ground = modifyEventRequest.getGround();
+        this.memo = modifyEventRequest.getMemo();
+        this.situation = modifyEventRequest.getSituation();
     }
 }
