@@ -15,7 +15,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query("SELECT g FROM Group g " +
             "JOIN FETCH g.participantList p " +
             "WHERE g.id = :groupId " +
-            "AND g.status = 'ACTIVE' AND p.status = 'ACTIVE")
+            "AND g.status = 'ACTIVE' AND p.status = 'ACTIVE'")
     @EntityGraph(attributePaths = {"participantList"})
     Optional<Group> findByIdWithParticipants(@Param("groupId") Long groupId);
 
