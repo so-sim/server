@@ -51,6 +51,7 @@ public class Event extends BaseTimeEntity {
     @Builder
     private Event(LocalDate date, int amount, String ground, String memo, String situation,
                   String nickname, Group group, User user) {
+        this.date = date;
         this.amount = amount;
         this.ground = ground;
         this.memo = memo;
@@ -62,6 +63,7 @@ public class Event extends BaseTimeEntity {
 
     public static Event create(Group group, User user, CreateEventRequest createEventRequest) {
         return Event.builder()
+                .date(createEventRequest.getDate())
                 .amount(createEventRequest.getAmount())
                 .ground(createEventRequest.getGround())
                 .memo(createEventRequest.getMemo())
@@ -77,6 +79,7 @@ public class Event extends BaseTimeEntity {
             this.nickname = modifyEventRequest.getNickname();
             this.user = user;
         }
+        this.date = modifyEventRequest.getDate();
         this.amount = modifyEventRequest.getAmount();
         this.ground = modifyEventRequest.getGround();
         this.memo = modifyEventRequest.getMemo();
