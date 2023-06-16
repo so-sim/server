@@ -2,7 +2,7 @@ package com.sosim.server.participant;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
-import com.sosim.server.participant.dto.request.CreateParticipantRequest;
+import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class ParticipantController {
 
     @PostMapping("/participant")
     public ResponseEntity<?> intoGroup(@AuthUserId long userId, @PathVariable("groupId") long groupId,
-                                       @Validated @RequestBody CreateParticipantRequest participantRequest) {
+                                       @Validated @RequestBody ParticipantNicknameRequest participantRequest) {
         participantService.createParticipant(userId, groupId, participantRequest.getNickname());
 
         return new ResponseEntity<>(Response.create(INTO_GROUP, null), INTO_GROUP.getHttpStatus());
@@ -40,16 +40,14 @@ public class ParticipantController {
         return new ResponseEntity<>(Response.create(WITHDRAW_GROUP, null), WITHDRAW_GROUP.getHttpStatus());
     }
 
-//    @PatchMapping("/participant")
-//    public ResponseEntity<?> modifyNickname(@AuthUserId long userId,
-//                                            @PathVariable ("groupId") long groupId,
-//                                            @Validated @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
-//        groupService.modifyNickname(userId, groupId, participantNicknameRequest);
-//        ResponseCode modifyNickname = ResponseCode.MODIFY_NICKNAME;
-//
-//        return new ResponseEntity<>(Response.create(modifyNickname, null), modifyNickname.getHttpStatus());
-//    }
-//
+    @PatchMapping("/participant")
+    public ResponseEntity<?> modifyNickname(@AuthUserId long userId, @PathVariable ("groupId") long groupId,
+                                            @Validated @RequestBody ParticipantNicknameRequest request) {
+        participantService.modifyNickname(userId, groupId, request.getNickname());
+
+        return new ResponseEntity<>(Response.create(MODIFY_NICKNAME, null), MODIFY_NICKNAME.getHttpStatus());
+    }
+
 //    @GetMapping("/participant")
 //    public ResponseEntity<?> getMyNickname(@AuthUserId long userId,
 //                                           @PathVariable("groupId") long groupId) {

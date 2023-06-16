@@ -6,7 +6,7 @@ import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.UpdateGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
-import com.sosim.server.participant.dto.request.CreateParticipantRequest;
+import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -469,7 +469,7 @@ class GroupControllerTest {
     void modify_admin() throws Exception {
         //given
         String nickname = "변경닉네임";
-        CreateParticipantRequest request = new CreateParticipantRequest(nickname);
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
 
         //when
         String url = URI_PREFIX.concat(String.format("/%d/admin", groupId));
@@ -490,7 +490,7 @@ class GroupControllerTest {
     void modify_admin_not_admin_user() throws Exception {
         //given
         String nickname = "변경닉네임";
-        CreateParticipantRequest request = new CreateParticipantRequest(nickname);
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
 
         CustomException e = new CustomException(NONE_ADMIN);
         doThrow(e).when(groupService).modifyAdmin(userId, groupId, request);
@@ -515,7 +515,7 @@ class GroupControllerTest {
     void modify_admin_no_participant_data() throws Exception {
         //given
         String nickname = "변경닉네임";
-        CreateParticipantRequest request = new CreateParticipantRequest(nickname);
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
 
         CustomException e = new CustomException(NONE_PARTICIPANT);
         doThrow(e).when(groupService).modifyAdmin(userId, groupId, request);

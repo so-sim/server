@@ -2,10 +2,8 @@ package com.sosim.server.participant;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
-import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
-import com.sosim.server.participant.dto.request.CreateParticipantRequest;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.user.User;
@@ -59,15 +57,11 @@ public class ParticipantService {
     }
 
     @Transactional
-    public Participant modifyNickname(Long userId, Long groupId, CreateParticipantRequest createParticipantRequest) {
-        if (participantRepository.existsByGroupIdAndNicknameAndStatus(groupId,
-                createParticipantRequest.getNickname(), Status.ACTIVE)) {
-            throw new CustomException(ALREADY_USE_NICKNAME);
-        }
+    public void modifyNickname(long userId, long groupId, String newNickname) {
+        Group group = findGroup(groupId);
+        Participant participant = findParticipant(userId, groupId);
 
-        Participant participantEntity = findParticipant(userId, groupId);
-        participantEntity.modifyNickname(createParticipantRequest);
-        return participantEntity;
+        participant.modifyNickname(group, newNickname);
     }
 
     public GetNicknameResponse getMyNickname(Long userId, Long groupId) {

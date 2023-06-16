@@ -83,4 +83,13 @@ public class Group extends BaseTimeEntity {
         return participantList.stream()
                 .noneMatch(Participant::isActive);
     }
+
+    public boolean existThatNickname(String nickname) {
+        return getParticipantList().stream()
+                .anyMatch(p -> p.getNickname().equals(nickname));
+    }
+
+    public boolean isAdminNickname(String nickname) {
+        return adminNickname.equals(nickname);
+    }
 }

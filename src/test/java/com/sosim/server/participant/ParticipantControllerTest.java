@@ -2,7 +2,7 @@ package com.sosim.server.participant;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.participant.dto.request.CreateParticipantRequest;
+import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
@@ -117,7 +117,7 @@ class ParticipantControllerTest {
     void create_participant() throws Exception {
         //given
         String nickname = "닉네임";
-        CreateParticipantRequest request = new CreateParticipantRequest(nickname);
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
 
         doNothing().when(participantService).createParticipant(userId, groupId, nickname);
 
@@ -140,7 +140,7 @@ class ParticipantControllerTest {
     void create_participant_no_user() throws Exception {
         //given
         String nickname = "닉네임";
-        CreateParticipantRequest request = new CreateParticipantRequest(nickname);
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
 
         CustomException e = new CustomException(NOT_FOUND_USER);
         doThrow(e).when(participantService).createParticipant(userId, groupId, nickname);
@@ -164,7 +164,7 @@ class ParticipantControllerTest {
     void create_participant_no_group() throws Exception {
         //given
         String nickname = "닉네임";
-        CreateParticipantRequest request = new CreateParticipantRequest(nickname);
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
 
         CustomException e = new CustomException(NOT_FOUND_GROUP);
         doThrow(e).when(participantService).createParticipant(userId, groupId, nickname);
@@ -188,7 +188,7 @@ class ParticipantControllerTest {
     void create_participant_already_into() throws Exception {
         //given
         String nickname = "닉네임";
-        CreateParticipantRequest request = new CreateParticipantRequest(nickname);
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
 
         CustomException e = new CustomException(ALREADY_INTO_GROUP);
         doThrow(e).when(participantService).createParticipant(userId, groupId, nickname);
@@ -212,7 +212,7 @@ class ParticipantControllerTest {
     void create_participant_duplicate_nickname() throws Exception {
         //given
         String nickname = "닉네임";
-        CreateParticipantRequest request = new CreateParticipantRequest(nickname);
+        ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
 
         CustomException e = new CustomException(ALREADY_USE_NICKNAME);
         doThrow(e).when(participantService).createParticipant(userId, groupId, nickname);
