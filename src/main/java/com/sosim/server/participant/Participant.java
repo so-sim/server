@@ -63,4 +63,5 @@ public class Participant extends BaseTimeEntity {
             group.delete();
         }
     }
+
 }
