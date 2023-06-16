@@ -10,7 +10,6 @@ import com.sosim.server.group.dto.response.GetGroupListResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
-import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -84,12 +83,4 @@ public class GroupController {
         return new ResponseEntity<>(Response.create(getGroups, groupList), getGroups.getHttpStatus());
     }
 
-    @GetMapping("/group/{groupId}/participant")
-    public ResponseEntity<?> getMyNickname(@AuthenticationPrincipal AuthUser authUser,
-                                           @PathVariable("groupId") long groupId) {
-        GetNicknameResponse getNicknameResponse = groupService.getMyNickname(authUser.getId(), groupId);
-        ResponseCode getNickname = ResponseCode.GET_NICKNAME;
-
-        return new ResponseEntity<>(Response.create(getNickname, getNicknameResponse), getNickname.getHttpStatus());
-    }
 }

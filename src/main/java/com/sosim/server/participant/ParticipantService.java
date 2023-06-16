@@ -41,6 +41,7 @@ public class ParticipantService {
     @Transactional(readOnly = true)
     public GetParticipantListResponse getGroupParticipants(long userId, long groupId) {
         Group group = findGroup(groupId);
+        //TODO admin 테이블 구조 변경 후 리팩토링
         List<Participant> normalParticipants = participantRepository.findGroupNormalParticipants(groupId, group.getAdminNickname());
         if (requestUserIsNotAdmin(userId, group)) {
             changeRequestUserOrderToFirst(userId, normalParticipants);
@@ -64,28 +65,29 @@ public class ParticipantService {
         participant.modifyNickname(group, newNickname);
     }
 
-    public GetNicknameResponse getMyNickname(Long userId, Long groupId) {
-        return GetNicknameResponse.create(findParticipant(userId, groupId));
+    @Transactional(readOnly = true)
+    public GetNicknameResponse getMyNickname(long userId, long groupId) {
+        Participant participant = findParticipant(userId, groupId);
+
+        return GetNicknameResponse.toDto(participant);
     }
 
-    public Participant findParticipant(Long userId, Long groupId) {
+    public Participant findParticipant(long userId, long groupId) {
         return participantRepository.findByUserIdAndGroupId(userId, groupId)
                 .orElseThrow(() -> new CustomException(NONE_PARTICIPANT));
     }
 
-    public Participant findParticipant(String nickname, Long groupId) {
+    public Participant findParticipant(String nickname, long groupId) {
         return participantRepository.findByNicknameAndGroupId(nickname, groupId)
                 .orElseThrow(() -> new CustomException(NONE_PARTICIPANT));
     }
 
-    public Slice<Participant> getParticipantSlice(Long index, Long userId) {
+    public Slice<Participant> getParticipantSlice(long index, long userId) {
         if (index == 0) {
             return participantRepository.findByUserIdOrderByIdDesc(userId, PageRequest.ofSize(17));
         }
         return participantRepository.findByIdLessThanAndUserIdOrderByIdDesc(index, userId, PageRequest.ofSize(18));
     }
-
-    // --- Private Method ---
 
     private void saveNewParticipant(User user, Group group, String nickname) {
         Participant intoParticipant = Participant.create(user, nickname);
