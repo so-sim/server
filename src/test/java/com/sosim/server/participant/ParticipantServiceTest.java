@@ -3,6 +3,7 @@ package com.sosim.server.participant;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
+import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserRepository;
@@ -372,6 +373,36 @@ class ParticipantServiceTest {
         assertThat(e.getResponseCode()).isEqualTo(ALREADY_USE_NICKNAME);
     }
 
+    @DisplayName("내 닉네임 조회 / 성공")
+    @Test
+    void get_my_nickname() {
+        //given
+        String nickname = "닉네임";
+        Participant participant = makeParticipant(1L, userId, nickname);
+
+        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+
+        //when
+        GetNicknameResponse response = participantService.getMyNickname(userId, groupId);
+
+        //then
+        assertThat(response).isNotNull();
+        assertThat(response.getNickname()).isEqualTo(nickname);
+    }
+
+    @DisplayName("내 닉네임 조회 / 모임 or 참가자 없는 경우 CustomException(NONE_PARTICIPANT)")
+    @Test
+    void get_my_nickname_no_group_or_participant() {
+        //given
+        doReturn(Optional.empty()).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () ->
+                participantService.getMyNickname(userId, groupId));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NONE_PARTICIPANT);
+    }
 
     private Group makeGroup() {
         Group group = Group.builder().build();
