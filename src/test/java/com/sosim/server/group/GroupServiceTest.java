@@ -3,7 +3,7 @@ package com.sosim.server.group;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
-import com.sosim.server.group.dto.request.UpdateGroupRequest;
+import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.participant.Participant;
@@ -131,7 +131,7 @@ class GroupServiceTest {
         String nickname = null;
         String groupType = "그룹 타입";
         String colorType = "색";
-        UpdateGroupRequest request = makeUpdateGroupRequest(title, nickname, groupType, colorType);
+        ModifyGroupRequest request = makeUpdateGroupRequest(title, nickname, groupType, colorType);
 
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
@@ -140,7 +140,7 @@ class GroupServiceTest {
         doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
 
         //when
-        GroupIdResponse response = groupService.updateGroup(userId, groupId, request);
+        GroupIdResponse response = groupService.modifyGroup(userId, groupId, request);
 
         //then
         assertThat(response.getGroupId()).isEqualTo(groupId);
@@ -157,7 +157,7 @@ class GroupServiceTest {
         String nickname = null;
         String groupType = "그룹 타입";
         String colorType = "색";
-        UpdateGroupRequest request = makeUpdateGroupRequest(title, nickname, groupType, colorType);
+        ModifyGroupRequest request = makeUpdateGroupRequest(title, nickname, groupType, colorType);
 
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
@@ -168,7 +168,7 @@ class GroupServiceTest {
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
-                groupService.updateGroup(userId, groupId, request));
+                groupService.modifyGroup(userId, groupId, request));
 
         //then
         assertThat(e.getResponseCode()).isEqualTo(NONE_ADMIN);
@@ -230,8 +230,8 @@ class GroupServiceTest {
         assertThat(e.getResponseCode()).isEqualTo(NONE_ZERO_PARTICIPANT);
     }
 
-    private static UpdateGroupRequest makeUpdateGroupRequest(String title, String nickname, String groupType, String colorType) {
-        return UpdateGroupRequest.builder()
+    private static ModifyGroupRequest makeUpdateGroupRequest(String title, String nickname, String groupType, String colorType) {
+        return ModifyGroupRequest.builder()
                 .title(title)
                 .nickname(nickname)
                 .groupType(groupType)
