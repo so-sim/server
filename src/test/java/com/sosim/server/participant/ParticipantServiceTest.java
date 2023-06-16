@@ -56,7 +56,7 @@ class ParticipantServiceTest {
                 makeParticipant(userId + 1, "유저1"),
                 makeParticipant(userId + 2, "유저2")));
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
         doReturn(participants).when(participantRepository).findGroupNormalParticipants(groupId, adminNickname);
 
         //when
@@ -85,7 +85,7 @@ class ParticipantServiceTest {
                 makeParticipant(2, userId + 2, "유저2"),
                 makeParticipant(3, requestUserId, requestUserName)));
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
         doReturn(participants).when(participantRepository).findGroupNormalParticipants(groupId, adminNickname);
 
         //when
@@ -114,7 +114,7 @@ class ParticipantServiceTest {
                 makeParticipant(4, userId + 3, "4"),
                 makeParticipant(1, userId + 4, "5")));
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
         doReturn(participants).when(participantRepository).findGroupNormalParticipants(groupId, adminNickname);
 
         //when
@@ -134,7 +134,7 @@ class ParticipantServiceTest {
         String nickname = "닉네임";
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
         doReturn(false).when(participantRepository)
                 .existsByUserIdAndGroupIdAndStatus(userId, groupId, ACTIVE);
         doReturn(false).when(participantRepository)
@@ -171,7 +171,7 @@ class ParticipantServiceTest {
         String nickname = "닉네임";
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.empty()).when(groupRepository).findById(groupId);
+        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipants(groupId);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -190,7 +190,7 @@ class ParticipantServiceTest {
         String nickname = "닉네임";
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
         doReturn(true).when(participantRepository)
                 .existsByUserIdAndGroupIdAndStatus(userId, groupId, ACTIVE);
 
@@ -211,7 +211,7 @@ class ParticipantServiceTest {
         String nickname = "닉네임";
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
         doReturn(false).when(participantRepository)
                 .existsByUserIdAndGroupIdAndStatus(userId, groupId, ACTIVE);
         doReturn(true).when(participantRepository)
@@ -224,6 +224,78 @@ class ParticipantServiceTest {
         //then
         assertThat(exception.getResponseCode()).isEqualTo(ALREADY_USE_NICKNAME);
     }
+
+    @DisplayName("모임 탈퇴 / 성공")
+    @Test
+    void delete_participant() {
+        //given
+        Participant participant = makeParticipant(1L, userId, "닉네임");
+        Group group = makeGroup();
+        group.getParticipantList().add(participant);
+        group.getParticipantList().add(makeParticipant(2L, userId + 1, "닉네임" + 1));
+
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+
+        //when
+        participantService.deleteParticipant(userId, groupId);
+
+        //then
+        assertThat(participant.isActive()).isFalse();
+        assertThat(group.isActive()).isTrue();
+    }
+
+    @DisplayName("모임 탈퇴 / 참가자가 없는 경우 모임도 삭제")
+    @Test
+    void delete_participant_and_group() {
+        //given
+        Participant participant = makeParticipant(1L, userId, "닉네임");
+        Group group = makeGroup();
+        group.getParticipantList().add(participant);
+
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+
+        //when
+        participantService.deleteParticipant(userId, groupId);
+
+        //then
+        assertThat(participant.isActive()).isFalse();
+        assertThat(group.isActive()).isFalse();
+    }
+
+
+    @DisplayName("모임 탈퇴 / 모임이 없는 경우 CustomException(NOT_FOUND_GROUP)")
+    @Test
+    void delete_participant_no_group() {
+        //given
+        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipants(groupId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () ->
+                participantService.deleteParticipant(userId, groupId));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_GROUP);
+    }
+
+    @DisplayName("모임 탈퇴 / 참가자가 없는 경우 CustomException(NONE_PARTICIPANT)")
+    @Test
+    void delete_participant_no_participant() {
+        //given
+        Group group = makeGroup();
+
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.empty()).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () ->
+                participantService.deleteParticipant(userId, groupId));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NONE_PARTICIPANT);
+    }
+
 
     private Group makeGroup() {
         Group group = Group.builder().build();
