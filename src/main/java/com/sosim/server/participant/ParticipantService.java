@@ -51,8 +51,11 @@ public class ParticipantService {
     }
 
     @Transactional
-    public void deleteParticipant(Long userId, Long groupId) {
-        getParticipantEntity(userId, groupId).delete();
+    public void deleteParticipant(long userId, long groupId) {
+        Group group = findGroup(groupId);
+        Participant participant = findParticipant(userId, groupId);
+
+        participant.withdrawGroup(group);
     }
 
     @Transactional
@@ -62,21 +65,21 @@ public class ParticipantService {
             throw new CustomException(ResponseCode.ALREADY_USE_NICKNAME);
         }
 
-        Participant participantEntity = getParticipantEntity(userId, groupId);
+        Participant participantEntity = findParticipant(userId, groupId);
         participantEntity.modifyNickname(createParticipantRequest);
         return participantEntity;
     }
 
     public GetNicknameResponse getMyNickname(Long userId, Long groupId) {
-        return GetNicknameResponse.create(getParticipantEntity(userId, groupId));
+        return GetNicknameResponse.create(findParticipant(userId, groupId));
     }
 
-    public Participant getParticipantEntity(Long userId, Long groupId) {
+    public Participant findParticipant(Long userId, Long groupId) {
         return participantRepository.findByUserIdAndGroupId(userId, groupId)
                 .orElseThrow(() -> new CustomException(ResponseCode.NONE_PARTICIPANT));
     }
 
-    public Participant getParticipantEntity(String nickname, Long groupId) {
+    public Participant findParticipant(String nickname, Long groupId) {
         return participantRepository.findByNicknameAndGroupId(nickname, groupId)
                 .orElseThrow(() -> new CustomException(ResponseCode.NONE_PARTICIPANT));
     }
@@ -144,7 +147,7 @@ public class ParticipantService {
     }
 
     private Group findGroup(long groupId) {
-        return groupRepository.findById(groupId)
+        return groupRepository.findByIdWithParticipants(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
 }

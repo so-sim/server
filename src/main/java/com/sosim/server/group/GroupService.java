@@ -44,7 +44,7 @@ public class GroupService {
 
         try {
             if (userId != 0) {
-                isInto = participantService.getParticipantEntity(userId, groupId) != null;
+                isInto = participantService.findParticipant(userId, groupId) != null;
             }
         } catch (CustomException ignored) {}
 
@@ -86,10 +86,6 @@ public class GroupService {
         groupEntity.delete();
     }
 
-//    public void intoGroup(Long userId, Long groupId, CreateParticipantRequest createParticipantRequest) {
-//        participantService.createParticipant(userId, groupId, createParticipantRequest.getNickname());
-//    }
-
     @Transactional
     public void modifyAdmin(Long userId, Long groupId, CreateParticipantRequest createParticipantRequest) {
         Group groupEntity = getGroupEntity(groupId);
@@ -99,7 +95,7 @@ public class GroupService {
         }
 
         Participant participantEntity = participantService
-                .getParticipantEntity(createParticipantRequest.getNickname(), groupId);
+                .findParticipant(createParticipantRequest.getNickname(), groupId);
 
         if (groupEntity.getParticipantList().stream()
                 .noneMatch(p -> p.getId().equals(participantEntity.getId()))) {
@@ -109,14 +105,14 @@ public class GroupService {
         groupEntity.modifyAdmin(participantEntity);
     }
 
-    @Transactional
-    public void withdrawGroup(Long userId, Long groupId) {
-        Group groupEntity = getGroupEntity(groupId);
-        participantService.deleteParticipant(userId, groupId);
-        if (groupEntity.getParticipantList().stream().noneMatch(p -> p.getStatus().equals(Status.ACTIVE))) {
-            groupEntity.delete();
-        }
-    }
+//    @Transactional
+//    public void withdrawGroup(Long userId, Long groupId) {
+//        Group groupEntity = getGroupEntity(groupId);
+//        participantService.deleteParticipant(userId, groupId);
+//        if (groupEntity.getParticipantList().stream().noneMatch(p -> p.getStatus().equals(Status.ACTIVE))) {
+//            groupEntity.delete();
+//        }
+//    }
 
     public void modifyNickname(Long userId, Long groupId, CreateParticipantRequest createParticipantRequest) {
         Group groupEntity = getGroupEntity(groupId);

@@ -1,7 +1,6 @@
 package com.sosim.server.group;
 
 import com.sosim.server.common.auditing.BaseTimeEntity;
-import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.UpdateGroupRequest;
 import com.sosim.server.participant.Participant;
@@ -13,6 +12,8 @@ import org.hibernate.annotations.BatchSize;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.sosim.server.common.auditing.Status.ACTIVE;
 
 @Entity
 @Getter
@@ -50,7 +51,7 @@ public class Group extends BaseTimeEntity {
         this.adminNickname = adminNickname;
         this.coverColor = coverColor;
         this.groupType = groupType;
-        status = Status.ACTIVE;
+        status = ACTIVE;
     }
 
     public static Group create(Long adminId, CreateGroupRequest createGroupRequest) {
@@ -72,5 +73,14 @@ public class Group extends BaseTimeEntity {
     public void modifyAdmin(Participant participant) {
         adminId = participant.getUser().getId();
         adminNickname = participant.getNickname();
+    }
+
+    public boolean removeParticipant(Participant participant) {
+        return participantList.remove(participant);
+    }
+
+    public boolean hasNoParticipant() {
+        return participantList.stream()
+                .noneMatch(Participant::isActive);
     }
 }

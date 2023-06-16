@@ -92,7 +92,7 @@ class GroupServiceTest {
         Participant participant = new Participant();
 
         doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
-        doReturn(participant).when(participantService).getParticipantEntity(userId, groupId);
+        doReturn(participant).when(participantService).findParticipant(userId, groupId);
 
         //when
         GetGroupResponse response = groupService.getGroup(userId, groupId);
@@ -114,7 +114,7 @@ class GroupServiceTest {
 
         doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
         CustomException e = new CustomException(NONE_PARTICIPANT);
-        doThrow(e).when(participantService).getParticipantEntity(userId, groupId);
+        doThrow(e).when(participantService).findParticipant(userId, groupId);
 
         //when
         GetGroupResponse response = groupService.getGroup(userId, groupId);

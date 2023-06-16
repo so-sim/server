@@ -60,16 +60,6 @@ public class GroupController {
         return new ResponseEntity<>(Response.create(deleteGroup, null), deleteGroup.getHttpStatus());
     }
 
-//    @PostMapping("/group/{groupId}/participant")
-//    public ResponseEntity<?> intoGroup(@AuthenticationPrincipal AuthUser authUser,
-//                                       @PathVariable("groupId") long groupId,
-//                                       @Validated @RequestBody CreateParticipantRequest createParticipantRequest) {
-//        groupService.intoGroup(authUser.getId(), groupId, createParticipantRequest);
-//        ResponseCode intoGroup = ResponseCode.INTO_GROUP;
-//
-//        return new ResponseEntity<>(Response.create(intoGroup, null), intoGroup.getHttpStatus());
-//    }
-
     @PatchMapping("/group/{groupId}/admin")
     public ResponseEntity<?> modifyAdmin(@AuthenticationPrincipal AuthUser authUser,
                                          @PathVariable("groupId") long groupId,
@@ -81,14 +71,14 @@ public class GroupController {
         return new ResponseEntity<>(Response.create(modifyGroupAdmin, null), modifyGroupAdmin.getHttpStatus());
     }
 
-    @DeleteMapping("/group/{groupId}/participant")
-    public ResponseEntity<?> withdrawGroup(@AuthenticationPrincipal AuthUser authUser,
-                                           @PathVariable("groupId") long groupId) {
-        groupService.withdrawGroup(authUser.getId(), groupId);
-        ResponseCode withdrawGroup = ResponseCode.WITHDRAW_GROUP;
-
-        return new ResponseEntity<>(Response.create(withdrawGroup, null), withdrawGroup.getHttpStatus());
-    }
+//    @DeleteMapping("/group/{groupId}/participant")
+//    public ResponseEntity<?> withdrawGroup(@AuthenticationPrincipal AuthUser authUser,
+//                                           @PathVariable("groupId") long groupId) {
+//        groupService.withdrawGroup(authUser.getId(), groupId);
+//        ResponseCode withdrawGroup = ResponseCode.WITHDRAW_GROUP;
+//
+//        return new ResponseEntity<>(Response.create(withdrawGroup, null), withdrawGroup.getHttpStatus());
+//    }
 
     @PatchMapping("/group/{groupId}/participant")
     public ResponseEntity<?> modifyNickname(@AuthenticationPrincipal AuthUser authUser,

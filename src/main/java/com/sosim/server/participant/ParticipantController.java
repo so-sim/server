@@ -33,26 +33,13 @@ public class ParticipantController {
         return new ResponseEntity<>(Response.create(INTO_GROUP, null), INTO_GROUP.getHttpStatus());
     }
 
-//    @PatchMapping("/admin")
-//    public ResponseEntity<?> modifyAdmin(@AuthUserId long userId,
-//                                         @PathVariable("groupId") long groupId,
-//                                         @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
-//
-//        groupService.modifyAdmin(userId, groupId, participantNicknameRequest);
-//        ResponseCode modifyGroupAdmin = ResponseCode.MODIFY_GROUP_ADMIN;
-//
-//        return new ResponseEntity<>(Response.create(modifyGroupAdmin, null), modifyGroupAdmin.getHttpStatus());
-//    }
-//
-//    @DeleteMapping("/participant")
-//    public ResponseEntity<?> withdrawGroup(@AuthUserId long userId,
-//                                           @PathVariable("groupId") long groupId) {
-//        groupService.withdrawGroup(userId, groupId);
-//        ResponseCode withdrawGroup = ResponseCode.WITHDRAW_GROUP;
-//
-//        return new ResponseEntity<>(Response.create(withdrawGroup, null), withdrawGroup.getHttpStatus());
-//    }
-//
+    @DeleteMapping("/participant")
+    public ResponseEntity<?> withdrawGroup(@AuthUserId long userId, @PathVariable("groupId") long groupId) {
+        participantService.deleteParticipant(userId, groupId);
+
+        return new ResponseEntity<>(Response.create(WITHDRAW_GROUP, null), WITHDRAW_GROUP.getHttpStatus());
+    }
+
 //    @PatchMapping("/participant")
 //    public ResponseEntity<?> modifyNickname(@AuthUserId long userId,
 //                                            @PathVariable ("groupId") long groupId,
