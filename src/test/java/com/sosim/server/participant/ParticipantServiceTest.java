@@ -296,6 +296,82 @@ class ParticipantServiceTest {
         assertThat(e.getResponseCode()).isEqualTo(NONE_PARTICIPANT);
     }
 
+    @DisplayName("참가자 닉네임 변경 / 성공")
+    @Test
+    void modify_participant() {
+        //given
+        Participant participant = makeParticipant(1L, userId, "닉네임");
+        Group group = makeGroup();
+        group.getParticipantList().add(participant);
+
+        String newNickname = "새닉네임";
+
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+
+        //when
+        participantService.modifyNickname(userId, groupId, newNickname);
+
+        //then
+        assertThat(participant.getNickname()).isEqualTo(newNickname);
+    }
+
+    @DisplayName("참가자 닉네임 변경 / 그룹이 없는 경우 CustomException(NOT_FOUND_GROUP)")
+    @Test
+    void modify_participant_no_group() {
+        //given
+        String newNickname = "새닉네임";
+
+        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipants(groupId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () ->
+                participantService.modifyNickname(userId, groupId, newNickname));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_GROUP);
+    }
+
+    @DisplayName("참가자 닉네임 변경 / 참가자가 없는 경우 CustomException(NONE_PARTICIPANT)")
+    @Test
+    void modify_participant_no_participant() {
+        //given
+        String newNickname = "새닉네임";
+        Group group = makeGroup();
+
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.empty()).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () ->
+                participantService.modifyNickname(userId, groupId, newNickname));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NONE_PARTICIPANT);
+    }
+
+    @DisplayName("참가자 닉네임 변경 / 중복된 닉네임이 있는 경우 CustomException(ALREADY_USE_NICKNAME)")
+    @Test
+    void modify_participant_dup_nickname() {
+        //given
+        String newNickname = "새닉네임";
+        Group group = makeGroup();
+        Participant participant1 = makeParticipant(1L, userId, "닉네임");
+        Participant participant2 = makeParticipant(2L, userId + 1, newNickname);
+        group.getParticipantList().add(participant1);
+        group.getParticipantList().add(participant2);
+
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(participant1)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () ->
+                participantService.modifyNickname(userId, groupId, newNickname));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(ALREADY_USE_NICKNAME);
+    }
+
 
     private Group makeGroup() {
         Group group = Group.builder().build();

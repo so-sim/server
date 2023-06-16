@@ -90,6 +90,6 @@ public class Group extends BaseTimeEntity {
     }
 
     public boolean isAdminNickname(String nickname) {
-        return adminNickname.equals(nickname);
+        return nickname.equals(adminNickname);
     }
 }
