@@ -18,6 +18,13 @@ import static com.sosim.server.common.response.ResponseCode.*;
 public class ParticipantController {
     private final ParticipantService participantService;
 
+    @GetMapping("/participant")
+    public ResponseEntity<?> getMyNickname(@AuthUserId long userId, @PathVariable long groupId) {
+        GetNicknameResponse response = participantService.getMyNickname(userId, groupId);
+
+        return new ResponseEntity<>(Response.create(GET_NICKNAME, response), GET_NICKNAME.getHttpStatus());
+    }
+
     @GetMapping("/participants")
     public ResponseEntity<?> getGroupParticipants(@AuthUserId long userId, @PathVariable long groupId) {
         GetParticipantListResponse getGroupParticipants = participantService.getGroupParticipants(userId, groupId);
@@ -48,10 +55,4 @@ public class ParticipantController {
         return new ResponseEntity<>(Response.create(MODIFY_NICKNAME, null), MODIFY_NICKNAME.getHttpStatus());
     }
 
-    @GetMapping("/participant")
-    public ResponseEntity<?> getMyNickname(@AuthUserId long userId, @PathVariable long groupId) {
-        GetNicknameResponse response = participantService.getMyNickname(userId, groupId);
-
-        return new ResponseEntity<>(Response.create(GET_NICKNAME, response), GET_NICKNAME.getHttpStatus());
-    }
 }

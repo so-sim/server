@@ -3,6 +3,7 @@ package com.sosim.server.participant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
+import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
@@ -377,6 +378,46 @@ class ParticipantControllerTest {
         resultActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status.code").value(ALREADY_USE_NICKNAME.getCode()))
                 .andExpect(jsonPath("$.status.message").value(ALREADY_USE_NICKNAME.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("내 닉네임 조회 / 성공")
+    @Test
+    void get_my_nickname() throws Exception {
+        //given
+        String nickname = "닉네임";
+        GetNicknameResponse response = new GetNicknameResponse(nickname);
+
+        doReturn(response).when(participantService).getMyNickname(userId, groupId);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d/participant", groupId));
+        ResultActions resultActions = mvc.perform(get(url));
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.status.code").value(GET_NICKNAME.getCode()))
+                .andExpect(jsonPath("$.status.message").value(GET_NICKNAME.getMessage()))
+                .andExpect(jsonPath("$.content.nickname").value(nickname));
+    }
+
+    @WithMockCustomUser
+    @DisplayName("내 닉네임 조회 / 그룹 or 참가자가 없는 경우 NONE_PARTICIPANT")
+    @Test
+    void get_my_nickname_no_participant_or_group() throws Exception {
+        //given
+        CustomException e = new CustomException(NONE_PARTICIPANT);
+        doThrow(e).when(participantService).getMyNickname(userId, groupId);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d/participant", groupId));
+        ResultActions resultActions = mvc.perform(get(url));
+
+        //then
+        resultActions.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status.code").value(NONE_PARTICIPANT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NONE_PARTICIPANT.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
