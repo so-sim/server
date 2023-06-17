@@ -90,8 +90,7 @@ class GroupControllerTest {
                 .content(om.writeValueAsString(request)));
 
         //then
-        //TODO : Status Not_Found 변경
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_USER.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_USER.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -230,8 +229,7 @@ class GroupControllerTest {
         ResultActions resultActions = mvc.perform(get(url));
 
         //then
-        //TODO : Status Not_Found 변경
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -279,8 +277,7 @@ class GroupControllerTest {
                 .content(om.writeValueAsString(request)));
 
         //then
-        //TODO : Status Not_Found 변경
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -303,7 +300,7 @@ class GroupControllerTest {
                 .content(om.writeValueAsString(request)));
 
         //then
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -356,7 +353,7 @@ class GroupControllerTest {
         nullActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status.code").value(BINDING_ERROR.getCode()))
                 .andExpect(jsonPath("$.status.message").value(BINDING_ERROR.getMessage()))
-                .andExpect(jsonPath("$.content.field").value("groupType"));
+                .andExpect(jsonPath("$.content.field").value("type"));
     }
 
     @WithMockCustomUser
@@ -376,7 +373,7 @@ class GroupControllerTest {
         nullActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status.code").value(BINDING_ERROR.getCode()))
                 .andExpect(jsonPath("$.status.message").value(BINDING_ERROR.getMessage()))
-                .andExpect(jsonPath("$.content.field").value("coverColorType"));
+                .andExpect(jsonPath("$.content.field").value("coverColor"));
     }
 
     @WithMockCustomUser
@@ -390,7 +387,6 @@ class GroupControllerTest {
         ResultActions resultActions = mvc.perform(delete(url));
 
         //then
-        //TODO : 204로 변경 체크
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.status.code").value(DELETE_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(DELETE_GROUP.getMessage()))
@@ -412,7 +408,7 @@ class GroupControllerTest {
         ResultActions resultActions = mvc.perform(delete(url));
 
         //then
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -502,8 +498,7 @@ class GroupControllerTest {
                 .content(om.writeValueAsString(request)));
 
         //then
-        //TODO 403 Forbbiden 건의
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());

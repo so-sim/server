@@ -37,7 +37,7 @@ public enum ResponseCode {
     CANNOT_WITHDRAWAL_BY_GROUP_ADMIN(1102, HttpStatus.BAD_REQUEST, "모임의 총무는 소심한 총무 서비스 회원 탈퇴를 할 수 없습니다. 총무 역할을 위임해 주세요."),
 
     NOT_FOUND_GROUP(1001, HttpStatus.NOT_FOUND, "해당 모임을 찾을 수 없습니다."),
-    NONE_ADMIN(1002, HttpStatus.NOT_FOUND, "모임 관리자 권한이 필요합니다."),
+    NONE_ADMIN(1002, HttpStatus.FORBIDDEN, "모임 관리자 권한이 필요합니다."),
     NOT_FOUND_PARTICIPANT(1003, HttpStatus.NOT_FOUND, "존재하지 않는 참가자 정보입니다."),
     ALREADY_USE_NICKNAME(1004, HttpStatus.BAD_REQUEST, "모임에서 이미 사용중인 닉네임입니다."),
     NO_MORE_GROUP(1005, HttpStatus.BAD_REQUEST, "더 이상 조회할 모임이 없습니다."),
