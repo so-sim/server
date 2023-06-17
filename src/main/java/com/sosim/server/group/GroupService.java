@@ -97,9 +97,6 @@ public class GroupService {
                 .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
     }
 
-    private Slice<Participant> getMyParticipants(long userId, Pageable pageable) {
-        return participantRepository.findByUserId(userId, pageable);
-    }
     private Group findGroup(long groupId) {
         return groupRepository.findById(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
