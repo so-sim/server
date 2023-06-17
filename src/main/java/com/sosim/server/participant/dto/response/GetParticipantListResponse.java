@@ -1,6 +1,5 @@
 package com.sosim.server.participant.dto.response;
 
-import com.sosim.server.group.Group;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,9 +12,9 @@ public class GetParticipantListResponse {
 
     private List<String> nicknameList;
 
-    public static GetParticipantListResponse toDto(Group group, List<String> nicknameList) {
+    public static GetParticipantListResponse toDto(String adminNickname, List<String> nicknameList) {
         return GetParticipantListResponse.builder()
-                .adminNickname(group.getAdminNickname())
+                .adminNickname(adminNickname)
                 .nicknameList(nicknameList)
                 .build();
     }

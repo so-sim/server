@@ -51,7 +51,7 @@ class GroupServiceTest {
         CreateGroupRequest request = CreateGroupRequest.builder().build();
 
         User user = new User();
-        Group group = Group.create(userId, request);
+        Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
 
         doReturn(user).when(userService).getUserEntity(userId);
@@ -95,14 +95,14 @@ class GroupServiceTest {
         Participant participant = new Participant();
 
         doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
-        doReturn(participant).when(participantService).findParticipant(userId, groupId);
+//        doReturn(participant).when(participantService).findParticipant(userId, groupId);
 
         //when
         GetGroupResponse response = groupService.getGroup(userId, groupId);
 
         //then
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(groupId);
+        assertThat(response.getGroupId()).isEqualTo(groupId);
         assertThat(response.getTitle()).isEqualTo(title);
         assertThat(response.getIsInto()).isEqualTo(true);
     }
@@ -116,8 +116,8 @@ class GroupServiceTest {
         ReflectionTestUtils.setField(group, "adminId", userId);
 
         doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
-        CustomException e = new CustomException(NONE_PARTICIPANT);
-        doThrow(e).when(participantService).findParticipant(userId, groupId);
+        CustomException e = new CustomException(NOT_FOUND_PARTICIPANT);
+//        doThrow(e).when(participantService).findParticipant(userId, groupId);
 
         //when
         GetGroupResponse response = groupService.getGroup(userId, groupId);

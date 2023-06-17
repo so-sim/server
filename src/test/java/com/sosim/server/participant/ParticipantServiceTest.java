@@ -294,7 +294,7 @@ class ParticipantServiceTest {
                 participantService.deleteParticipant(userId, groupId));
 
         //then
-        assertThat(e.getResponseCode()).isEqualTo(NONE_PARTICIPANT);
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_PARTICIPANT);
     }
 
     @DisplayName("참가자 닉네임 변경 / 성공")
@@ -348,7 +348,7 @@ class ParticipantServiceTest {
                 participantService.modifyNickname(userId, groupId, newNickname));
 
         //then
-        assertThat(e.getResponseCode()).isEqualTo(NONE_PARTICIPANT);
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_PARTICIPANT);
     }
 
     @DisplayName("참가자 닉네임 변경 / 중복된 닉네임이 있는 경우 CustomException(ALREADY_USE_NICKNAME)")
@@ -401,7 +401,7 @@ class ParticipantServiceTest {
                 participantService.getMyNickname(userId, groupId));
 
         //then
-        assertThat(e.getResponseCode()).isEqualTo(NONE_PARTICIPANT);
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_PARTICIPANT);
     }
 
     private Group makeGroup() {

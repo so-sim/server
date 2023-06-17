@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 import static com.sosim.server.common.response.ResponseCode.ALREADY_USE_NICKNAME;
+import static com.sosim.server.common.response.ResponseCode.CANNOT_WITHDRAWAL_BY_GROUP_ADMIN;
 
 @Entity
 @Getter
@@ -34,31 +35,34 @@ public class Participant extends BaseTimeEntity {
     @Column(name = "NICKNAME")
     private String nickname;
 
+    @Column(name = "IS_ADMIN")
+    private boolean isAdmin;
+
     @Builder
-    private Participant(User user, Group group, String nickname) {
+    private Participant(User user, Group group, String nickname, boolean isAdmin) {
         this.user = user;
         this.group = group;
         this.nickname = nickname;
+        this.isAdmin = isAdmin;
         status = Status.ACTIVE;
     }
 
-    public static Participant create(User user, String nickname) {
-        return Participant.builder()
+    public static Participant create(User user, Group group, String nickname, boolean isAdmin) {
+        Participant participant = Participant.builder()
                 .user(user)
+                .group(group)
                 .nickname(nickname)
+                .isAdmin(isAdmin)
                 .build();
+        participant.addGroup(group);
+        return participant;
     }
 
     public void modifyNickname(Group group, String newNickname) {
         if (group.existThatNickname(newNickname)) {
             throw new CustomException(ALREADY_USE_NICKNAME);
         }
-        String preNickname = nickname;
         nickname = newNickname;
-        //TODO 테이블 구조 변경 후 삭제
-        if (group.isAdminNickname(preNickname)) {
-            group.modifyAdmin(user.getId(), newNickname);
-        }
     }
 
     public void addGroup(Group group) {
@@ -69,9 +73,23 @@ public class Participant extends BaseTimeEntity {
     public void withdrawGroup(Group group) {
         delete();
         group.removeParticipant(this);
+        if (isAdmin && group.hasMoreParticipant()) {
+            throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
+        }
         if (group.hasNoParticipant()) {
             group.delete();
         }
     }
 
+    public boolean isMine(long userId) {
+        return user.getId().equals(userId);
+    }
+
+    public void resign() {
+        this.isAdmin = false;
+    }
+
+    public void signOn() {
+        this.isAdmin = true;
+    }
 }

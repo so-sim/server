@@ -9,16 +9,14 @@ import java.util.List;
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class MyGroupsResponse {
-    private Long index;
 
-    private boolean next;
+    private boolean hasNext;
 
-    List<GetGroupResponse> groupList;
+    List<MyGroupDto> groupList;
 
-    public static MyGroupsResponse create(Long index, boolean next, List<GetGroupResponse> groupList) {
+    public static MyGroupsResponse toResponseDto(boolean hasNext, List<MyGroupDto> groupList) {
         return MyGroupsResponse.builder()
-                .index(index)
-                .next(next)
+                .hasNext(hasNext)
                 .groupList(groupList)
                 .build();
     }

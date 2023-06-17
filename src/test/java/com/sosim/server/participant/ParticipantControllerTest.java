@@ -98,7 +98,7 @@ class ParticipantControllerTest {
     @Test
     void get_participants_no_participant() throws Exception {
         //given
-        CustomException e = new CustomException(NONE_PARTICIPANT);
+        CustomException e = new CustomException(NOT_FOUND_PARTICIPANT);
         doThrow(e).when(participantService).getGroupParticipants(userId, groupId);
 
         //when
@@ -107,8 +107,8 @@ class ParticipantControllerTest {
 
         //then
         resultActions.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status.code").value(NONE_PARTICIPANT.getCode()))
-                .andExpect(jsonPath("$.status.message").value(NONE_PARTICIPANT.getMessage()))
+                .andExpect(jsonPath("$.status.code").value(NOT_FOUND_PARTICIPANT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NOT_FOUND_PARTICIPANT.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
@@ -273,7 +273,7 @@ class ParticipantControllerTest {
     @Test
     void delete_participant_no_participant() throws Exception {
         //given
-        CustomException e = new CustomException(NONE_PARTICIPANT);
+        CustomException e = new CustomException(NOT_FOUND_PARTICIPANT);
         doThrow(e).when(participantService).deleteParticipant(userId, groupId);
 
         //when
@@ -282,8 +282,8 @@ class ParticipantControllerTest {
 
         //then
         resultActions.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status.code").value(NONE_PARTICIPANT.getCode()))
-                .andExpect(jsonPath("$.status.message").value(NONE_PARTICIPANT.getMessage()))
+                .andExpect(jsonPath("$.status.code").value(NOT_FOUND_PARTICIPANT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NOT_FOUND_PARTICIPANT.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
@@ -341,7 +341,7 @@ class ParticipantControllerTest {
         String newNickname = "새닉네임";
         ParticipantNicknameRequest request = new ParticipantNicknameRequest(newNickname);
 
-        CustomException e = new CustomException(NONE_PARTICIPANT);
+        CustomException e = new CustomException(NOT_FOUND_PARTICIPANT);
         doThrow(e).when(participantService).modifyNickname(userId, groupId, newNickname);
 
         //when
@@ -352,8 +352,8 @@ class ParticipantControllerTest {
 
         //then
         resultActions.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status.code").value(NONE_PARTICIPANT.getCode()))
-                .andExpect(jsonPath("$.status.message").value(NONE_PARTICIPANT.getMessage()))
+                .andExpect(jsonPath("$.status.code").value(NOT_FOUND_PARTICIPANT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NOT_FOUND_PARTICIPANT.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
@@ -407,7 +407,7 @@ class ParticipantControllerTest {
     @Test
     void get_my_nickname_no_participant_or_group() throws Exception {
         //given
-        CustomException e = new CustomException(NONE_PARTICIPANT);
+        CustomException e = new CustomException(NOT_FOUND_PARTICIPANT);
         doThrow(e).when(participantService).getMyNickname(userId, groupId);
 
         //when
@@ -416,8 +416,8 @@ class ParticipantControllerTest {
 
         //then
         resultActions.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status.code").value(NONE_PARTICIPANT.getCode()))
-                .andExpect(jsonPath("$.status.message").value(NONE_PARTICIPANT.getMessage()))
+                .andExpect(jsonPath("$.status.code").value(NOT_FOUND_PARTICIPANT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NOT_FOUND_PARTICIPANT.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 

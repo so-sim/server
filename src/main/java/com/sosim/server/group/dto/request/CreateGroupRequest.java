@@ -29,11 +29,9 @@ public class CreateGroupRequest {
     @NotNull
     private String coverColor;
 
-    public Group toEntity(long userId) {
+    public Group toEntity() {
         return Group.builder()
                 .title(title)
-                .adminId(userId)
-                .adminNickname(nickname)
                 .groupType(groupType)
                 .coverColor(coverColor)
                 .build();

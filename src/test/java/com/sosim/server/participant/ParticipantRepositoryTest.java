@@ -4,7 +4,6 @@ import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -79,16 +78,14 @@ class ParticipantRepositoryTest {
 
     private Participant makeAdminParticipant(Group group, String nickname) {
         admin = makeParticipant(group, nickname);
-        group.modifyAdmin(admin);
+        group.modifyAdmin(admin.getUser().getId(), nickname);
         groupRepository.save(group);
-        adminId = group.getAdminId();
-        adminName = group.getAdminNickname();
         return admin;
     }
 
     private Participant makeParticipant(Group group, String nickname) {
         User user = makeUser();
-        Participant participant = Participant.create(user, nickname);
+        Participant participant = Participant.create(user, group, nickname, false);
         participant.addGroup(group);
         return participant;
     }

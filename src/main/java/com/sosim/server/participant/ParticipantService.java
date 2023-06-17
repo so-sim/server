@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,21 +40,20 @@ public class ParticipantService {
     @Transactional(readOnly = true)
     public GetParticipantListResponse getGroupParticipants(long userId, long groupId) {
         Group group = findGroup(groupId);
-        //TODO admin 테이블 구조 변경 후 리팩토링
-        List<Participant> normalParticipants = participantRepository.findGroupNormalParticipants(groupId, group.getAdminNickname());
-        if (requestUserIsNotAdmin(userId, group)) {
-            changeRequestUserOrderToFirst(userId, normalParticipants);
-        }
-        return GetParticipantListResponse.toDto(group, toNicknameList(normalParticipants));
-    }
+        List<Participant> participants = getParticipants(group);
 
+        Participant admin = removeAdminInList(participants);
+        if (userIsNotAdmin(userId, group)) {
+            changeRequestUserOrderToFirst(userId, participants);
+        }
+        return GetParticipantListResponse.toDto(admin.getNickname(), toNicknameList(participants));
+    }
 
     @Transactional
     public void deleteParticipant(long userId, long groupId) {
         Group group = findGroup(groupId);
         Participant participant = findParticipant(userId, groupId);
 
-        //TODO : 데이터 구조 변경 후, 총무 탈퇴 요청인데 다른 참가자 존재하는 경우 Exception 던지기
         participant.withdrawGroup(group);
     }
 
@@ -72,20 +72,31 @@ public class ParticipantService {
         return GetNicknameResponse.toDto(participant);
     }
 
-    //TODO 사용 체크하기
-    public Participant findParticipant(long userId, long groupId) {
+    private Participant findParticipant(long userId, long groupId) {
         return participantRepository.findByUserIdAndGroupId(userId, groupId)
-                .orElseThrow(() -> new CustomException(NONE_PARTICIPANT));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
     }
 
-    private static boolean requestUserIsNotAdmin(long userId, Group group) {
+    private ArrayList<Participant> getParticipants(Group group) {
+        return new ArrayList<>(group.getParticipantList());
+    }
+
+    private Participant removeAdminInList(List<Participant> participants) {
+        Participant admin = participants.stream()
+                .filter(Participant::isAdmin)
+                .findFirst()
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
+        participants.remove(admin);
+        return admin;
+    }
+
+    private static boolean userIsNotAdmin(long userId, Group group) {
         return !group.isAdminUser(userId);
     }
 
     private void saveNewParticipant(User user, Group group, String nickname) {
-        Participant intoParticipant = Participant.create(user, nickname);
-        intoParticipant.addGroup(group);
-        participantRepository.save(intoParticipant);
+        Participant participant = Participant.create(user, group, nickname, false);
+        participantRepository.save(participant);
     }
 
     private void checkUsedNickname(Group group, String nickname) {
@@ -124,7 +135,7 @@ public class ParticipantService {
                 return i;
             }
         }
-        throw new CustomException(NONE_PARTICIPANT);
+        throw new CustomException(NOT_FOUND_PARTICIPANT);
     }
 
     private boolean isParticipantOfUser(long userId, Participant participant) {
