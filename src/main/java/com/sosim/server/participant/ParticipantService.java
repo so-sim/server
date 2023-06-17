@@ -9,8 +9,6 @@ import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +41,7 @@ public class ParticipantService {
         Group group = findGroup(groupId);
         //TODO admin 테이블 구조 변경 후 리팩토링
         List<Participant> normalParticipants = participantRepository.findGroupNormalParticipants(groupId, group.getAdminNickname());
-        if (requestUserIsNotAdmin(userId, group)) {
+        if (group.isAdminUser(userId)) {
             changeRequestUserOrderToFirst(userId, normalParticipants);
         }
         return GetParticipantListResponse.toDto(group, toNicknameList(normalParticipants));
@@ -54,6 +52,7 @@ public class ParticipantService {
         Group group = findGroup(groupId);
         Participant participant = findParticipant(userId, groupId);
 
+        //TODO : 데이터 구조 변경 후, 총무 탈퇴 요청인데 다른 참가자 존재하는 경우 Exception 던지기
         participant.withdrawGroup(group);
     }
 
@@ -75,18 +74,6 @@ public class ParticipantService {
     public Participant findParticipant(long userId, long groupId) {
         return participantRepository.findByUserIdAndGroupId(userId, groupId)
                 .orElseThrow(() -> new CustomException(NONE_PARTICIPANT));
-    }
-
-    public Participant findParticipant(String nickname, long groupId) {
-        return participantRepository.findByNicknameAndGroupId(nickname, groupId)
-                .orElseThrow(() -> new CustomException(NONE_PARTICIPANT));
-    }
-
-    public Slice<Participant> getParticipantSlice(long index, long userId) {
-        if (index == 0) {
-            return participantRepository.findByUserIdOrderByIdDesc(userId, PageRequest.ofSize(17));
-        }
-        return participantRepository.findByIdLessThanAndUserIdOrderByIdDesc(index, userId, PageRequest.ofSize(18));
     }
 
     private void saveNewParticipant(User user, Group group, String nickname) {
@@ -136,10 +123,6 @@ public class ParticipantService {
 
     private boolean isParticipantOfUser(long userId, Participant participant) {
         return participant.getUser().getId().equals(userId);
-    }
-
-    private boolean requestUserIsNotAdmin(long userId, Group group) {
-        return !group.getAdminId().equals(userId);
     }
 
     private Group findGroup(long groupId) {

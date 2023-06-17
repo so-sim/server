@@ -57,7 +57,7 @@ public class Participant extends BaseTimeEntity {
         nickname = newNickname;
         //TODO 테이블 구조 변경 후 삭제
         if (group.isAdminNickname(preNickname)) {
-            group.modifyAdmin(this);
+            group.modifyAdmin(user.getId(), newNickname);
         }
     }
 

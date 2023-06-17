@@ -8,10 +8,9 @@ import lombok.Getter;
 @Getter
 @Builder
 public class GroupIdResponse {
-    @JsonProperty("groupId")
-    private Long groupId;
+    private long groupId;
 
-    public static GroupIdResponse create(Group group) {
+    public static GroupIdResponse toDto(Group group) {
         return GroupIdResponse.builder()
                 .groupId(group.getId())
                 .build();
