@@ -41,11 +41,12 @@ public class ParticipantService {
         Group group = findGroup(groupId);
         //TODO admin 테이블 구조 변경 후 리팩토링
         List<Participant> normalParticipants = participantRepository.findGroupNormalParticipants(groupId, group.getAdminNickname());
-        if (group.isAdminUser(userId)) {
+        if (requestUserIsNotAdmin(userId, group)) {
             changeRequestUserOrderToFirst(userId, normalParticipants);
         }
         return GetParticipantListResponse.toDto(group, toNicknameList(normalParticipants));
     }
+
 
     @Transactional
     public void deleteParticipant(long userId, long groupId) {
@@ -71,9 +72,14 @@ public class ParticipantService {
         return GetNicknameResponse.toDto(participant);
     }
 
+    //TODO 사용 체크하기
     public Participant findParticipant(long userId, long groupId) {
         return participantRepository.findByUserIdAndGroupId(userId, groupId)
                 .orElseThrow(() -> new CustomException(NONE_PARTICIPANT));
+    }
+
+    private static boolean requestUserIsNotAdmin(long userId, Group group) {
+        return !group.isAdminUser(userId);
     }
 
     private void saveNewParticipant(User user, Group group, String nickname) {
