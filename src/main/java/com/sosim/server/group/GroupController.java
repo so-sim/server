@@ -74,7 +74,6 @@ public class GroupController {
     public ResponseEntity<?> modifyAdmin(@AuthenticationPrincipal AuthUser authUser,
                                          @PathVariable("groupId") long groupId,
                                          @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
-
         groupService.modifyAdmin(authUser.getId(), groupId, participantNicknameRequest);
         ResponseCode modifyGroupAdmin = ResponseCode.MODIFY_GROUP_ADMIN;
 

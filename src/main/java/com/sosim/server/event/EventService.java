@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +72,16 @@ public class EventService {
         isAdmin(eventEntity, userId, true);
 
         eventEntity.delete();
+    }
+
+    @Transactional
+    public List<Long> modifyEventSituation(long userId, ModifySituationRequest modifySituationRequest) {
+        List<Event> eventList = eventRepository.findByIdIn(modifySituationRequest.getEventIdList());
+        for (Event event : eventList) {
+            event.modifySituation(modifySituationRequest.getSituation());
+        }
+
+        return eventList.stream().map(Event::getId).collect(Collectors.toList());
     }
 
     private Event saveEventEntity(Event event) {

@@ -15,6 +15,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/event/penalty")
@@ -54,5 +56,14 @@ public class EventController {
         ResponseCode deleteEvent = ResponseCode.DELETE_EVENT;
 
         return new ResponseEntity<>(Response.create(deleteEvent, null), deleteEvent.getHttpStatus());
+    }
+
+    @PatchMapping
+    public ResponseEntity<?> modifyEventSituation(@AuthUserId long userId,
+                                                  @Validated @RequestBody ModifySituationRequest modifySituationRequest) {
+        List<Long> eventIdListResponse = eventService.modifyEventSituation(userId, modifySituationRequest);
+        ResponseCode modifySituation = ResponseCode.MODIFY_EVENT_SITUATION;
+
+        return new ResponseEntity<>(Response.create(modifySituation, eventIdListResponse), modifySituation.getHttpStatus());
     }
 }

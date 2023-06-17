@@ -85,4 +85,8 @@ public class Event extends BaseTimeEntity {
         this.memo = modifyEventRequest.getMemo();
         this.situation = modifyEventRequest.getSituation();
     }
+
+    public void modifySituation(String situation) {
+        this.situation = situation;
+    }
 }

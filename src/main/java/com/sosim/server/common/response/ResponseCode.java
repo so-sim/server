@@ -32,6 +32,7 @@ public enum ResponseCode {
     GET_EVENT(successCode(), HttpStatus.OK, "상세 내역이 성공적으로 조회되었습니다."),
     MODIFY_EVENT(successCode(), HttpStatus.OK, "상세 내역이 성공적으로 수정되었습니다."),
     DELETE_EVENT(successCode(), HttpStatus.OK, "상세 내역이 성공적으로 삭제되었습니다."),
+    MODIFY_EVENT_SITUATION(successCode(), HttpStatus.OK, "상세 내역 납부 여부가 성공적으로 변경되었습니다."),
 
     BINDING_ERROR(2000, HttpStatus.BAD_REQUEST, "입력값 중 검증에 실패한 값이 있습니다"),
 
