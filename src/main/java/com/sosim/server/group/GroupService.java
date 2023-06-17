@@ -37,9 +37,7 @@ public class GroupService {
         User user = findUser(userId);
         Group group = groupRepository.save(createGroupRequest.toEntity());
 
-        String adminNickname = createGroupRequest.getNickname();
-        Participant admin = Participant.create(user, group, adminNickname, true);
-        participantRepository.save(admin);
+        saveAdminParticipant(createGroupRequest, user, group);
 
         return GroupIdResponse.toDto(group);
     }
@@ -47,10 +45,7 @@ public class GroupService {
     @Transactional(readOnly = true)
     public GetGroupResponse getGroup(long userId, long groupId) {
         Group group = findGroupWithParticipants(groupId);
-        //TODO : user N + 1 발생하는지 테스트 필요
-        Participant myParticipant = group.getUserParticipant(userId);
 
-        //TODO : IsInto 결정되면 리팩토링
         boolean isAdmin = group.isAdminUser(userId);
         boolean isInto = group.hasParticipant(userId);
         int numberOfParticipants = group.getNumberOfParticipants();
@@ -90,6 +85,12 @@ public class GroupService {
                 .collect(Collectors.toList());
 
         return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroupDtos);
+    }
+
+    private void saveAdminParticipant(CreateGroupRequest createGroupRequest, User user, Group group) {
+        String adminNickname = createGroupRequest.getNickname();
+        Participant admin = Participant.create(user, group, adminNickname, true);
+        participantRepository.save(admin);
     }
 
     private User findUser(long userId) {

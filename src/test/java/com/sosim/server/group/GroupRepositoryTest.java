@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
@@ -16,27 +18,17 @@ import org.springframework.data.domain.Slice;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class GroupRepositoryTest {
+    private static final Logger log = LoggerFactory.getLogger(GroupRepositoryTest.class);
 
-    private long groupId1 = 1L;
-    private long groupId2 = 2L;
 
-    private long userId1 = 1L;
-    private long userId2 = 2L;
-    private long userId3 = 3L;
-    private long userId4 = 4L;
-    private long userId5 = 4L;
-    private long userId6 = 4L;
+    private long groupId = 1L;
 
-    private String nickname1 = "닉네임1";
-    private String nickname2 = "닉네임2";
-    private String nickname3 = "닉네임3";
-    private String nickname4 = "닉네임4";
-    private String nickname5 = "닉네임4";
-    private String nickname6 = "닉네임4";
+    private long userId = 1L;
+
 
     private int nicknameNo;
 
@@ -49,29 +41,54 @@ class GroupRepositoryTest {
     @Autowired
     UserRepository userRepository;
 
-    private int activeParticipantSize;
-    private int deleteParticipantSize;
+    @BeforeEach
+    void setUp() {
+        groupRepository.deleteAll();
+        nicknameNo = 1;
+        groupId = 1L;
+        userId = 1L;
+    }
 
+    @DisplayName("findByIdWithParticipants / 정상 작동 확인")
     @Test
     void findByIdWithParticipants() {
-        Group group = groupRepository.findByIdWithParticipants(1L).get();
+        int activeNumber = saveOneGroupAndParticipants();
 
-        assertThat(group.getParticipantList().size()).isEqualTo(activeParticipantSize);
+        Group group = groupRepository.findByIdWithParticipants(groupId).get();
+
+        assertThat(group.getParticipantList().size()).isEqualTo(activeNumber);
+    }
+
+    @Disabled
+    @DisplayName("findByIdWithParticipants / n + 1 문제 확인")
+    @Test
+    void findByIdWithParticipants_n_plus_1() {
+        int activeNumber = saveOneGroupAndParticipants();
+
+        log.info("\n=============== Query =================");
+        Group group = groupRepository.findByIdWithParticipants(groupId).get();
+
+        group.isAdminUser(userId);
+        group.hasParticipant(userId);
+        group.getNumberOfParticipants();
     }
 
     @DisplayName("findMyGroups / 내 그룹 조회 페이징 성공")
     @Test
     void findMyGroups() {
+        //given
         saveFindMyGroupsData();
 
         PageRequest pageable1 = PageRequest.of(0, 2);
         PageRequest pageable2 = PageRequest.of(1, 2);
         PageRequest pageable3 = PageRequest.of(2, 2);
 
-        Slice<Group> myGroups1 = groupRepository.findMyGroups(userId1, pageable1);
-        Slice<Group> myGroups2 = groupRepository.findMyGroups(userId1, pageable2);
-        Slice<Group> myGroups3 = groupRepository.findMyGroups(userId1, pageable3);
+        //when
+        Slice<Group> myGroups1 = groupRepository.findMyGroups(userId, pageable1);
+        Slice<Group> myGroups2 = groupRepository.findMyGroups(userId, pageable2);
+        Slice<Group> myGroups3 = groupRepository.findMyGroups(userId, pageable3);
 
+        //that
         assertThat(myGroups1.hasNext()).isTrue();
         assertThat(myGroups1.getSize()).isEqualTo(2);
 
@@ -90,13 +107,38 @@ class GroupRepositoryTest {
 
         PageRequest pageable = PageRequest.of(0, 2);
 
-        Slice<Group> myGroups = groupRepository.findMyGroups(userId1, pageable);
+        Slice<Group> myGroups = groupRepository.findMyGroups(userId, pageable);
 
         Group group = myGroups.get().filter(g -> g.getId().equals(1L))
                 .findFirst().get();
         System.out.println(group.isAdminUser(1L));
         System.out.println(group.getAdminParticipant().getNickname());
         System.out.println(group.getNumberOfParticipants());
+    }
+
+    private int saveOneGroupAndParticipants() {
+        Group group = groupRepository.save(makeGroup());
+        groupId = group.getId();
+        User user = userRepository.save(makeUser());
+        userId = user.getId();
+
+        int n = 10;
+        int deletedN = 2;
+        List<Participant> participants = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            participants.add(Participant.create(user, group, "닉네임" + nicknameNo, false));
+        }
+        participants.get(0).signOn();
+        for (int i = 1; i <= deletedN; i++) {
+            Participant delete = participants.get(n % (deletedN + 1) + i);
+            delete.delete();
+            group.getParticipantList().remove(delete);
+        }
+        for (Participant participant : participants) {
+            participantRepository.save(participant);
+        }
+        groupRepository.save(group);
+        return n - deletedN;
     }
 
     private void saveFindMyGroupsData() {
@@ -119,42 +161,8 @@ class GroupRepositoryTest {
         }
     }
 
-//    user1, 2, 3, 4
-    //group1, 2
-    //participant
-
-    @BeforeEach
-    void setUp() {
-        groupRepository.deleteAll();
-
-//
-//
-//        groupId = group.getId();
-//        activeParticipantSize = 5;
-//        for (int i = 0; i < activeParticipantSize; i++) {
-//            Participant participant = saveParticipant(group);
-//        }
-//        deleteParticipantSize = 3;
-//        for (int i = 0; i < deleteParticipantSize; i++) {
-//            Participant participant = saveDeleteParticipant(group);
-//        }
-    }
-
     private User makeUser() {
         return User.builder().build();
-    }
-
-    private Participant saveDeleteParticipant(Group group) {
-        Participant participant = Participant.create(null, group, "닉네임" + nicknameNo++, false);
-        participant.addGroup(group);
-        participant.withdrawGroup(group);
-        return participantRepository.save(participant);
-    }
-
-    private Participant saveParticipant(Group group) {
-        Participant participant = Participant.create(null, group,"닉네임" + nicknameNo++, false);
-        participant.addGroup(group);
-        return participantRepository.save(participant);
     }
 
     private static Group makeGroup() {
