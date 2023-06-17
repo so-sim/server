@@ -51,8 +51,8 @@ public class Group extends BaseTimeEntity {
     public void update(long userId, UpdateGroupRequest updateGroupRequest) {
         checkIsAdmin(userId);
         this.title = updateGroupRequest.getTitle();
-        this.groupType = updateGroupRequest.getGroupType();
-        this.coverColor = updateGroupRequest.getCoverColorType();
+        this.groupType = updateGroupRequest.getType();
+        this.coverColor = updateGroupRequest.getCoverColor();
     }
 
     public void deleteGroup(long userId) {

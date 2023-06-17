@@ -88,7 +88,7 @@ class GroupRepositoryTest {
         Slice<Group> myGroups2 = groupRepository.findMyGroups(userId, pageable2);
         Slice<Group> myGroups3 = groupRepository.findMyGroups(userId, pageable3);
 
-        //that
+        //then
         assertThat(myGroups1.hasNext()).isTrue();
         assertThat(myGroups1.getSize()).isEqualTo(2);
 
