@@ -89,7 +89,7 @@ public class EventService {
     }
 
     private Event getEventEntity(long eventId) {
-        return eventRepository.findById(eventId)
+        return eventRepository.findByIdWithGroup(eventId)
                 .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_EVENT));
     }
 
