@@ -4,9 +4,11 @@ import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.event.dto.request.CreateEventRequest;
+import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.request.ModifySituationRequest;
 import com.sosim.server.event.dto.response.EventIdResponse;
+import com.sosim.server.event.dto.response.GetEventCalendarResponse;
 import com.sosim.server.event.dto.response.GetEventResponse;
 import com.sosim.server.security.AuthUser;
 import lombok.RequiredArgsConstructor;
@@ -65,5 +67,13 @@ public class EventController {
         ResponseCode modifySituation = ResponseCode.MODIFY_EVENT_SITUATION;
 
         return new ResponseEntity<>(Response.create(modifySituation, eventIdListResponse), modifySituation.getHttpStatus());
+    }
+
+    @GetMapping("/calendar")
+    public ResponseEntity<?> getEventCalendar(FilterEventRequest filterEventRequest) {
+        GetEventCalendarResponse eventCalendarResponse = eventService.getEventCalendar(filterEventRequest);
+        ResponseCode eventCalendar = ResponseCode.GET_EVENT_CALENDAR;
+
+        return new ResponseEntity<>(Response.create(eventCalendar, eventCalendarResponse), eventCalendar.getHttpStatus());
     }
 }

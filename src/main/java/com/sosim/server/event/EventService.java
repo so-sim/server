@@ -3,9 +3,11 @@ package com.sosim.server.event;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.event.dto.request.CreateEventRequest;
+import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.request.ModifySituationRequest;
 import com.sosim.server.event.dto.response.EventIdResponse;
+import com.sosim.server.event.dto.response.GetEventCalendarResponse;
 import com.sosim.server.event.dto.response.GetEventResponse;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
@@ -82,6 +84,11 @@ public class EventService {
         }
 
         return eventList.stream().map(Event::getId).collect(Collectors.toList());
+    }
+
+    public GetEventCalendarResponse getEventCalendar(FilterEventRequest filterEventRequest) {
+        List<Event> events = eventRepository.searchAll(filterEventRequest);
+        return GetEventCalendarResponse.toDto(events);
     }
 
     private Event saveEventEntity(Event event) {
