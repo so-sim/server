@@ -1,6 +1,7 @@
 package com.sosim.server.event;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,17 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
+    public List<Event> searchAll(FilterEventRequest filterEventRequest) {
+        return filterEvent(filterEventRequest).fetch();
+    }
+
+    @Override
     public Page<Event> searchAll(FilterEventRequest filterEventRequest, Pageable pageable) {
-        List<Event> result = jpaQueryFactory
+        return doPageable(filterEvent(filterEventRequest), pageable);
+    }
+
+    private JPAQuery<Event> filterEvent(FilterEventRequest filterEventRequest) {
+        return jpaQueryFactory
                 .selectFrom(event)
                 .where(
                         equalsGroup(filterEventRequest.getGroupId()),
@@ -29,11 +39,7 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
                         equalsNickname(filterEventRequest.getNickname()),
                         equalsSituation(filterEventRequest.getSituation())
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-//                .orderBy(sortEventList(pageable))
-                .fetch();
-        return new PageImpl<>(result);
+                .orderBy(event.date.asc());
     }
 
     private BooleanExpression equalsGroup(long groupId) {
@@ -50,5 +56,11 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
 
     private BooleanExpression equalsSituation(String situation) {
         return situation == null ? null : event.situation.contains(situation);
+    }
+
+    private Page<Event> doPageable(JPAQuery<Event> filterEvents, Pageable pageable) {
+        return new PageImpl<>(filterEvents.offset(pageable.getOffset())
+                        .limit(pageable.getPageSize())
+                        .fetch());
     }
 }

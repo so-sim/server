@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface EventRepository extends JpaRepository<Event, Long> {
+public interface EventRepository extends JpaRepository<Event, Long>, EventRepositoryDsl {
     List<Event> findByIdIn(List<Long> eventIdList);
 
     @Query("select e from Event e join fetch e.group where e.id = :eventId")
