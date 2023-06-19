@@ -9,8 +9,6 @@ import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -63,10 +61,10 @@ public class GroupController {
     }
 
     @GetMapping("/groups")
-    public ResponseEntity<?> getMyGroups(@AuthUserId long userId, @PageableDefault(size = 17) Pageable pageable) {
-        MyGroupsResponse myGroups = groupService.getMyGroups(userId, pageable);
+    public ResponseEntity<?> getMyGroups(@AuthUserId long userId, @RequestParam int page) {
+        MyGroupsResponse myGroups = groupService.getMyGroups(userId, page);
 
-        return new ResponseEntity<>(Response.create(GET_GROUPS, myGroups), GET_GROUPS.getHttpStatus());
+        return new ResponseEntity<>(Response.create(GET_MY_GROUPS, myGroups), GET_MY_GROUPS.getHttpStatus());
     }
 
 }

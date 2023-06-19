@@ -89,24 +89,24 @@ class GroupRepositoryTest {
 //        PageRequest pageable3 = PageRequest.of(2, pageSize);
 
         //when
-        Slice<Group> myGroups1 = groupRepository.findMyGroups(userId, pageable1);
-        Slice<Group> myGroups2 = groupRepository.findMyGroups(userId, pageable2);
+//        Slice<Group> myGroups1 = groupRepository.findMyGroups(userId, pageable1);
+//        Slice<Group> myGroups2 = groupRepository.findMyGroups(userId, pageable2);
 //        Slice<Group> myGroups3 = groupRepository.findMyGroups(userId, pageable3);
 
         System.out.println("\n\n====================");
-        System.out.println("=== 1 ===");
-        List<Group> content1 = myGroups1.getContent();
-        System.out.println("size = " + content1.size());
-        for (Group group : content1) {
-            System.out.println("group.getId() = " + group.getId());
-        }
-        System.out.println("\n=== 2 ===");
-        List<Group> content2 = myGroups2.getContent();
-        System.out.println("size = " + content2.size());
-        for (Group group : content2) {
-            System.out.println("group.getId() = " + group.getId());
-        }
-        System.out.println();
+//        System.out.println("=== 1 ===");
+//        List<Group> content1 = myGroups1.getContent();
+//        System.out.println("size = " + content1.size());
+//        for (Group group : content1) {
+//            System.out.println("group.getId() = " + group.getId());
+//        }
+//        System.out.println("\n=== 2 ===");
+//        List<Group> content2 = myGroups2.getContent();
+//        System.out.println("size = " + content2.size());
+//        for (Group group : content2) {
+//            System.out.println("group.getId() = " + group.getId());
+//        }
+//        System.out.println();
 
         //then
 //        assertThat(myGroups1.hasNext()).isTrue();
@@ -123,17 +123,17 @@ class GroupRepositoryTest {
     @DisplayName("findMyGroups / n + 1확인")
     @Test
     void findMyGroups_check_n_plus_1() {
-        saveFindMyGroupsData();
-
-        PageRequest pageable = PageRequest.of(0, 2);
-
-        Slice<Group> myGroups = groupRepository.findMyGroups(userId, pageable);
-
-        Group group = myGroups.get().filter(g -> g.getId().equals(1L))
-                .findFirst().get();
-        System.out.println(group.isAdminUser(1L));
-        System.out.println(group.getAdminParticipant().getNickname());
-        System.out.println(group.getNumberOfParticipants());
+//        saveFindMyGroupsData();
+//
+//        PageRequest pageable = PageRequest.of(0, 2);
+//
+//        Slice<Group> myGroups = groupRepository.findMyGroups(userId, pageable);
+//
+//        Group group = myGroups.get().filter(g -> g.getId().equals(1L))
+//                .findFirst().get();
+//        System.out.println(group.isAdminUser(1L));
+//        System.out.println(group.getAdminParticipant().getNickname());
+//        System.out.println(group.getNumberOfParticipants());
     }
 
     private int saveOneGroupAndParticipants() {

@@ -22,7 +22,7 @@ public enum ResponseCode {
     MODIFY_GROUP_ADMIN(successCode(), HttpStatus.OK, "관리자가 성공적으로 변경되었습니다."),
     WITHDRAW_GROUP(successCode(), HttpStatus.OK, "성공적으로 모임에서 탈퇴되었습니다."),
     MODIFY_NICKNAME(successCode(), HttpStatus.OK, "성공적으로 닉네임이 수정되었습니다."),
-    GET_GROUPS(successCode(), HttpStatus.OK, "성공적으로 참가한 모임들이 조회되었습니다"),
+    GET_MY_GROUPS(successCode(), HttpStatus.OK, "성공적으로 참가한 모임들이 조회되었습니다"),
     GET_NICKNAME(successCode(), HttpStatus.OK , "성공적으로 닉네임이 조회되었습니다."),
 
     CAN_WITHDRAW(successCode(), HttpStatus.OK, "회원 탈퇴가 가능한 상태입니다."),
