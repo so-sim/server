@@ -2,7 +2,7 @@ package com.sosim.server.group;
 
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
-import com.sosim.server.group.dto.request.UpdateGroupRequest;
+import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.participant.Participant;
 import lombok.Builder;
 import lombok.Getter;
@@ -64,10 +64,10 @@ public class Group extends BaseTimeEntity {
                 .build();
     }
 
-    public void update(UpdateGroupRequest updateGroupRequest) {
-        this.title = updateGroupRequest.getTitle();
-        this.groupType = updateGroupRequest.getGroupType();
-        this.coverColor = updateGroupRequest.getCoverColorType();
+    public void modify(ModifyGroupRequest modifyGroupRequest) {
+        this.title = modifyGroupRequest.getTitle();
+        this.groupType = modifyGroupRequest.getGroupType();
+        this.coverColor = modifyGroupRequest.getCoverColorType();
     }
 
     public void modifyAdmin(Participant participant) {

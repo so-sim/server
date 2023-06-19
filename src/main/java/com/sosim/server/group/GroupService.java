@@ -4,7 +4,7 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
-import com.sosim.server.group.dto.request.UpdateGroupRequest;
+import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupListResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
@@ -51,13 +51,13 @@ public class GroupService {
     }
 
     @Transactional
-    public GroupIdResponse updateGroup(Long userId, Long groupId, UpdateGroupRequest updateGroupRequest) {
+    public GroupIdResponse modifyGroup(Long userId, Long groupId, ModifyGroupRequest modifyGroupRequest) {
         Group groupEntity = getGroupEntity(groupId);
 
         if (!groupEntity.getAdminId().equals(userId)) {
             throw new CustomException(ResponseCode.NONE_ADMIN);
         }
-        groupEntity.update(updateGroupRequest);
+        groupEntity.modify(modifyGroupRequest);
 
         //TODO 논의 후 지우기
 //        if (updateGroupRequest.getNickname() != null) {

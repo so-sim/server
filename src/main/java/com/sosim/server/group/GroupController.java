@@ -5,7 +5,7 @@ import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
-import com.sosim.server.group.dto.request.UpdateGroupRequest;
+import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupListResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
@@ -43,8 +43,8 @@ public class GroupController {
     @PatchMapping("/group/{groupId}")
     public ResponseEntity<?> modifyGroup(@AuthUserId long userId,
                                          @PathVariable("groupId") long groupId,
-                                         @Validated @RequestBody UpdateGroupRequest updateGroupRequest) {
-        GroupIdResponse groupIdResponse = groupService.updateGroup(userId, groupId, updateGroupRequest);
+                                         @Validated @RequestBody ModifyGroupRequest modifyGroupRequest) {
+        GroupIdResponse groupIdResponse = groupService.modifyGroup(userId, groupId, modifyGroupRequest);
         ResponseCode modifyGroup = ResponseCode.MODIFY_GROUP;
 
         return new ResponseEntity<>(Response.create(modifyGroup, groupIdResponse), modifyGroup.getHttpStatus());
@@ -63,7 +63,6 @@ public class GroupController {
     public ResponseEntity<?> modifyAdmin(@AuthenticationPrincipal AuthUser authUser,
                                          @PathVariable("groupId") long groupId,
                                          @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
-
         groupService.modifyAdmin(authUser.getId(), groupId, participantNicknameRequest);
         ResponseCode modifyGroupAdmin = ResponseCode.MODIFY_GROUP_ADMIN;
 

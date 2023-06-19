@@ -1,15 +1,18 @@
 package com.sosim.server.group;
 
+import com.sosim.server.config.QueryDslConfig;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
+@Import(QueryDslConfig.class)
 class GroupRepositoryTest {
 
     private long groupId = 1L;
