@@ -2,14 +2,13 @@ package com.sosim.server.event.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sosim.server.event.Event;
-import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
 @Getter
-@Builder(access = AccessLevel.PRIVATE)
+@SuperBuilder
 public class GetEventResponse {
     @JsonProperty("eventId")
     private Long id;
@@ -32,10 +31,7 @@ public class GetEventResponse {
     @JsonProperty("nickname")
     private String nickname;
 
-    @JsonProperty("isAdmin")
-    private Boolean isAdmin;
-
-    public static GetEventResponse toDto(Event event, boolean isAdmin) {
+    public static GetEventResponse toDto(Event event) {
         return GetEventResponse.builder()
                 .id(event.getId())
                 .date(event.getDate())
@@ -44,7 +40,6 @@ public class GetEventResponse {
                 .memo(event.getMemo())
                 .situation(event.getSituation())
                 .nickname(event.getNickname())
-                .isAdmin(isAdmin)
                 .build();
     }
 }
