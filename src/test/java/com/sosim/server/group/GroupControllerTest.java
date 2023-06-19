@@ -6,20 +6,28 @@ import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.UpdateGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
+import com.sosim.server.group.dto.response.MyGroupDto;
+import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.sosim.server.common.response.ResponseCode.*;
 import static org.mockito.Mockito.*;
@@ -452,11 +460,36 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
+    @Disabled // TODO : 모임 조회 페이징 변경 후 수정
     @WithMockCustomUser
     @DisplayName("내 모임 조회 / 성공")
     @Test
     void get_my_groups() throws Exception {
-        //TODO: 리팩토링 후 작성
+        //given
+        List<MyGroupDto> myGroupDtos = new ArrayList<>();
+        Group group = Group.builder().build();
+        ReflectionTestUtils.setField(group, "id", 1L);
+        myGroupDtos.add(MyGroupDto.toDto(group, true));
+        for (int i = 0; i < 16; i++) {
+            Group temp = Group.builder().build();
+            ReflectionTestUtils.setField(temp, "id", 1);
+            myGroupDtos.add(MyGroupDto.toDto(group, false));
+        }
+        MyGroupsResponse response = MyGroupsResponse.toResponseDto(true, myGroupDtos);
+
+        doReturn(response).when(groupService).getMyGroups(userId, any(Pageable.class));
+
+        //when
+        String url = "/api/groups";
+        ResultActions resultActions = mvc.perform(get(url)
+                .param("page", "0"));
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.status.code").value(GET_GROUPS.getCode()))
+                .andExpect(jsonPath("$.status.message").value(GET_GROUPS.getMessage()))
+                //TODO
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @WithMockCustomUser
