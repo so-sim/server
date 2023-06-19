@@ -87,7 +87,7 @@ class ParticipantControllerTest {
         ResultActions resultActions = mvc.perform(get(url));
 
         //then
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -153,7 +153,7 @@ class ParticipantControllerTest {
                 .content(om.writeValueAsString(request)));
 
         //then
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_USER.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_USER.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -177,7 +177,7 @@ class ParticipantControllerTest {
                 .content(om.writeValueAsString(request)));
 
         //then
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -262,7 +262,7 @@ class ParticipantControllerTest {
         ResultActions resultActions = mvc.perform(delete(url));
 
         //then
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -327,7 +327,7 @@ class ParticipantControllerTest {
                 .content(om.writeValueAsString(request)));
 
         //then
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
