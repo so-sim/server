@@ -1,4 +1,4 @@
-buildscript { // 이놈
+buildscript {
 	ext {
 		queryDslVersion = "5.0.0"
 	}
@@ -72,22 +72,22 @@ tasks.named('test') {
 
 def querydslDir = "$buildDir/generated/querydsl"
 
-querydsl { //이놈
+querydsl {
 	jpa = true
 	querydslSourcesDir = querydslDir
 }
 
-sourceSets { //이놈
+sourceSets {
 	main.java.srcDir querydslDir
 }
 
-configurations { // 이놈
+configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
 	querydsl.extendsFrom compileClasspath
 }
 
-compileQuerydsl { // 이놈
+compileQuerydsl {
 	options.annotationProcessorPath = configurations.querydsl
 }
