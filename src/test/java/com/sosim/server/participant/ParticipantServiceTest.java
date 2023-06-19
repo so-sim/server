@@ -15,8 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static com.sosim.server.common.auditing.Status.ACTIVE;
@@ -43,88 +41,6 @@ class ParticipantServiceTest {
 
     @Mock
     UserRepository userRepository;
-
-    @DisplayName("모임 참가자 리스트 조회 / 응답 테스트")
-    @Test
-    void get_participants() {
-        //given
-        String adminNickname = "총무닉네임";
-        Group group = new Group();
-        ReflectionTestUtils.setField(group, "id", groupId);
-        ReflectionTestUtils.setField(group, "adminId", userId);
-        ReflectionTestUtils.setField(group, "adminNickname", adminNickname);
-        List<Participant> participants = new ArrayList<>(List.of(
-                makeParticipant(userId + 1, "유저1"),
-                makeParticipant(userId + 2, "유저2")));
-
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
-        doReturn(participants).when(participantRepository).findGroupNormalParticipants(groupId, adminNickname);
-
-        //when
-        GetParticipantListResponse response = participantService.getGroupParticipants(userId, groupId);
-
-        //then
-        assertThat(response).isNotNull();
-        assertThat(response.getAdminNickname()).isEqualTo(adminNickname);
-        assertThat(response.getNicknameList()).containsExactly("유저1", "유저2");
-    }
-
-    @DisplayName("모임 참가자 리스트 조회 / 총무가 아닌 유저가 nicknameList의 첫 번째 원소")
-    @Test
-    void get_participants_not_admin_request() {
-        //given
-        String adminNickname = "총무닉네임";
-        long requestUserId = 9;
-        String requestUserName = "요청유저";
-
-        Group group = new Group();
-        ReflectionTestUtils.setField(group, "id", groupId);
-        ReflectionTestUtils.setField(group, "adminId", userId);
-        ReflectionTestUtils.setField(group, "adminNickname", adminNickname);
-        List<Participant> participants = new ArrayList<>(List.of(
-                makeParticipant(1, userId + 1, "유저1"),
-                makeParticipant(2, userId + 2, "유저2"),
-                makeParticipant(3, requestUserId, requestUserName)));
-
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
-        doReturn(participants).when(participantRepository).findGroupNormalParticipants(groupId, adminNickname);
-
-        //when
-        GetParticipantListResponse response = participantService.getGroupParticipants(requestUserId, groupId);
-
-        //then
-        assertThat(response.getNicknameList().get(0)).isEqualTo(requestUserName);
-    }
-
-    @DisplayName("모임 참가자 리스트 조회 / 요청 유저 제외하고 nickname 오름차순 정렬")
-    @Test
-    void get_participants_asc_nickname() {
-        //given
-        String adminNickname = "총무닉네임";
-        long requestUserId = 9;
-        String requestUserName = "3";
-
-        Group group = new Group();
-        ReflectionTestUtils.setField(group, "id", groupId);
-        ReflectionTestUtils.setField(group, "adminId", userId);
-        ReflectionTestUtils.setField(group, "adminNickname", adminNickname);
-        List<Participant> participants = new ArrayList<>(List.of(
-                makeParticipant(3, userId + 1, "1"),
-                makeParticipant(2, userId + 2, "2"),
-                makeParticipant(5, requestUserId, requestUserName),
-                makeParticipant(4, userId + 3, "4"),
-                makeParticipant(1, userId + 4, "5")));
-
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
-        doReturn(participants).when(participantRepository).findGroupNormalParticipants(groupId, adminNickname);
-
-        //when
-        GetParticipantListResponse response = participantService.getGroupParticipants(requestUserId, groupId);
-
-        //then
-        assertThat(response.getNicknameList())
-                .containsExactly(requestUserName, "1", "2", "4", "5");
-    }
 
     @DisplayName("참가자 가입 / 정상")
     @Test
@@ -225,6 +141,104 @@ class ParticipantServiceTest {
         //then
         assertThat(exception.getResponseCode()).isEqualTo(ALREADY_USE_NICKNAME);
     }
+
+    @DisplayName("모임 참가자 리스트 조회 / 응답 테스트")
+    @Test
+    void get_participants() {
+        //given
+        Group group = makeGroup();
+        addParticipantInGroup(group, userId, true);
+        addParticipantInGroup(group, userId + 1, false);
+        addParticipantInGroup(group, userId + 2, false);
+        addParticipantInGroup(group, userId + 3, false);
+
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+
+        //when
+        GetParticipantListResponse response = participantService.getGroupParticipants(userId, groupId);
+
+        //then
+        assertThat(response).isNotNull();
+        assertThat(response.getAdminNickname()).isEqualTo("닉네임" + userId);
+        assertThat(response.getNicknameList())
+                .containsExactly("닉네임" + (userId + 1), "닉네임" + (userId + 2), "닉네임" + (userId + 3));
+    }
+
+    @DisplayName("모임 참가자 리스트 조회 / 총무가 아닌 유저가 nicknameList의 첫 번째 원소")
+    @Test
+    void get_participants_not_admin_request() {
+        //given
+        Group group = makeGroup();
+        addParticipantInGroup(group, userId + 1, true);
+        addParticipantInGroup(group, userId + 2, false);
+        addParticipantInGroup(group, userId, false);
+        addParticipantInGroup(group, userId + 3, false);
+
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+
+        //when
+        GetParticipantListResponse response = participantService.getGroupParticipants(userId, groupId);
+
+        //then
+        assertThat(response.getAdminNickname()).isEqualTo("닉네임" + (userId + 1));
+        assertThat(response.getNicknameList()).containsExactly("닉네임" + userId, "닉네임" + (userId + 2), "닉네임" + (userId + 3));
+    }
+
+    @DisplayName("모임 참가자 리스트 조회 / 요청 유저, Admin 제외하고 nickname 오름차순 정렬")
+    @Test
+    void get_participants_asc_nickname() {
+        //given
+        Group group = makeGroup();
+        addParticipantInGroup(group, userId + 1, true);
+        addParticipantInGroup(group, userId + 2, false);
+        addParticipantInGroup(group, userId + 3, false);
+        addParticipantInGroup(group, userId + 4, false);
+        addParticipantInGroup(group, userId + 5, false);
+
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+
+        //when
+        GetParticipantListResponse response = participantService.getGroupParticipants(userId + 3, groupId);
+
+        //then
+        assertThat(response.getAdminNickname()).isEqualTo("닉네임" + (userId + 1));
+        assertThat(response.getNicknameList())
+                .containsExactly("닉네임" + (userId + 3),
+                        "닉네임" + (userId + 2),
+                        "닉네임" + (userId + 4),
+                        "닉네임" + (userId + 5));
+    }
+
+    @DisplayName("모임 참가자 리스트 조회 / 그룹이 없는 경우 CustomException(NOT_FOUND_GROUP)")
+    @Test
+    void get_participants_no_group() {
+        //given
+        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipants(groupId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () ->
+                participantService.getGroupParticipants(userId, groupId));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_GROUP);
+    }
+
+    @DisplayName("모임 참가자 리스트 조회 / 총무가 없는 경우 CustomException(NOT_FOUND_PARTICIPANT)")
+    @Test
+    void get_participants_no_admin() {
+        //given
+        Group group = makeGroup();
+        addParticipantInGroup(group, userId, false);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () ->
+                participantService.getGroupParticipants(userId, groupId));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_PARTICIPANT);
+    }
+
 
     @DisplayName("모임 탈퇴 / 성공")
     @Test
@@ -416,17 +430,19 @@ class ParticipantServiceTest {
         return user;
     }
 
-    private Participant makeParticipant(long id, String nickname) {
-        return makeParticipant(id, 0L, nickname);
-    }
-
     private Participant makeParticipant(long id, long userId, String nickname) {
         Participant participant = Participant.builder().nickname(nickname).build();
         ReflectionTestUtils.setField(participant, "id", id);
         User user = new User();
         ReflectionTestUtils.setField(user, "id", userId);
         ReflectionTestUtils.setField(participant, "user", user);
+
         return participant;
     }
 
+    private Participant addParticipantInGroup(Group group, long userId, boolean isAdmin) {
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", userId);
+        return Participant.create(user, group, "닉네임" + userId, isAdmin);
+    }
 }
