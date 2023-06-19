@@ -6,12 +6,12 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class GetOneEventResponse extends GetEventResponse {
+public class GetEventOneResponse extends GetEventResponse {
 
     private Boolean isAdmin;
 
-    public static GetOneEventResponse toDto(Event event, boolean isAdmin) {
-        return GetOneEventResponse.builder()
+    public static GetEventOneResponse toDto(Event event, boolean isAdmin) {
+        return GetEventOneResponse.builder()
                 .id(event.getId())
                 .date(event.getDate())
                 .amount(event.getAmount())
