@@ -6,15 +6,15 @@ import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.request.ModifySituationRequest;
-import com.sosim.server.event.dto.response.EventIdResponse;
-import com.sosim.server.event.dto.response.GetEventCalendarResponse;
-import com.sosim.server.event.dto.response.GetEventResponse;
+import com.sosim.server.event.dto.response.*;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,10 +45,10 @@ public class EventService {
         return EventIdResponse.create(eventEntity);
     }
 
-    public GetEventResponse getEvent(long userId, long eventId) {
+    public GetEventOneResponse getEvent(long userId, long eventId) {
         Event eventEntity = getEventEntity(eventId);
 
-        return GetEventResponse.toDto(eventEntity, isAdmin(eventEntity, userId, false));
+        return GetEventOneResponse.toDto(eventEntity, isAdmin(eventEntity, userId, false));
     }
 
     @Transactional
@@ -89,6 +89,11 @@ public class EventService {
     public GetEventCalendarResponse getEventCalendar(FilterEventRequest filterEventRequest) {
         List<Event> events = eventRepository.searchAll(filterEventRequest);
         return GetEventCalendarResponse.toDto(events);
+    }
+
+    public GetEventListResponse getEvents(FilterEventRequest filterEventRequest, Pageable pageable) {
+        Page<Event> events = eventRepository.searchAll(filterEventRequest, pageable);
+        return GetEventListResponse.toDto(events.getContent(), events.getTotalElements());
     }
 
     private Event saveEventEntity(Event event) {
