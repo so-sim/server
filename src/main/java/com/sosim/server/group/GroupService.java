@@ -6,13 +6,11 @@ import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupListResponse;
-import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
+import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantService;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
-import com.sosim.server.participant.dto.response.GetNicknameResponse;
-import com.sosim.server.user.User;
 import com.sosim.server.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -31,9 +29,8 @@ public class GroupService {
     private final ParticipantService participantService;
 
     public GroupIdResponse createGroup(Long userId, CreateGroupRequest createGroupRequest) {
-        User userEntity = userService.getUserEntity(userId);
         Group groupEntity = saveGroupEntity(Group.create(userId, createGroupRequest));
-        participantService.creteParticipant(userEntity, groupEntity, createGroupRequest.getNickname());
+        participantService.createParticipant(userId, groupEntity.getId(), createGroupRequest.getNickname());
 
         return GroupIdResponse.create(groupEntity);
     }
@@ -44,7 +41,7 @@ public class GroupService {
 
         try {
             if (userId != 0) {
-                isInto = participantService.getParticipantEntity(userId, groupId) != null;
+                isInto = participantService.findParticipant(userId, groupId) != null;
             }
         } catch (CustomException ignored) {}
 
@@ -62,9 +59,10 @@ public class GroupService {
         }
         groupEntity.modify(modifyGroupRequest);
 
-        if (modifyGroupRequest.getNickname() != null) {
-            modifyNickname(userId, groupId, new ParticipantNicknameRequest(modifyGroupRequest.getNickname()));
-        }
+        //TODO 논의 후 지우기
+//        if (updateGroupRequest.getNickname() != null) {
+//            modifyNickname(userId, groupId, new ParticipantNicknameRequest(updateGroupRequest.getNickname()));
+//        }
 
         return GroupIdResponse.create(groupEntity);
     }
@@ -86,11 +84,6 @@ public class GroupService {
         groupEntity.delete();
     }
 
-    public void intoGroup(Long userId,Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
-        participantService.creteParticipant(userService.getUserEntity(userId), getGroupEntity(groupId),
-                participantNicknameRequest.getNickname());
-    }
-
     @Transactional
     public void modifyAdmin(Long userId, Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
         Group groupEntity = getGroupEntity(groupId);
@@ -100,7 +93,7 @@ public class GroupService {
         }
 
         Participant participantEntity = participantService
-                .getParticipantEntity(participantNicknameRequest.getNickname(), groupId);
+                .findParticipant(participantNicknameRequest.getNickname(), groupId);
 
         if (groupEntity.getParticipantList().stream()
                 .noneMatch(p -> p.getId().equals(participantEntity.getId()))) {
@@ -108,24 +101,6 @@ public class GroupService {
         }
 
         groupEntity.modifyAdmin(participantEntity);
-    }
-
-    @Transactional
-    public void withdrawGroup(Long userId, Long groupId) {
-        Group groupEntity = getGroupEntity(groupId);
-        participantService.deleteParticipant(userId, groupId);
-        if (groupEntity.getParticipantList().stream().noneMatch(p -> p.getStatus().equals(Status.ACTIVE))) {
-            groupEntity.delete();
-        }
-    }
-
-    public void modifyNickname(Long userId, Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
-        Group groupEntity = getGroupEntity(groupId);
-        Participant participant = participantService.modifyNickname(userId, groupId, participantNicknameRequest);
-
-        if (groupEntity.getAdminId().equals(userId)) {
-            groupEntity.modifyAdmin(participant);
-        }
     }
 
     public GetGroupListResponse getMyGroups(Long index, Long userId) {
@@ -146,10 +121,6 @@ public class GroupService {
 
         return GetGroupListResponse.create(participantList.get(participantList.size() - 1).getId(),
                 slice.hasNext(), groupList);
-    }
-
-    public GetNicknameResponse getMyNickname(Long userId, Long groupId) {
-        return participantService.getMyNickname(userId, groupId);
     }
 
     public Group saveGroupEntity(Group group) {

@@ -1,15 +1,17 @@
 package com.sosim.server.participant;
 
+import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.Group;
-import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import static com.sosim.server.common.response.ResponseCode.ALREADY_USE_NICKNAME;
 
 @Entity
 @Getter
@@ -40,15 +42,36 @@ public class Participant extends BaseTimeEntity {
         status = Status.ACTIVE;
     }
 
-    public static Participant create(User user, Group group, String nickname) {
+    public static Participant create(User user, String nickname) {
         return Participant.builder()
                 .user(user)
-                .group(group)
                 .nickname(nickname)
                 .build();
     }
 
-    public void modifyNickname(ParticipantNicknameRequest participantNicknameRequest) {
-        this.nickname = participantNicknameRequest.getNickname();
+    public void modifyNickname(Group group, String newNickname) {
+        if (group.existThatNickname(newNickname)) {
+            throw new CustomException(ALREADY_USE_NICKNAME);
+        }
+        String preNickname = nickname;
+        nickname = newNickname;
+        //TODO 테이블 구조 변경 후 삭제
+        if (group.isAdminNickname(preNickname)) {
+            group.modifyAdmin(this);
+        }
     }
+
+    public void addGroup(Group group) {
+        group.getParticipantList().add(this);
+        this.group = group;
+    }
+
+    public void withdrawGroup(Group group) {
+        delete();
+        group.removeParticipant(this);
+        if (group.hasNoParticipant()) {
+            group.delete();
+        }
+    }
+
 }

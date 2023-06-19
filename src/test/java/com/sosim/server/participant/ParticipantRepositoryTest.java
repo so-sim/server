@@ -88,7 +88,9 @@ class ParticipantRepositoryTest {
 
     private Participant makeParticipant(Group group, String nickname) {
         User user = makeUser();
-        return Participant.create(user, group, nickname);
+        Participant participant = Participant.create(user, nickname);
+        participant.addGroup(group);
+        return participant;
     }
 
     private User makeUser() {
