@@ -2,7 +2,7 @@ package com.sosim.server.group;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
-import com.sosim.server.group.dto.request.UpdateGroupRequest;
+import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupDto;
@@ -53,9 +53,9 @@ public class GroupService {
     }
 
     @Transactional
-    public GroupIdResponse updateGroup(long userId, long groupId, UpdateGroupRequest updateGroupRequest) {
+    public GroupIdResponse updateGroup(long userId, long groupId, ModifyGroupRequest modifyGroupRequest) {
         Group group = findGroup(groupId);
-        group.update(userId, updateGroupRequest);
+        group.update(userId, modifyGroupRequest);
 
         return GroupIdResponse.toDto(group);
     }

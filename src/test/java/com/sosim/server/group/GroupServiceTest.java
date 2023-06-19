@@ -3,7 +3,7 @@ package com.sosim.server.group;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
-import com.sosim.server.group.dto.request.UpdateGroupRequest;
+import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.participant.Participant;
@@ -169,7 +169,7 @@ class GroupServiceTest {
         String title = "타이틀";
         String groupType = "그룹 타입";
         String colorType = "색";
-        UpdateGroupRequest request = makeUpdateGroupRequest(title, groupType, colorType);
+        ModifyGroupRequest request = makeUpdateGroupRequest(title, groupType, colorType);
 
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
@@ -191,7 +191,7 @@ class GroupServiceTest {
     @Test
     void modify_group_not_admin() {
         //given
-        UpdateGroupRequest request = makeUpdateGroupRequest("타이틀", "그룹 타입", "색");
+        ModifyGroupRequest request = makeUpdateGroupRequest("타이틀", "그룹 타입", "색");
 
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
@@ -270,8 +270,8 @@ class GroupServiceTest {
         return Participant.create(user, group, "닉네임" + userId, isAdmin);
     }
 
-    private static UpdateGroupRequest makeUpdateGroupRequest(String title, String groupType, String colorType) {
-        return UpdateGroupRequest.builder()
+    private static ModifyGroupRequest makeUpdateGroupRequest(String title, String groupType, String colorType) {
+        return ModifyGroupRequest.builder()
                 .title(title)
                 .type(groupType)
                 .coverColor(colorType)

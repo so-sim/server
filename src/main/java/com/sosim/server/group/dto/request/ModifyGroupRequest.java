@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class UpdateGroupRequest {
+public class ModifyGroupRequest {
     @NotBlank
     @Size(min = 1, max = 15, message = "모임 이름은 최소 1글자, 최대 15글자까지 허용됩니다.")
     private String title;
@@ -24,7 +24,7 @@ public class UpdateGroupRequest {
     private String coverColor;
 
     @Builder
-    public UpdateGroupRequest(String title, String type, String coverColor) {
+    public ModifyGroupRequest(String title, String type, String coverColor) {
         this.title = title;
         this.type = type;
         this.coverColor = coverColor;

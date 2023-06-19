@@ -3,7 +3,7 @@ package com.sosim.server.group;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.common.response.ResponseCode;
-import com.sosim.server.group.dto.request.UpdateGroupRequest;
+import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.participant.Participant;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,7 +48,7 @@ public class Group extends BaseTimeEntity {
         status = ACTIVE;
     }
 
-    public void update(long userId, UpdateGroupRequest updateGroupRequest) {
+    public void update(long userId, ModifyGroupRequest updateGroupRequest) {
         checkIsAdmin(userId);
         this.title = updateGroupRequest.getTitle();
         this.groupType = updateGroupRequest.getType();

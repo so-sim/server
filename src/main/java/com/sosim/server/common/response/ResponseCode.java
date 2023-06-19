@@ -28,6 +28,14 @@ public enum ResponseCode {
     CAN_WITHDRAW(successCode(), HttpStatus.OK, "회원 탈퇴가 가능한 상태입니다."),
     SUCCESS_WITHDRAW(successCode(), HttpStatus.OK, "회원 탈퇴가 성공적으로 이루어졌습니다."),
 
+    CREATE_EVENT(successCode(), HttpStatus.CREATED, "상세 내역이 성공적으로 생성되었습니다."),
+    GET_EVENT(successCode(), HttpStatus.OK, "상세 내역이 성공적으로 조회되었습니다."),
+    MODIFY_EVENT(successCode(), HttpStatus.OK, "상세 내역이 성공적으로 수정되었습니다."),
+    DELETE_EVENT(successCode(), HttpStatus.OK, "상세 내역이 성공적으로 삭제되었습니다."),
+    MODIFY_EVENT_SITUATION(successCode(), HttpStatus.OK, "상세 내역 납부 여부가 성공적으로 변경되었습니다."),
+    GET_EVENT_CALENDAR(successCode(), HttpStatus.OK, "상세 내역 캘린더가 성공적으로 조회되었습니다."),
+    GET_EVENTS(successCode(), HttpStatus.OK, "상세 내역 리스트가 성공적으로 조회되었습니다."),
+
     BINDING_ERROR(2000, HttpStatus.BAD_REQUEST, "입력값 중 검증에 실패한 값이 있습니다"),
 
     NOT_EXIST_TOKEN_COOKIE(1200, HttpStatus.BAD_REQUEST, "리프레시 토큰이 존재하지 않습니다."),
@@ -45,6 +53,8 @@ public enum ResponseCode {
     NONE_ZERO_PARTICIPANT(1007, HttpStatus.BAD_REQUEST, "모임에 다른 참가자가 존재합니다."),
 
     NOT_FOUND_ADMIN(1008, HttpStatus.NOT_FOUND, "모임의 총무를 찾을 수 없습니다."),
+    NOT_FOUND_EVENT(1300, HttpStatus.BAD_REQUEST, "해당 상세 내역을 찾을 수 없습니다."),
+
     ;
 
     private int code;

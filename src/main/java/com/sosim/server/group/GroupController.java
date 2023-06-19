@@ -3,10 +3,10 @@ package com.sosim.server.group;
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
-import com.sosim.server.group.dto.request.UpdateGroupRequest;
-import com.sosim.server.group.dto.response.MyGroupsResponse;
+import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
+import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -40,8 +40,8 @@ public class GroupController {
 
     @PatchMapping("/group/{groupId}")
     public ResponseEntity<?> modifyGroup(@AuthUserId long userId, @PathVariable long groupId,
-                                         @Validated @RequestBody UpdateGroupRequest updateGroupRequest) {
-        GroupIdResponse groupIdResponse = groupService.updateGroup(userId, groupId, updateGroupRequest);
+                                         @Validated @RequestBody ModifyGroupRequest modifyGroupRequest) {
+        GroupIdResponse groupIdResponse = groupService.updateGroup(userId, groupId, modifyGroupRequest);
 
         return new ResponseEntity<>(Response.create(MODIFY_GROUP, groupIdResponse), MODIFY_GROUP.getHttpStatus());
     }
