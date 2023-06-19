@@ -6,48 +6,43 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class GetGroupResponse {
+public class MyGroupDto {
     private long groupId;
 
     private String title;
 
     private String coverColor;
 
-    @JsonProperty("type")
-    private String groupType;
+    private String type;
 
     private String adminNickname;
 
     @JsonProperty("isAdmin")
-    private Boolean isAdmin;
+    private boolean isAdmin;
 
     private int size;
 
-    @JsonProperty("isInto")
-    private Boolean isInto;
 
     @Builder
-    public GetGroupResponse(long id, String title, String coverColor, String groupType, String adminNickname, Boolean isAdmin, int size, Boolean isInto) {
+    public MyGroupDto(long id, String title, String coverColor, String type, String adminNickname, boolean isAdmin, int size, Boolean isInto) {
         this.groupId = id;
         this.title = title;
         this.coverColor = coverColor;
-        this.groupType = groupType;
+        this.type = type;
         this.adminNickname = adminNickname;
         this.isAdmin = isAdmin;
         this.size = size;
-        this.isInto = isInto;
     }
 
-    public static GetGroupResponse toDto(Group group, boolean isAdmin, int size, boolean isInto) {
-        return GetGroupResponse.builder()
+    public static MyGroupDto toDto(Group group, boolean isAdmin) {
+        return MyGroupDto.builder()
                 .id(group.getId())
                 .title(group.getTitle())
                 .coverColor(group.getCoverColor())
-                .groupType(group.getGroupType())
+                .type(group.getGroupType())
                 .adminNickname(group.getAdminParticipant().getNickname())
                 .isAdmin(isAdmin)
-                .size(size)
-                .isInto(isInto)
+                .size(group.getNumberOfParticipants())
                 .build();
     }
 }

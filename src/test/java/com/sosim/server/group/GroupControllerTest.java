@@ -6,20 +6,28 @@ import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
+import com.sosim.server.group.dto.response.MyGroupDto;
+import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.sosim.server.common.response.ResponseCode.*;
 import static org.mockito.Mockito.*;
@@ -90,8 +98,7 @@ class GroupControllerTest {
                 .content(om.writeValueAsString(request)));
 
         //then
-        //TODO : Status Not_Found 변경
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_USER.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_USER.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -230,8 +237,7 @@ class GroupControllerTest {
         ResultActions resultActions = mvc.perform(get(url));
 
         //then
-        //TODO : Status Not_Found 변경
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -242,10 +248,10 @@ class GroupControllerTest {
     @Test
     void update_group() throws Exception {
         //given
-        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "닉네임", "스터디", "색");
+        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "스터디", "색");
         GroupIdResponse response = GroupIdResponse.builder().groupId(groupId).build();
 
-        doReturn(response).when(groupService).modifyGroup(userId, groupId, request);
+        doReturn(response).when(groupService).updateGroup(userId, groupId, request);
 
         //when
         String url = URI_PREFIX.concat(String.format("/%d", groupId));
@@ -259,7 +265,7 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$.status.message").value(MODIFY_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content.groupId").value(groupId));
 
-        verify(groupService, times(1)).modifyGroup(userId, groupId, request);
+        verify(groupService, times(1)).updateGroup(userId, groupId, request);
     }
 
     @WithMockCustomUser
@@ -268,9 +274,9 @@ class GroupControllerTest {
     void update_group_no_group() throws Exception {
         //given
         CustomException e = new CustomException(NOT_FOUND_GROUP);
-        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "닉네임", "스터디", "색");
+        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "스터디", "색");
 
-        doThrow(e).when(groupService).modifyGroup(userId, groupId, request);
+        doThrow(e).when(groupService).updateGroup(userId, groupId, request);
 
         //when
         String url = URI_PREFIX.concat(String.format("/%d", groupId));
@@ -279,8 +285,7 @@ class GroupControllerTest {
                 .content(om.writeValueAsString(request)));
 
         //then
-        //TODO : Status Not_Found 변경
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -292,9 +297,9 @@ class GroupControllerTest {
     void update_group_not_admin() throws Exception {
         //given
         CustomException e = new CustomException(NONE_ADMIN);
-        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "닉네임", "스터디", "색");
+        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "스터디", "색");
 
-        doThrow(e).when(groupService).modifyGroup(userId, groupId, request);
+        doThrow(e).when(groupService).updateGroup(userId, groupId, request);
 
         //when
         String url = URI_PREFIX.concat(String.format("/%d", groupId));
@@ -303,7 +308,7 @@ class GroupControllerTest {
                 .content(om.writeValueAsString(request)));
 
         //then
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -314,8 +319,8 @@ class GroupControllerTest {
     @Test
     void update_title_fail() throws Exception {
         //given
-        ModifyGroupRequest shortTitle = makeUpdateRequest("", "닉네임", "스터디", "색");
-        ModifyGroupRequest longTitle = makeUpdateRequest("그루비룸그루비룸그루비룸그루비룸", "닉네임", "스터디", "색");
+        ModifyGroupRequest shortTitle = makeUpdateRequest("", "스터디", "색");
+        ModifyGroupRequest longTitle = makeUpdateRequest("그루비룸그루비룸그루비룸그루비룸", "스터디", "색");
 
         //when
         String url = URI_PREFIX.concat(String.format("/%d", groupId));
@@ -344,7 +349,7 @@ class GroupControllerTest {
     @Test
     void update_groupType_fail() throws Exception {
         //given
-        ModifyGroupRequest nullType = makeUpdateRequest("그루비룸", "닉네임", null, "색");
+        ModifyGroupRequest nullType = makeUpdateRequest("그루비룸", null, "색");
 
         //when
         String url = URI_PREFIX.concat(String.format("/%d", groupId));
@@ -356,7 +361,7 @@ class GroupControllerTest {
         nullActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status.code").value(BINDING_ERROR.getCode()))
                 .andExpect(jsonPath("$.status.message").value(BINDING_ERROR.getMessage()))
-                .andExpect(jsonPath("$.content.field").value("groupType"));
+                .andExpect(jsonPath("$.content.field").value("type"));
     }
 
     @WithMockCustomUser
@@ -364,7 +369,7 @@ class GroupControllerTest {
     @Test
     void update_coverColor_fail() throws Exception {
         //given
-        ModifyGroupRequest nullType = makeUpdateRequest("그루비룸", "닉네임", "타입", null);
+        ModifyGroupRequest nullType = makeUpdateRequest("그루비룸", "타입", null);
 
         //when
         String url = URI_PREFIX.concat(String.format("/%d", groupId));
@@ -376,7 +381,7 @@ class GroupControllerTest {
         nullActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status.code").value(BINDING_ERROR.getCode()))
                 .andExpect(jsonPath("$.status.message").value(BINDING_ERROR.getMessage()))
-                .andExpect(jsonPath("$.content.field").value("coverColorType"));
+                .andExpect(jsonPath("$.content.field").value("coverColor"));
     }
 
     @WithMockCustomUser
@@ -390,7 +395,6 @@ class GroupControllerTest {
         ResultActions resultActions = mvc.perform(delete(url));
 
         //then
-        //TODO : 204로 변경 체크
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.status.code").value(DELETE_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(DELETE_GROUP.getMessage()))
@@ -412,7 +416,7 @@ class GroupControllerTest {
         ResultActions resultActions = mvc.perform(delete(url));
 
         //then
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -442,7 +446,7 @@ class GroupControllerTest {
     @Test
     void delete_group_has_no_participant() throws Exception {
         //given
-        CustomException e = new CustomException(NONE_PARTICIPANT);
+        CustomException e = new CustomException(NOT_FOUND_PARTICIPANT);
         doThrow(e).when(groupService).deleteGroup(userId, groupId);
 
         //when
@@ -451,16 +455,41 @@ class GroupControllerTest {
 
         //then
         resultActions.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status.code").value(NONE_PARTICIPANT.getCode()))
-                .andExpect(jsonPath("$.status.message").value(NONE_PARTICIPANT.getMessage()))
+                .andExpect(jsonPath("$.status.code").value(NOT_FOUND_PARTICIPANT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NOT_FOUND_PARTICIPANT.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
+    @Disabled // TODO : 모임 조회 페이징 변경 후 수정
     @WithMockCustomUser
     @DisplayName("내 모임 조회 / 성공")
     @Test
     void get_my_groups() throws Exception {
-        //TODO: 리팩토링 후 작성
+        //given
+        List<MyGroupDto> myGroupDtos = new ArrayList<>();
+        Group group = Group.builder().build();
+        ReflectionTestUtils.setField(group, "id", 1L);
+        myGroupDtos.add(MyGroupDto.toDto(group, true));
+        for (int i = 0; i < 16; i++) {
+            Group temp = Group.builder().build();
+            ReflectionTestUtils.setField(temp, "id", 1);
+            myGroupDtos.add(MyGroupDto.toDto(group, false));
+        }
+        MyGroupsResponse response = MyGroupsResponse.toResponseDto(true, myGroupDtos);
+
+        doReturn(response).when(groupService).getMyGroups(userId, any(Pageable.class));
+
+        //when
+        String url = "/api/groups";
+        ResultActions resultActions = mvc.perform(get(url)
+                .param("page", "0"));
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.status.code").value(GET_GROUPS.getCode()))
+                .andExpect(jsonPath("$.status.message").value(GET_GROUPS.getMessage()))
+                //TODO
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @WithMockCustomUser
@@ -502,8 +531,7 @@ class GroupControllerTest {
                 .content(om.writeValueAsString(request)));
 
         //then
-        //TODO 403 Forbbiden 건의
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -517,7 +545,7 @@ class GroupControllerTest {
         String nickname = "변경닉네임";
         ParticipantNicknameRequest request = new ParticipantNicknameRequest(nickname);
 
-        CustomException e = new CustomException(NONE_PARTICIPANT);
+        CustomException e = new CustomException(NOT_FOUND_PARTICIPANT);
         doThrow(e).when(groupService).modifyAdmin(userId, groupId, request);
 
         //when
@@ -528,19 +556,18 @@ class GroupControllerTest {
 
         //then
         resultActions.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status.code").value(NONE_PARTICIPANT.getCode()))
-                .andExpect(jsonPath("$.status.message").value(NONE_PARTICIPANT.getMessage()))
+                .andExpect(jsonPath("$.status.code").value(NOT_FOUND_PARTICIPANT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NOT_FOUND_PARTICIPANT.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
     //--- Private Method ---
 
-    private ModifyGroupRequest makeUpdateRequest(String title, String nickname, String type, String color) {
+    private ModifyGroupRequest makeUpdateRequest(String title, String type, String color) {
         return ModifyGroupRequest.builder()
                 .title(title)
-                .nickname(nickname)
-                .groupType(type)
-                .coverColorType(color)
+                .type(type)
+                .coverColor(color)
                 .build();
     }
 

@@ -1,21 +1,21 @@
 package com.sosim.server.group;
 
-import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
-import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
-import com.sosim.server.group.dto.response.GetGroupListResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
+import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
-import com.sosim.server.security.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import static com.sosim.server.common.response.ResponseCode.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,59 +27,46 @@ public class GroupController {
     @PostMapping("/group")
     public ResponseEntity<?> createGroup(@AuthUserId long userId, @Validated @RequestBody CreateGroupRequest createGroupRequest) {
         GroupIdResponse groupIdResponse = groupService.createGroup(userId, createGroupRequest);
-        ResponseCode createGroup = ResponseCode.CREATE_GROUP;
 
-        return new ResponseEntity<>(Response.create(createGroup, groupIdResponse), createGroup.getHttpStatus());
+        return new ResponseEntity<>(Response.create(CREATE_GROUP, groupIdResponse), CREATE_GROUP.getHttpStatus());
     }
 
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<?> getGroup(@AuthUserId long userId, @PathVariable("groupId") long groupId) {
+    public ResponseEntity<?> getGroup(@AuthUserId long userId, @PathVariable long groupId) {
         GetGroupResponse getGroupResponse = groupService.getGroup(userId, groupId);
-        ResponseCode getGroup = ResponseCode.GET_GROUP;
 
-        return new ResponseEntity<>(Response.create(getGroup, getGroupResponse), getGroup.getHttpStatus());
+        return new ResponseEntity<>(Response.create(GET_GROUP, getGroupResponse), GET_GROUP.getHttpStatus());
     }
 
     @PatchMapping("/group/{groupId}")
-    public ResponseEntity<?> modifyGroup(@AuthUserId long userId,
-                                         @PathVariable("groupId") long groupId,
+    public ResponseEntity<?> modifyGroup(@AuthUserId long userId, @PathVariable long groupId,
                                          @Validated @RequestBody ModifyGroupRequest modifyGroupRequest) {
-        GroupIdResponse groupIdResponse = groupService.modifyGroup(userId, groupId, modifyGroupRequest);
-        ResponseCode modifyGroup = ResponseCode.MODIFY_GROUP;
+        GroupIdResponse groupIdResponse = groupService.updateGroup(userId, groupId, modifyGroupRequest);
 
-        return new ResponseEntity<>(Response.create(modifyGroup, groupIdResponse), modifyGroup.getHttpStatus());
+        return new ResponseEntity<>(Response.create(MODIFY_GROUP, groupIdResponse), MODIFY_GROUP.getHttpStatus());
     }
 
     @DeleteMapping("/group/{groupId}")
-    public ResponseEntity<?> deleteGroup(@AuthUserId long userId,
-                                         @PathVariable("groupId") long groupId) {
+    public ResponseEntity<?> deleteGroup(@AuthUserId long userId, @PathVariable long groupId) {
         groupService.deleteGroup(userId, groupId);
-        ResponseCode deleteGroup = ResponseCode.DELETE_GROUP;
 
-        return new ResponseEntity<>(Response.create(deleteGroup, null), deleteGroup.getHttpStatus());
+        return new ResponseEntity<>(Response.create(DELETE_GROUP, null), DELETE_GROUP.getHttpStatus());
     }
 
     @PatchMapping("/group/{groupId}/admin")
-    public ResponseEntity<?> modifyAdmin(@AuthenticationPrincipal AuthUser authUser,
-                                         @PathVariable("groupId") long groupId,
+    public ResponseEntity<?> modifyAdmin(@AuthUserId long userId, @PathVariable long groupId,
                                          @RequestBody ParticipantNicknameRequest participantNicknameRequest) {
-        groupService.modifyAdmin(authUser.getId(), groupId, participantNicknameRequest);
-        ResponseCode modifyGroupAdmin = ResponseCode.MODIFY_GROUP_ADMIN;
 
-        return new ResponseEntity<>(Response.create(modifyGroupAdmin, null), modifyGroupAdmin.getHttpStatus());
+        groupService.modifyAdmin(userId, groupId, participantNicknameRequest);
+
+        return new ResponseEntity<>(Response.create(MODIFY_GROUP_ADMIN, null), MODIFY_GROUP_ADMIN.getHttpStatus());
     }
 
     @GetMapping("/groups")
-    public ResponseEntity<?> getMyGroups(@AuthenticationPrincipal AuthUser authUser,
-                                         @RequestParam("index") Long index) {
-        if (index == null) {
-            throw new CustomException(ResponseCode.BINDING_ERROR);
-        }
+    public ResponseEntity<?> getMyGroups(@AuthUserId long userId, @PageableDefault(size = 17) Pageable pageable) {
+        MyGroupsResponse myGroups = groupService.getMyGroups(userId, pageable);
 
-        GetGroupListResponse groupList = groupService.getMyGroups(index, authUser.getId());
-        ResponseCode getGroups = ResponseCode.GET_GROUPS;
-
-        return new ResponseEntity<>(Response.create(getGroups, groupList), getGroups.getHttpStatus());
+        return new ResponseEntity<>(Response.create(GET_GROUPS, myGroups), GET_GROUPS.getHttpStatus());
     }
 
 }

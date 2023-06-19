@@ -1,7 +1,6 @@
 package com.sosim.server.event.dto.response;
 
 import com.sosim.server.event.Event;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 

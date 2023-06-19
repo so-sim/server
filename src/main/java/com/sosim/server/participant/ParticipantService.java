@@ -9,11 +9,10 @@ import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,12 +40,13 @@ public class ParticipantService {
     @Transactional(readOnly = true)
     public GetParticipantListResponse getGroupParticipants(long userId, long groupId) {
         Group group = findGroup(groupId);
-        //TODO admin 테이블 구조 변경 후 리팩토링
-        List<Participant> normalParticipants = participantRepository.findGroupNormalParticipants(groupId, group.getAdminNickname());
-        if (requestUserIsNotAdmin(userId, group)) {
-            changeRequestUserOrderToFirst(userId, normalParticipants);
+        List<Participant> participants = getParticipants(group);
+
+        Participant admin = removeAdminInList(participants);
+        if (userIsNotAdmin(userId, group)) {
+            changeRequestUserOrderToFirst(userId, participants);
         }
-        return GetParticipantListResponse.toDto(group, toNicknameList(normalParticipants));
+        return GetParticipantListResponse.toDto(admin.getNickname(), toNicknameList(participants));
     }
 
     @Transactional
@@ -72,27 +72,31 @@ public class ParticipantService {
         return GetNicknameResponse.toDto(participant);
     }
 
-    public Participant findParticipant(long userId, long groupId) {
+    private Participant findParticipant(long userId, long groupId) {
         return participantRepository.findByUserIdAndGroupId(userId, groupId)
-                .orElseThrow(() -> new CustomException(NONE_PARTICIPANT));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
     }
 
-    public Participant findParticipant(String nickname, long groupId) {
-        return participantRepository.findByNicknameAndGroupId(nickname, groupId)
-                .orElseThrow(() -> new CustomException(NONE_PARTICIPANT));
+    private ArrayList<Participant> getParticipants(Group group) {
+        return new ArrayList<>(group.getParticipantList());
     }
 
-    public Slice<Participant> getParticipantSlice(long index, long userId) {
-        if (index == 0) {
-            return participantRepository.findByUserIdOrderByIdDesc(userId, PageRequest.ofSize(17));
-        }
-        return participantRepository.findByIdLessThanAndUserIdOrderByIdDesc(index, userId, PageRequest.ofSize(18));
+    private Participant removeAdminInList(List<Participant> participants) {
+        Participant admin = participants.stream()
+                .filter(Participant::isAdmin)
+                .findFirst()
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
+        participants.remove(admin);
+        return admin;
+    }
+
+    private static boolean userIsNotAdmin(long userId, Group group) {
+        return !group.isAdminUser(userId);
     }
 
     private void saveNewParticipant(User user, Group group, String nickname) {
-        Participant intoParticipant = Participant.create(user, nickname);
-        intoParticipant.addGroup(group);
-        participantRepository.save(intoParticipant);
+        Participant participant = Participant.create(user, group, nickname, false);
+        participantRepository.save(participant);
     }
 
     private void checkUsedNickname(Group group, String nickname) {
@@ -131,15 +135,11 @@ public class ParticipantService {
                 return i;
             }
         }
-        throw new CustomException(NONE_PARTICIPANT);
+        throw new CustomException(NOT_FOUND_PARTICIPANT);
     }
 
     private boolean isParticipantOfUser(long userId, Participant participant) {
         return participant.getUser().getId().equals(userId);
-    }
-
-    private boolean requestUserIsNotAdmin(long userId, Group group) {
-        return !group.getAdminId().equals(userId);
     }
 
     private Group findGroup(long groupId) {

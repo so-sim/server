@@ -1,134 +1,110 @@
 package com.sosim.server.group;
 
 import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.common.auditing.Status;
-import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
-import com.sosim.server.group.dto.response.GetGroupListResponse;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
+import com.sosim.server.group.dto.response.MyGroupDto;
+import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.participant.Participant;
-import com.sosim.server.participant.ParticipantService;
+import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
-import com.sosim.server.user.UserService;
+import com.sosim.server.user.User;
+import com.sosim.server.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.sosim.server.common.response.ResponseCode.NOT_FOUND_GROUP;
+import static com.sosim.server.common.response.ResponseCode.NOT_FOUND_USER;
 
 @Service
 @RequiredArgsConstructor
 public class GroupService {
 
     private final GroupRepository groupRepository;
-    private final UserService userService;
-    private final ParticipantService participantService;
+    private final UserRepository userRepository;
+    private final ParticipantRepository participantRepository;
 
-    public GroupIdResponse createGroup(Long userId, CreateGroupRequest createGroupRequest) {
-        Group groupEntity = saveGroupEntity(Group.create(userId, createGroupRequest));
-        participantService.createParticipant(userId, groupEntity.getId(), createGroupRequest.getNickname());
+    @Transactional
+    public GroupIdResponse createGroup(long userId, CreateGroupRequest createGroupRequest) {
+        User user = findUser(userId);
+        Group group = groupRepository.save(createGroupRequest.toEntity());
 
-        return GroupIdResponse.create(groupEntity);
+        saveAdminParticipant(createGroupRequest, user, group);
+
+        return GroupIdResponse.toDto(group);
     }
 
-    public GetGroupResponse getGroup(Long userId, Long groupId) {
-        Group groupEntity = getGroupEntity(groupId);
-        boolean isInto = false;
+    @Transactional(readOnly = true)
+    public GetGroupResponse getGroup(long userId, long groupId) {
+        Group group = findGroupWithParticipants(groupId);
 
-        try {
-            if (userId != 0) {
-                isInto = participantService.findParticipant(userId, groupId) != null;
-            }
-        } catch (CustomException ignored) {}
-
-        return GetGroupResponse.create(groupEntity, groupEntity.getAdminId().equals(userId),
-                (int) groupEntity.getParticipantList().stream()
-                        .filter(p -> p.getStatus().equals(Status.ACTIVE)).count(), isInto);
+        boolean isAdmin = group.isAdminUser(userId);
+        boolean isInto = group.hasParticipant(userId);
+        int numberOfParticipants = group.getNumberOfParticipants();
+        return GetGroupResponse.toDto(group, isAdmin, numberOfParticipants, isInto);
     }
 
     @Transactional
-    public GroupIdResponse modifyGroup(Long userId, Long groupId, ModifyGroupRequest modifyGroupRequest) {
-        Group groupEntity = getGroupEntity(groupId);
+    public GroupIdResponse updateGroup(long userId, long groupId, ModifyGroupRequest modifyGroupRequest) {
+        Group group = findGroup(groupId);
+        group.update(userId, modifyGroupRequest);
 
-        if (!groupEntity.getAdminId().equals(userId)) {
-            throw new CustomException(ResponseCode.NONE_ADMIN);
-        }
-        groupEntity.modify(modifyGroupRequest);
-
-        //TODO 논의 후 지우기
-//        if (updateGroupRequest.getNickname() != null) {
-//            modifyNickname(userId, groupId, new ParticipantNicknameRequest(updateGroupRequest.getNickname()));
-//        }
-
-        return GroupIdResponse.create(groupEntity);
+        return GroupIdResponse.toDto(group);
     }
 
     @Transactional
-    public void deleteGroup(Long userId, Long groupId) {
-        Group groupEntity = getGroupEntity(groupId);
+    public void deleteGroup(long userId, long groupId) {
+        Group group = findGroupWithParticipants(groupId);
 
-        if (!groupEntity.getAdminId().equals(userId)) {
-            throw new CustomException(ResponseCode.NONE_ADMIN);
-        }
-
-        if (groupEntity.getParticipantList().stream()
-                .filter(p -> p.getStatus().equals(Status.ACTIVE)).count() > 1) {
-            throw new CustomException(ResponseCode.NONE_ZERO_PARTICIPANT);
-        }
-
-        participantService.deleteParticipant(userId, groupId);
-        groupEntity.delete();
+        //TODO : 참가자 삭제 로직과 겹치므로 의논 후 수정
+        group.deleteGroup(userId);
     }
 
     @Transactional
-    public void modifyAdmin(Long userId, Long groupId, ParticipantNicknameRequest participantNicknameRequest) {
-        Group groupEntity = getGroupEntity(groupId);
+    public void modifyAdmin(long userId, long groupId, ParticipantNicknameRequest nicknameRequest) {
+        Group group = findGroupWithParticipants(groupId);
 
-        if (!groupEntity.getAdminId().equals(userId)) {
-            throw new CustomException(ResponseCode.NONE_ADMIN);
-        }
-
-        Participant participantEntity = participantService
-                .findParticipant(participantNicknameRequest.getNickname(), groupId);
-
-        if (groupEntity.getParticipantList().stream()
-                .noneMatch(p -> p.getId().equals(participantEntity.getId()))) {
-            throw new CustomException(ResponseCode.NONE_PARTICIPANT);
-        }
-
-        groupEntity.modifyAdmin(participantEntity);
+        group.modifyAdmin(userId, nicknameRequest.getNickname());
     }
 
-    public GetGroupListResponse getMyGroups(Long index, Long userId) {
-        Slice<Participant> slice = participantService.getParticipantSlice(index, userId);
-        List<Participant> participantList = slice.getContent();
+    @Transactional(readOnly = true)
+    public MyGroupsResponse getMyGroups(long userId, Pageable pageable) {
+        //TODO : 조회 결과가 없을 때 Exception 처리를 넣어야 하는지?
+        Slice<Group> myGroups = groupRepository.findMyGroups(userId, pageable);
 
-        if (participantList.isEmpty()) {
-            throw new CustomException(ResponseCode.NO_MORE_GROUP);
-        }
+        List<MyGroupDto> myGroupDtos = myGroups.stream()
+                .map(g -> MyGroupDto.toDto(g, g.isAdminUser(userId)))
+                .collect(Collectors.toList());
 
-        List<GetGroupResponse> groupList = new ArrayList<>();
-        for (Participant participant : participantList) {
-            Group group = participant.getGroup();
-            groupList.add(GetGroupResponse.create(group, group.getAdminId().equals(userId),
-                    (int) group.getParticipantList().stream()
-                            .filter(p -> p.getStatus().equals(Status.ACTIVE)).count(),true));
-        }
-
-        return GetGroupListResponse.create(participantList.get(participantList.size() - 1).getId(),
-                slice.hasNext(), groupList);
+        return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroupDtos);
     }
 
-    public Group saveGroupEntity(Group group) {
-        return groupRepository.save(group);
+    private void saveAdminParticipant(CreateGroupRequest createGroupRequest, User user, Group group) {
+        String adminNickname = createGroupRequest.getNickname();
+        Participant admin = Participant.create(user, group, adminNickname, true);
+        participantRepository.save(admin);
     }
 
-    public Group getGroupEntity(Long groupId) {
+    private User findUser(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    }
+
+    private Group findGroup(long groupId) {
         return groupRepository.findById(groupId)
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_GROUP));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
+    }
+
+    private Group findGroupWithParticipants(long groupId) {
+        return groupRepository.findByIdWithParticipants(groupId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
 }

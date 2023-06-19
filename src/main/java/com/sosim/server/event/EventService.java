@@ -34,9 +34,9 @@ public class EventService {
                 .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_GROUP));
         Participant participantEntity = participantRepository.findByNicknameAndGroupId(
                 createEventRequest.getNickname(), createEventRequest.getGroupId())
-                .orElseThrow(() -> new CustomException(ResponseCode.NONE_PARTICIPANT));
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_PARTICIPANT));
 
-        if (!groupEntity.getAdminId().equals(id)) {
+        if (!groupEntity.isAdminUser(id)) {
             throw new CustomException(ResponseCode.NONE_ADMIN);
         }
 
@@ -60,7 +60,7 @@ public class EventService {
         if (!eventEntity.getNickname().equals(modifyEventRequest.getNickname())) {
             userEntity = participantRepository.findByNicknameAndGroupId(
                             modifyEventRequest.getNickname(), eventEntity.getGroup().getId())
-                    .orElseThrow(() -> new CustomException(ResponseCode.NONE_PARTICIPANT)).getUser();
+                    .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_PARTICIPANT)).getUser();
         }
 
         eventEntity.modify(userEntity, modifyEventRequest);
@@ -106,7 +106,7 @@ public class EventService {
     }
 
     private boolean isAdmin(Event event, long userId, boolean throwException) {
-        boolean isAdmin = event.getGroup().getAdminId().equals(userId);
+        boolean isAdmin = event.getGroup().isAdminUser(userId);
         if (!isAdmin && throwException) {
             throw new CustomException(ResponseCode.NONE_ADMIN);
         }

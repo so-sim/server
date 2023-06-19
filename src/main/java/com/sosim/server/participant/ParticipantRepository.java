@@ -37,4 +37,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, java.l
             "ORDER BY p.nickname ASC")
     List<Participant> findGroupNormalParticipants(@Param("groupId") long groupId, @Param("adminNickname") String adminNickname);
 
+    //TODO: 쿼리 테스트
+    @Query("SELECT p FROM Participant p " +
+            "WHERE p.user.id = :userId AND p.status = 'ACTIVE'")
+    Slice<Participant> findByUserId(@Param("userId") long userId, Pageable pageable);
 }

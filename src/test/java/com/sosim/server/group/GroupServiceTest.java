@@ -7,10 +7,9 @@ import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.participant.Participant;
-import com.sosim.server.participant.ParticipantService;
+import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.user.User;
-import com.sosim.server.user.UserService;
-import org.junit.jupiter.api.Disabled;
+import com.sosim.server.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,8 +24,7 @@ import static com.sosim.server.common.response.ResponseCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GroupServiceTest {
@@ -39,11 +37,10 @@ class GroupServiceTest {
     @Mock
     GroupRepository groupRepository;
     @Mock
-    UserService userService;
+    UserRepository userRepository;
     @Mock
-    ParticipantService participantService;
+    ParticipantRepository participantRepository;
 
-    @Disabled //TODO Group 리팩토링 후 제거
     @DisplayName("그룹 생성 / 성공")
     @Test
     void create_group() {
@@ -51,10 +48,10 @@ class GroupServiceTest {
         CreateGroupRequest request = CreateGroupRequest.builder().build();
 
         User user = new User();
-        Group group = Group.create(userId, request);
+        Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
 
-        doReturn(user).when(userService).getUserEntity(userId);
+        doReturn(Optional.of(user)).when(userRepository).findById(userId);
         doReturn(group).when(groupRepository).save(any(Group.class));
         
         //when
@@ -63,24 +60,27 @@ class GroupServiceTest {
         //then
         assertThat(response).isNotNull();
         assertThat(response.getGroupId()).isEqualTo(groupId);
+
+        verify(groupRepository, times(1)).save(any(Group.class));
+        verify(participantRepository, times(1)).save(any(Participant.class));
     }
 
-    @Disabled //TODO Group 리팩토링 후 제거
     @DisplayName("그룹 생성 / User가 없는 경우 CustomException(NOT_FOUND_USER)")
     @Test
     void create_group_no_user() {
         //given
         CreateGroupRequest request = CreateGroupRequest.builder().build();
 
-        CustomException e = new CustomException(NOT_FOUND_USER);
-        doThrow(e).when(userService).getUserEntity(userId);
+        doReturn(Optional.empty()).when(userRepository).findById(userId);
 
         //when
-        CustomException exception = assertThrows(CustomException.class, () ->
+        CustomException e = assertThrows(CustomException.class, () ->
                 groupService.createGroup(userId, request));
 
         //then
-        assertThat(exception.getResponseCode()).isEqualTo(NOT_FOUND_USER);
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_USER);
+
+        verify(groupRepository, times(0)).save(any(Group.class));
     }
 
     @DisplayName("그룹 상세조회 / 성공")
@@ -91,33 +91,36 @@ class GroupServiceTest {
         String title = "타이틀";
         ReflectionTestUtils.setField(group, "id", groupId);
         ReflectionTestUtils.setField(group, "title", title);
-        ReflectionTestUtils.setField(group, "adminId", userId);
-        Participant participant = new Participant();
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
-        doReturn(participant).when(participantService).findParticipant(userId, groupId);
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        String nickname = "닉네임";
+        Participant admin = Participant.create(user, group, nickname, true);
+
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
 
         //when
         GetGroupResponse response = groupService.getGroup(userId, groupId);
 
         //then
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(groupId);
+        assertThat(response.getGroupId()).isEqualTo(groupId);
         assertThat(response.getTitle()).isEqualTo(title);
-        assertThat(response.getIsInto()).isEqualTo(true);
+        assertThat(response.getAdminNickname()).isEqualTo(admin.getNickname());
+        assertThat(response.getSize()).isEqualTo(1);
+        assertThat(response.getIsInto()).isTrue();
     }
 
-    @DisplayName("그룹 상세조회 / 참가자 데이터가 없는 경우 isInto는 false")
+    @DisplayName("그룹 상세조회 / 참여하지 않은 그룹인 경우 isInto는 False")
     @Test
-    void get_group_no_participant() {
+    void get_group_is_not_into() {
         //given
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
-        ReflectionTestUtils.setField(group, "adminId", userId);
+        addParticipantInGroup(group, userId + 1, true);
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
-        CustomException e = new CustomException(NONE_PARTICIPANT);
-        doThrow(e).when(participantService).findParticipant(userId, groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
 
         //when
         GetGroupResponse response = groupService.getGroup(userId, groupId);
@@ -126,24 +129,56 @@ class GroupServiceTest {
         assertThat(response.getIsInto()).isFalse();
     }
 
+    @DisplayName("그룹 상세조회 / 일반 유저인 경우 isAdmin은 False, isInto는 true")
+    @Test
+    void get_group_is_not_admin() {
+        //given
+        Group group = Group.builder().build();
+        ReflectionTestUtils.setField(group, "id", groupId);
+        addParticipantInGroup(group, userId + 1, true);
+        addParticipantInGroup(group, userId, false);
+
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+
+        //when
+        GetGroupResponse response = groupService.getGroup(userId, groupId);
+
+        //then
+        assertThat(response.getIsAdmin()).isFalse();
+        assertThat(response.getIsInto()).isTrue();
+    }
+
+    @DisplayName("그룹 상세조회 / 조회한 유저가 참가하지 않은 경우 IsInto는 False")
+    @Test
+    void get_group_no_group() {
+        //given
+        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipants(groupId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () ->
+                groupService.getGroup(userId, groupId));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_GROUP);
+    }
+
     @DisplayName("그룹 변경 / 성공")
     @Test
     void modify_group() {
         //given
         String title = "타이틀";
-        String nickname = null;
         String groupType = "그룹 타입";
         String colorType = "색";
-        ModifyGroupRequest request = makeUpdateGroupRequest(title, nickname, groupType, colorType);
+        ModifyGroupRequest request = makeUpdateGroupRequest(title, groupType, colorType);
 
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
-        ReflectionTestUtils.setField(group, "adminId", userId);
+        addParticipantInGroup(group, userId, true);
 
         doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
 
         //when
-        GroupIdResponse response = groupService.modifyGroup(userId, groupId, request);
+        GroupIdResponse response = groupService.updateGroup(userId, groupId, request);
 
         //then
         assertThat(response.getGroupId()).isEqualTo(groupId);
@@ -156,22 +191,18 @@ class GroupServiceTest {
     @Test
     void modify_group_not_admin() {
         //given
-        String title = "타이틀";
-        String nickname = null;
-        String groupType = "그룹 타입";
-        String colorType = "색";
-        ModifyGroupRequest request = makeUpdateGroupRequest(title, nickname, groupType, colorType);
+        ModifyGroupRequest request = makeUpdateGroupRequest("타이틀", "그룹 타입", "색");
 
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
-        long isNotAdminId = userId + 1;
-        ReflectionTestUtils.setField(group, "adminId", isNotAdminId);
+        addParticipantInGroup(group, userId + 1, true);
+        addParticipantInGroup(group, userId, false);
 
         doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
-                groupService.modifyGroup(userId, groupId, request));
+                groupService.updateGroup(userId, groupId, request));
 
         //then
         assertThat(e.getResponseCode()).isEqualTo(NONE_ADMIN);
@@ -183,9 +214,9 @@ class GroupServiceTest {
         //given
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
-        ReflectionTestUtils.setField(group, "adminId", userId);
+        addParticipantInGroup(group, userId, true);
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
 
         //when
         groupService.deleteGroup(userId, groupId);
@@ -200,10 +231,11 @@ class GroupServiceTest {
     void delete_group_not_admin() {
         //given
         Group group = Group.builder().build();
-        long notAdminId = userId + 1;
-        ReflectionTestUtils.setField(group, "adminId", notAdminId);
+        ReflectionTestUtils.setField(group, "id", groupId);
+        addParticipantInGroup(group, userId + 1, true);
+        addParticipantInGroup(group, userId, false);
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -219,11 +251,10 @@ class GroupServiceTest {
         //given
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
-        ReflectionTestUtils.setField(group, "adminId", userId);
-        group.getParticipantList().add(Participant.builder().build());
-        group.getParticipantList().add(Participant.builder().build());
+        addParticipantInGroup(group, userId, true);
+        addParticipantInGroup(group, userId + 1, false);
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -233,12 +264,17 @@ class GroupServiceTest {
         assertThat(e.getResponseCode()).isEqualTo(NONE_ZERO_PARTICIPANT);
     }
 
-    private static ModifyGroupRequest makeUpdateGroupRequest(String title, String nickname, String groupType, String colorType) {
+    private Participant addParticipantInGroup(Group group, long userId, boolean isAdmin) {
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", userId);
+        return Participant.create(user, group, "닉네임" + userId, isAdmin);
+    }
+
+    private static ModifyGroupRequest makeUpdateGroupRequest(String title, String groupType, String colorType) {
         return ModifyGroupRequest.builder()
                 .title(title)
-                .nickname(nickname)
-                .groupType(groupType)
-                .coverColorType(colorType)
+                .type(groupType)
+                .coverColor(colorType)
                 .build();
     }
 

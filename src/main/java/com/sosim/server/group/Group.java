@@ -1,7 +1,8 @@
 package com.sosim.server.group;
 
+import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
-import com.sosim.server.group.dto.request.CreateGroupRequest;
+import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.participant.Participant;
 import lombok.Builder;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sosim.server.common.auditing.Status.ACTIVE;
+import static com.sosim.server.common.response.ResponseCode.*;
 
 @Entity
 @Getter
@@ -28,12 +30,6 @@ public class Group extends BaseTimeEntity {
     @Column(name = "TITLE")
     private String title;
 
-    @Column(name = "ADMIN_ID")
-    private Long adminId;
-
-    @Column(name = "ADMIN_NICKNAME")
-    private String adminNickname;
-
     @Column(name = "COVER_COLOR")
     private String coverColor;
 
@@ -45,34 +41,34 @@ public class Group extends BaseTimeEntity {
     private List<Participant> participantList = new ArrayList<>();
 
     @Builder
-    private Group(String title, Long adminId, String adminNickname, String coverColor, String groupType) {
+    private Group(String title, String coverColor, String groupType) {
         this.title = title;
-        this.adminId = adminId;
-        this.adminNickname = adminNickname;
         this.coverColor = coverColor;
         this.groupType = groupType;
         status = ACTIVE;
     }
 
-    public static Group create(Long adminId, CreateGroupRequest createGroupRequest) {
-        return Group.builder()
-                .title(createGroupRequest.getTitle())
-                .adminId(adminId)
-                .adminNickname(createGroupRequest.getNickname())
-                .groupType(createGroupRequest.getGroupType())
-                .coverColor(createGroupRequest.getCoverColor())
-                .build();
+    public void update(long userId, ModifyGroupRequest updateGroupRequest) {
+        checkIsAdmin(userId);
+        this.title = updateGroupRequest.getTitle();
+        this.groupType = updateGroupRequest.getType();
+        this.coverColor = updateGroupRequest.getCoverColor();
     }
 
-    public void modify(ModifyGroupRequest modifyGroupRequest) {
-        this.title = modifyGroupRequest.getTitle();
-        this.groupType = modifyGroupRequest.getGroupType();
-        this.coverColor = modifyGroupRequest.getCoverColorType();
+    public void deleteGroup(long userId) {
+        checkIsAdmin(userId);
+        checkNotRemainParticipantWithoutAdmin();
+
+        deleteGroupAndAdmin();
     }
 
-    public void modifyAdmin(Participant participant) {
-        adminId = participant.getUser().getId();
-        adminNickname = participant.getNickname();
+    public void modifyAdmin(long userId, String newAdminNickname) {
+        Participant preAdmin = getAdminParticipant();
+        checkIsAdmin(userId, preAdmin);
+        Participant newAdmin = checkNewAdminIsInGroup(newAdminNickname);
+
+        preAdmin.resign();
+        newAdmin.signOn();
     }
 
     public boolean removeParticipant(Participant participant) {
@@ -84,12 +80,79 @@ public class Group extends BaseTimeEntity {
                 .noneMatch(Participant::isActive);
     }
 
-    public boolean existThatNickname(String nickname) {
-        return getParticipantList().stream()
-                .anyMatch(p -> p.getNickname().equals(nickname));
+    public boolean hasParticipant(long userId) {
+        return participantList.stream()
+                .anyMatch(p -> p.getUser().getId().equals(userId));
     }
 
-    public boolean isAdminNickname(String nickname) {
-        return nickname.equals(adminNickname);
+    public boolean hasMoreParticipant() {
+        return participantList.stream()
+                .anyMatch(Participant::isActive);
     }
+
+    public Participant getAdminParticipant() {
+        return participantList.stream()
+                .filter(Participant::isAdmin)
+                .findFirst()
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_ADMIN));
+    }
+
+    private Participant getParticipantByNickname(String nickname) {
+        return participantList.stream()
+                .filter(p -> p.isActive() && p.getNickname().equals(nickname))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
+    }
+
+    public Participant getUserParticipant(long userId) {
+        return participantList.stream()
+                .filter(p -> p.isActive() && p.isMine(userId))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
+    }
+
+    public boolean existThatNickname(String nickname) {
+        return getParticipantList().stream()
+                .anyMatch(p -> p.isActive() && p.getNickname().equals(nickname));
+    }
+
+
+    public boolean isAdminUser(long userId) {
+        Participant admin = getAdminParticipant();
+        return admin.isMine(userId);
+    }
+
+    public int getNumberOfParticipants() {
+        return (int) participantList.stream()
+                .filter(p -> ACTIVE.equals(p.getStatus()))
+                .count();
+    }
+
+    private void deleteGroupAndAdmin() {
+        Participant adminParticipant = getAdminParticipant();
+        adminParticipant.withdrawGroup(this);
+    }
+
+    private Participant checkNewAdminIsInGroup(String newAdminName) {
+        return getParticipantByNickname(newAdminName);
+    }
+
+    private void checkNotRemainParticipantWithoutAdmin() {
+        if (getNumberOfParticipants() > 1) {
+            throw new CustomException(NONE_ZERO_PARTICIPANT);
+        }
+    }
+
+    private void checkIsAdmin(long userId) {
+        if (!isAdminUser(userId)) {
+            throw new CustomException(NONE_ADMIN);
+        }
+    }
+
+    private void checkIsAdmin(long userId, Participant adminParticipant) {
+        if (!adminParticipant.isMine(userId)) {
+            throw new CustomException(NONE_ADMIN);
+        }
+    }
+
 }
