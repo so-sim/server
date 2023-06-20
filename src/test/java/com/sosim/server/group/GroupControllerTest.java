@@ -8,17 +8,17 @@ import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupDto;
 import com.sosim.server.group.dto.response.MyGroupsResponse;
+import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
+import com.sosim.server.user.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -460,24 +460,31 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
-    @Disabled // TODO : 모임 조회 페이징 변경 후 수정
     @WithMockCustomUser
     @DisplayName("내 모임 조회 / 성공")
     @Test
     void get_my_groups() throws Exception {
         //given
+        int page = 0;
+        int resultSize = 17;
+        long groupId = 1L;
+
         List<MyGroupDto> myGroupDtos = new ArrayList<>();
+
         Group group = Group.builder().build();
-        ReflectionTestUtils.setField(group, "id", 1L);
+        ReflectionTestUtils.setField(group, "id", groupId++);
+        addParticipantInGroup(group, userId, true);
         myGroupDtos.add(MyGroupDto.toDto(group, true));
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < resultSize - 1; i++) {
             Group temp = Group.builder().build();
-            ReflectionTestUtils.setField(temp, "id", 1);
-            myGroupDtos.add(MyGroupDto.toDto(group, false));
+            ReflectionTestUtils.setField(temp, "id", groupId++);
+            addParticipantInGroup(temp, userId + 1, true);
+            addParticipantInGroup(temp, userId, false);
+            myGroupDtos.add(MyGroupDto.toDto(temp, false));
         }
         MyGroupsResponse response = MyGroupsResponse.toResponseDto(true, myGroupDtos);
 
-        doReturn(response).when(groupService).getMyGroups(userId, any(Pageable.class));
+        doReturn(response).when(groupService).getMyGroups(userId, page);
 
         //when
         String url = "/api/groups";
@@ -486,10 +493,19 @@ class GroupControllerTest {
 
         //then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.status.code").value(GET_GROUPS.getCode()))
-                .andExpect(jsonPath("$.status.message").value(GET_GROUPS.getMessage()))
-                //TODO
-                .andExpect(jsonPath("$.content").isEmpty());
+                .andExpect(jsonPath("$.status.code").value(GET_MY_GROUPS.getCode()))
+                .andExpect(jsonPath("$.status.message").value(GET_MY_GROUPS.getMessage()))
+                .andExpect(jsonPath("$.content.hasNext").value(true))
+                .andExpect(jsonPath("$.content.groupList[0].groupId").value(1L))
+                .andExpect(jsonPath("$.content.groupList[0].isAdmin").value(true))
+                .andExpect(jsonPath("$.content.groupList[1].isAdmin").value(false))
+                ;
+    }
+
+    private Participant addParticipantInGroup(Group group, long userId, boolean isAdmin) {
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", userId);
+        return Participant.create(user, group, "닉네임" + userId, isAdmin);
     }
 
     @WithMockCustomUser

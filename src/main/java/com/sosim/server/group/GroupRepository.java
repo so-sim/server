@@ -1,7 +1,5 @@
 package com.sosim.server.group;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface GroupRepository extends JpaRepository<Group, Long> {
+public interface GroupRepository extends JpaRepository<Group, Long>, GroupRepositoryDsl {
     @Query("select g from Group g where g.id = :groupId and g.status = 'ACTIVE'")
     Optional<Group> findById(@Param("groupId") long groupId);
 
@@ -25,10 +23,4 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
             "and p.status = 'ACTIVE'")
     List<Group> findFetchJoinGroupByAdminId(@Param("adminId") long groupId);
 
-    @Query("SELECT g FROM Group g " +
-            "WHERE g.id IN (SELECT p.group.id FROM Participant p " +
-            "               WHERE p.user.id = :userId AND p.status = 'ACTIVE') " +
-            "ORDER BY g.id DESC")
-    @EntityGraph(attributePaths = "participantList")
-    Slice<Group> findMyGroups(@Param("userId") long userId, Pageable pageable);
 }

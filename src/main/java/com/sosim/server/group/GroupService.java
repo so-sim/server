@@ -1,6 +1,7 @@
 package com.sosim.server.group;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.group.dto.MyGroupPageDto;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
@@ -13,7 +14,6 @@ import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +64,6 @@ public class GroupService {
     public void deleteGroup(long userId, long groupId) {
         Group group = findGroupWithParticipants(groupId);
 
-        //TODO : 참가자 삭제 로직과 겹치므로 의논 후 수정
         group.deleteGroup(userId);
     }
 
@@ -76,15 +75,18 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    public MyGroupsResponse getMyGroups(long userId, Pageable pageable) {
-        //TODO : 조회 결과가 없을 때 Exception 처리를 넣어야 하는지?
-        Slice<Group> myGroups = groupRepository.findMyGroups(userId, pageable);
+    public MyGroupsResponse getMyGroups(long userId, int page) {
+        MyGroupPageDto pageDto = MyGroupPaginationUtil.calculateOffsetAndSize(page);
+        Slice<Group> myGroups = groupRepository.findMyGroups(userId, pageDto.getOffset(), pageDto.getLimit());
 
-        List<MyGroupDto> myGroupDtos = myGroups.stream()
+        List<MyGroupDto> myGroupDtoList = toMyGroupDtoList(userId, myGroups);
+        return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroupDtoList);
+    }
+
+    private static List<MyGroupDto> toMyGroupDtoList(long userId, Slice<Group> myGroups) {
+        return myGroups.stream()
                 .map(g -> MyGroupDto.toDto(g, g.isAdminUser(userId)))
                 .collect(Collectors.toList());
-
-        return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroupDtos);
     }
 
     private void saveAdminParticipant(CreateGroupRequest createGroupRequest, User user, Group group) {

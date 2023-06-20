@@ -2,10 +2,12 @@ package com.sosim.server.group;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
+import com.sosim.server.group.dto.MyGroupPageDto;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
+import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.user.User;
@@ -16,8 +18,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.sosim.server.common.response.ResponseCode.*;
@@ -263,6 +270,35 @@ class GroupServiceTest {
 
         //then
         assertThat(e.getResponseCode()).isEqualTo(NONE_ZERO_PARTICIPANT);
+    }
+
+    @DisplayName("내 그룹 조회 / 성공")
+    @Test
+    void get_my_groups() {
+        //given
+        int page = 0;
+
+        Group group = Group.builder().build();
+        String title = "타이틀";
+        ReflectionTestUtils.setField(group, "id", groupId);
+        ReflectionTestUtils.setField(group, "title", title);
+        addParticipantInGroup(group, userId, true);
+        List<Group> content = new ArrayList<>();
+        content.add(group);
+
+        MyGroupPageDto pageDto = MyGroupPaginationUtil.calculateOffsetAndSize(page);
+        long offset = pageDto.getOffset();
+        long limit = pageDto.getLimit();
+        Slice<Group> groups = new SliceImpl<>(content, PageRequest.ofSize(1), false);
+        doReturn(groups).when(groupRepository).findMyGroups(userId, offset, limit);
+
+        //when
+        MyGroupsResponse response = groupService.getMyGroups(userId, page);
+
+        //then
+        assertThat(response).isNotNull();
+        assertThat(response.getGroupList().size()).isEqualTo(1);
+        assertThat(response.isHasNext()).isFalse();
     }
 
     private Participant addParticipantInGroup(Group group, long userId, boolean isAdmin) {
