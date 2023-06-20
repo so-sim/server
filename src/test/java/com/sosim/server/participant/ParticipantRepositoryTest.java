@@ -16,7 +16,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Disabled //TODO 수정하기
 @DataJpaTest
@@ -65,10 +65,10 @@ class ParticipantRepositoryTest {
 
     private void saveParticipantsInGroup(long groupId, int size) {
         Group group = makeGroup();
-        groupId = group.getId();
-        participantRepository.save(makeAdminParticipant(group, makeNickname()));
+        admin = participantRepository.save(makeParticipant(group, makeNickname(), true));
+        adminName = admin.getNickname();
         for (int i = 1; i < size; i++) {
-            participantRepository.save(makeParticipant(group, makeNickname()));
+            participantRepository.save(makeParticipant(group, makeNickname(), false));
         }
     }
 
@@ -81,17 +81,9 @@ class ParticipantRepositoryTest {
         return groupRepository.save(group);
     }
 
-    private Participant makeAdminParticipant(Group group, String nickname) {
-        admin = makeParticipant(group, nickname);
-        group.modifyAdmin(admin.getUser().getId(), nickname);
-        groupRepository.save(group);
-        return admin;
-    }
-
-    private Participant makeParticipant(Group group, String nickname) {
+    private Participant makeParticipant(Group group, String nickname, boolean isAdmin) {
         User user = makeUser();
-        Participant participant = Participant.create(user, group, nickname, false);
-        participant.addGroup(group);
+        Participant participant = Participant.create(user, group, nickname, isAdmin);
         return participant;
     }
 
