@@ -4,10 +4,10 @@ import lombok.Data;
 
 @Data
 public class MyGroupPageDto {
-    private int offset;
-    private int limit;
+    private long offset;
+    private long limit;
 
-    public MyGroupPageDto(int offset, int limit) {
+    public MyGroupPageDto(long offset, long limit) {
         this.offset = offset;
         this.limit = limit;
     }

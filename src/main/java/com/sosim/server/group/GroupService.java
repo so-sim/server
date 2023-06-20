@@ -64,7 +64,6 @@ public class GroupService {
     public void deleteGroup(long userId, long groupId) {
         Group group = findGroupWithParticipants(groupId);
 
-        //TODO : 참가자 삭제 로직과 겹치므로 의논 후 수정
         group.deleteGroup(userId);
     }
 
@@ -80,10 +79,14 @@ public class GroupService {
         MyGroupPageDto pageDto = MyGroupPaginationUtil.calculateOffsetAndSize(page);
         Slice<Group> myGroups = groupRepository.findMyGroups(userId, pageDto.getOffset(), pageDto.getLimit());
 
-        List<MyGroupDto> myGroupDtos = myGroups.stream()
+        List<MyGroupDto> myGroupDtoList = toMyGroupDtoList(userId, myGroups);
+        return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroupDtoList);
+    }
+
+    private static List<MyGroupDto> toMyGroupDtoList(long userId, Slice<Group> myGroups) {
+        return myGroups.stream()
                 .map(g -> MyGroupDto.toDto(g, g.isAdminUser(userId)))
                 .collect(Collectors.toList());
-        return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroupDtos);
     }
 
     private void saveAdminParticipant(CreateGroupRequest createGroupRequest, User user, Group group) {
