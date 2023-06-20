@@ -23,10 +23,4 @@ public interface GroupRepository extends JpaRepository<Group, Long>, GroupReposi
             "and p.status = 'ACTIVE'")
     List<Group> findFetchJoinGroupByAdminId(@Param("adminId") long groupId);
 
-//    @Query("SELECT g FROM Group g " +
-//            "WHERE g.id IN (SELECT p.group.id FROM Participant p " +
-//            "               WHERE p.user.id = :userId AND p.status = 'ACTIVE') " +
-//            "ORDER BY g.id DESC")
-//    @EntityGraph(attributePaths = "participantList")
-//    Slice<Group> findMyGroups(@Param("userId") long userId, Pageable pageable);
 }
