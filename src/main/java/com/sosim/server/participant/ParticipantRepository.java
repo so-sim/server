@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ParticipantRepository extends JpaRepository<Participant, java.lang.Long> {
-    boolean existsByUserIdAndGroupIdAndStatus(Long userId, Long groupId, Status status);
-    boolean existsByGroupIdAndNicknameAndStatus(Long groupId, String nickname, Status status);
 
     @Query("select p from Participant p where p.user.id = :userId " +
             "and p.group.id = :groupId and p.status = 'ACTIVE'")

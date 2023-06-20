@@ -47,7 +47,8 @@ class GroupServiceTest {
         //given
         CreateGroupRequest request = CreateGroupRequest.builder().build();
 
-        User user = new User();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
 
