@@ -82,7 +82,7 @@ public class Group extends BaseTimeEntity {
 
     public boolean hasParticipant(long userId) {
         return participantList.stream()
-                .anyMatch(p -> p.getUser().getId().equals(userId));
+                .anyMatch(p -> p.isActive() && p.getUser().getId().equals(userId));
     }
 
     public boolean hasMoreParticipant() {
@@ -104,18 +104,10 @@ public class Group extends BaseTimeEntity {
                 .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
     }
 
-    public Participant getUserParticipant(long userId) {
-        return participantList.stream()
-                .filter(p -> p.isActive() && p.isMine(userId))
-                .findFirst()
-                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
-    }
-
     public boolean existThatNickname(String nickname) {
         return getParticipantList().stream()
                 .anyMatch(p -> p.isActive() && p.getNickname().equals(nickname));
     }
-
 
     public boolean isAdminUser(long userId) {
         Participant admin = getAdminParticipant();
