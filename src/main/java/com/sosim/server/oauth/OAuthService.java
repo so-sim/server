@@ -7,6 +7,7 @@ import com.sosim.server.jwt.JwtService;
 import com.sosim.server.jwt.dto.response.JwtResponse;
 import com.sosim.server.oauth.dto.request.OAuthTokenRequest;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
+import com.sosim.server.oauth.dto.response.LoginResponse;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -34,19 +35,19 @@ public class OAuthService {
     private final UserService userService;
     private final JwtService jwtService;
 
-    public JwtResponse signUp(String social, String code) throws JsonProcessingException {
-        OAuthUserRequest oAuthUserInfo = getOAuthUserInfo(social, code);
-        User user = userService.save(oAuthUserInfo);
-        return jwtService.createToken(user.getId());
+    public LoginResponse signUp(String social, String code) throws JsonProcessingException {
+        return createLoginResponse(userService.save(getOAuthUserInfo(social, code)));
     }
 
-    public JwtResponse login(String social, String code) throws JsonProcessingException {
-        OAuthUserRequest oAuthUserInfo = getOAuthUserInfo(social, code);
-        User user = userService.update(oAuthUserInfo);
-        return jwtService.createToken(user.getId());
+    public LoginResponse login(String social, String code) throws JsonProcessingException {
+        return createLoginResponse(userService.update(getOAuthUserInfo(social, code)));
     }
 
-    public OAuthUserRequest getOAuthUserInfo(String social, String code) throws JsonProcessingException {
+    private LoginResponse createLoginResponse(User user) {
+        return LoginResponse.toDto(jwtService.createToken(user.getId()), user);
+    }
+
+    private OAuthUserRequest getOAuthUserInfo(String social, String code) throws JsonProcessingException {
         ClientRegistration clientRegistration = inMemoryRepository.findByRegistrationId(social);
         OAuthTokenRequest oAuth2Token = getOAuthToken(clientRegistration, code);
         Map<String, Object> oAuthAttributes = getOAuthAttributes(clientRegistration, oAuth2Token);
