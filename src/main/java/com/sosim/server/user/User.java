@@ -28,13 +28,13 @@ public class User extends BaseTimeEntity {
     private Social social;
 
     @Column(name = "SOCIAL_ID")
-    private Long socialId;
+    private long socialId;
 
     @Column(name = "WITHDRAW_REASON")
     private String withdrawReason;
 
     @Builder
-    private User(String email, Social social, Long socialId) {
+    private User(String email, Social social, long socialId) {
         this.email = email;
         this.social = social;
         this.socialId = socialId;
@@ -49,7 +49,7 @@ public class User extends BaseTimeEntity {
                 .build();
     }
 
-    public void setEmail(String email) {
+    public void changeEmail(String email) {
         this.email = email;
     }
 

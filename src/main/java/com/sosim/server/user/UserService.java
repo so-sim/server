@@ -1,8 +1,6 @@
 package com.sosim.server.user;
 
 import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.common.auditing.Status;
-import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
@@ -13,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.sosim.server.common.response.ResponseCode.*;
+
 
 @Service
 @RequiredArgsConstructor
@@ -21,42 +21,53 @@ public class UserService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
 
+    @Transactional
     public User save(OAuthUserRequest oAuthUserRequest) {
-        if (userRepository.findBySocialAndSocialId(
-                oAuthUserRequest.getOAuthSocial(), oAuthUserRequest.getOAuthId()).isPresent()) {
-            throw new CustomException(ResponseCode.USER_ALREADY_EXIST);
-        }
-
+        checkAlreadyExistUser(oAuthUserRequest);
         return userRepository.save(User.create(oAuthUserRequest));
     }
 
     @Transactional
     public User update(OAuthUserRequest oAuthUserRequest) {
-        User user = userRepository.findBySocialAndSocialId(
-                oAuthUserRequest.getOAuthSocial(), oAuthUserRequest.getOAuthId())
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_USER));
+        User user = getUser(oAuthUserRequest);
 
-        user.setEmail(oAuthUserRequest.getEmail());
+        user.changeEmail(oAuthUserRequest.getEmail());
         return user;
     }
 
-    public void checkCanWithdraw(Long id) {
+    @Transactional(readOnly = true)
+    public void checkCanWithdraw(long id) {
+        //TODO: 쿼리로 로직 개선
         List<Group> groupList = groupRepository.findFetchJoinGroupByAdminId(id);
         for (Group group : groupList) {
             if (group.getParticipantList().size() > 1) {
-                throw new CustomException(ResponseCode.CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
+                throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
             }
         }
     }
 
     @Transactional
-    public void withdrawUser(Long id, WithdrawRequest withdrawRequest) {
+    public void withdrawUser(long id, WithdrawRequest withdrawRequest) {
         checkCanWithdraw(id);
-        User userEntity = getUserEntity(id);
-        userEntity.delete(withdrawRequest.getWithdrawReason());
+
+        User user = getUser(id);
+        user.delete(withdrawRequest.getWithdrawReason());
     }
 
-    public User getUserEntity(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_USER));
+    private void checkAlreadyExistUser(OAuthUserRequest oAuthUserRequest) {
+        if (userRepository.findBySocialAndSocialId(
+                oAuthUserRequest.getOAuthSocial(), oAuthUserRequest.getOAuthId()).isPresent()) {
+            throw new CustomException(USER_ALREADY_EXIST);
+        }
+    }
+
+    private User getUser(OAuthUserRequest oAuthUserRequest) {
+        return userRepository.findBySocialAndSocialId(
+                        oAuthUserRequest.getOAuthSocial(), oAuthUserRequest.getOAuthId())
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    }
+
+    private User getUser(long id) {
+        return userRepository.findById(id).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
     }
 }

@@ -5,6 +5,5 @@ import lombok.Getter;
 
 @Getter
 public class WithdrawRequest {
-    @JsonProperty("withdrawReason")
     private String withdrawReason;
 }
