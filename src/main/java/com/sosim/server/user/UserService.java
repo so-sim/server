@@ -40,13 +40,6 @@ public class UserService {
         checkCanWithdraw(userId);
     }
 
-    private void checkCanWithdraw(long userId) {
-        List<Participant> myParticipants = participantRepository.findByUserIdAndIsAdminIsTrue(userId);
-        if (myParticipants.stream().anyMatch(Participant::isAdmin)) {
-            throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
-        }
-    }
-
     @Transactional
     public void withdrawUser(long userId, WithdrawRequest withdrawRequest) {
         checkCanWithdraw(userId);
@@ -62,6 +55,13 @@ public class UserService {
         if (userRepository.findBySocialAndSocialId(
                 oAuthUserRequest.getOAuthSocial(), oAuthUserRequest.getOAuthId()).isPresent()) {
             throw new CustomException(USER_ALREADY_EXIST);
+        }
+    }
+
+    private void checkCanWithdraw(long userId) {
+        List<Participant> myParticipants = participantRepository.findByUserIdAndIsAdminIsTrue(userId);
+        if (myParticipants.stream().anyMatch(Participant::isAdmin)) {
+            throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
         }
     }
 
