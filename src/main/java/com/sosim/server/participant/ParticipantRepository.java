@@ -3,6 +3,7 @@ package com.sosim.server.participant;
 import com.sosim.server.common.auditing.Status;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -41,4 +42,15 @@ public interface ParticipantRepository extends JpaRepository<Participant, java.l
     @Query("SELECT p FROM Participant p " +
             "WHERE p.user.id = :userId AND p.status = 'ACTIVE'")
     Slice<Participant> findByUserId(@Param("userId") long userId, Pageable pageable);
+
+    @Query("SELECT p FROM Participant p " +
+            "WHERE p.status = 'ACTIVE' " +
+            "AND p.user.id = :userId " +
+            "AND p.isAdmin = true")
+    List<Participant> findByUserIdAndIsAdminIsTrue(@Param("userId") long userId);
+
+    @Query("SELECT p FROM Participant p " +
+            "WHERE p.status = 'ACTIVE' AND p.user.id = :userId")
+    @EntityGraph(attributePaths = {"group"})
+    List<Participant> findByUserIdWithGroup(@Param("userId") long userId);
 }

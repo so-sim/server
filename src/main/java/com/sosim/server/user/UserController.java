@@ -26,7 +26,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<?> checkWithdraw(@AuthUserId long userId) {
-        userService.checkCanWithdraw(userId);
+        userService.canWithdraw(userId);
 
         return new ResponseEntity<>(Response.create(CAN_WITHDRAW, null), CAN_WITHDRAW.getHttpStatus());
     }

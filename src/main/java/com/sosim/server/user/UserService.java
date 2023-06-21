@@ -1,9 +1,9 @@
 package com.sosim.server.user;
 
 import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.group.Group;
-import com.sosim.server.group.GroupRepository;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
+import com.sosim.server.participant.Participant;
+import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.user.dto.request.WithdrawRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import static com.sosim.server.common.response.ResponseCode.*;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final GroupRepository groupRepository;
+    private final ParticipantRepository participantRepository;
 
     @Transactional
     public User save(OAuthUserRequest oAuthUserRequest) {
@@ -36,22 +36,26 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public void checkCanWithdraw(long id) {
-        //TODO: 쿼리로 로직 개선
-        List<Group> groupList = groupRepository.findFetchJoinGroupByAdminId(id);
-        for (Group group : groupList) {
-            if (group.getParticipantList().size() > 1) {
-                throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
-            }
+    public void canWithdraw(long userId) {
+        checkCanWithdraw(userId);
+    }
+
+    private void checkCanWithdraw(long userId) {
+        List<Participant> myParticipants = participantRepository.findByUserIdAndIsAdminIsTrue(userId);
+        if (myParticipants.stream().anyMatch(Participant::isAdmin)) {
+            throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
         }
     }
 
     @Transactional
-    public void withdrawUser(long id, WithdrawRequest withdrawRequest) {
-        checkCanWithdraw(id);
+    public void withdrawUser(long userId, WithdrawRequest withdrawRequest) {
+        checkCanWithdraw(userId);
 
-        User user = getUser(id);
+        User user = getUser(userId);
+        List<Participant> myParticipants = participantRepository.findByUserIdWithGroup(userId);
+
         user.delete(withdrawRequest.getWithdrawReason());
+        myParticipants.forEach(Participant::withdrawGroup);
     }
 
     private void checkAlreadyExistUser(OAuthUserRequest oAuthUserRequest) {
