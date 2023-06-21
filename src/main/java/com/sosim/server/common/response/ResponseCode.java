@@ -38,6 +38,9 @@ public enum ResponseCode {
 
     BINDING_ERROR(2000, HttpStatus.BAD_REQUEST, "입력값 중 검증에 실패한 값이 있습니다"),
 
+    NOT_SUPPORTED_OAUTH(1400, HttpStatus.BAD_REQUEST, "지원하지 않는 소셜 로그인 서비스입니다."),
+    INCORRECT_OAUTH_CODE(1401, HttpStatus.BAD_REQUEST, "올바르지 않은 Authorization 코드입니다."),
+
     NOT_EXIST_TOKEN_COOKIE(1200, HttpStatus.BAD_REQUEST, "리프레시 토큰이 존재하지 않습니다."),
 
     NOT_FOUND_USER(1100, HttpStatus.NOT_FOUND, "존재하지 않는 회원 정보입니다."),
@@ -51,8 +54,8 @@ public enum ResponseCode {
     NO_MORE_GROUP(1005, HttpStatus.BAD_REQUEST, "더 이상 조회할 모임이 없습니다."),
     ALREADY_INTO_GROUP(1006, HttpStatus.BAD_REQUEST, "이미 참여중인 모임입니다."),
     NONE_ZERO_PARTICIPANT(1007, HttpStatus.BAD_REQUEST, "모임에 다른 참가자가 존재합니다."),
-
     NOT_FOUND_ADMIN(1008, HttpStatus.NOT_FOUND, "모임의 총무를 찾을 수 없습니다."),
+
     NOT_FOUND_EVENT(1300, HttpStatus.BAD_REQUEST, "해당 상세 내역을 찾을 수 없습니다."),
 
     ;

@@ -3,10 +3,12 @@ package com.sosim.server.oauth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.jwt.JwtService;
-import com.sosim.server.jwt.dto.response.JwtResponse;
 import com.sosim.server.oauth.dto.request.OAuthTokenRequest;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
+import com.sosim.server.oauth.dto.response.LoginResponse;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
@@ -34,19 +37,19 @@ public class OAuthService {
     private final UserService userService;
     private final JwtService jwtService;
 
-    public JwtResponse signUp(String social, String code) throws JsonProcessingException {
-        OAuthUserRequest oAuthUserInfo = getOAuthUserInfo(social, code);
-        User user = userService.save(oAuthUserInfo);
-        return jwtService.createToken(user.getId());
+    public LoginResponse signUp(String social, String code) throws JsonProcessingException {
+        return createLoginResponse(userService.save(getOAuthUserInfo(social, code)));
     }
 
-    public JwtResponse login(String social, String code) throws JsonProcessingException {
-        OAuthUserRequest oAuthUserInfo = getOAuthUserInfo(social, code);
-        User user = userService.update(oAuthUserInfo);
-        return jwtService.createToken(user.getId());
+    public LoginResponse login(String social, String code) throws JsonProcessingException {
+        return createLoginResponse(userService.update(getOAuthUserInfo(social, code)));
     }
 
-    public OAuthUserRequest getOAuthUserInfo(String social, String code) throws JsonProcessingException {
+    private LoginResponse createLoginResponse(User user) {
+        return LoginResponse.toDto(jwtService.createToken(user.getId()), user);
+    }
+
+    private OAuthUserRequest getOAuthUserInfo(String social, String code) throws JsonProcessingException {
         ClientRegistration clientRegistration = inMemoryRepository.findByRegistrationId(social);
         OAuthTokenRequest oAuth2Token = getOAuthToken(clientRegistration, code);
         Map<String, Object> oAuthAttributes = getOAuthAttributes(clientRegistration, oAuth2Token);
@@ -85,6 +88,10 @@ public class OAuthService {
     }
 
     private String getResponseBody(String uri, HttpMethod method, HttpEntity<?> request) {
-        return new RestTemplate().exchange(uri, method, request, String.class).getBody();
+        try {
+            return new RestTemplate().exchange(uri, method, request, String.class).getBody();
+        } catch (HttpClientErrorException ignore) {
+            throw new CustomException(ResponseCode.INCORRECT_OAUTH_CODE);
+        }
     }
 }

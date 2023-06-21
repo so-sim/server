@@ -1,5 +1,7 @@
 package com.sosim.server.oauth;
 
+import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.oauth.dto.request.KakaoUserRequest;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 
@@ -11,7 +13,7 @@ public class OAuthUserFactory {
 //            case "google": return new GoogleUserInfoRequest(attributes);
 //            case "naver": return new NaverOAuth2UserInfo(attributes);
             case "kakao": return new KakaoUserRequest(attributes);
-            default: throw new IllegalArgumentException("등록되지 않은 소셜 로그인입니다.");
+            default: throw new CustomException(ResponseCode.NOT_SUPPORTED_OAUTH);
         }
     }
 }
