@@ -6,7 +6,6 @@ import com.sosim.server.group.GroupRepository;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled //TODO 수정하기
 @DataJpaTest
 @Import(QueryDslConfig.class)
 class ParticipantRepositoryTest {
