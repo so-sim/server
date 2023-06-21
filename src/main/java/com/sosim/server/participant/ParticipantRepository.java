@@ -1,6 +1,6 @@
 package com.sosim.server.participant;
 
-import com.sosim.server.common.auditing.Status;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,4 +25,14 @@ public interface ParticipantRepository extends JpaRepository<Participant, java.l
             "ORDER BY p.nickname ASC")
     List<Participant> findGroupNormalParticipants(@Param("groupId") long groupId, @Param("adminNickname") String adminNickname);
 
+    @Query("SELECT p FROM Participant p " +
+            "WHERE p.status = 'ACTIVE' " +
+            "AND p.user.id = :userId " +
+            "AND p.isAdmin = true")
+    List<Participant> findByUserIdAndIsAdminIsTrue(@Param("userId") long userId);
+
+    @Query("SELECT p FROM Participant p " +
+            "WHERE p.status = 'ACTIVE' AND p.user.id = :userId")
+    @EntityGraph(attributePaths = {"group"})
+    List<Participant> findByUserIdWithGroup(@Param("userId") long userId);
 }

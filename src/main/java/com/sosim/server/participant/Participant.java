@@ -72,6 +72,10 @@ public class Participant extends BaseTimeEntity {
         this.group = group;
     }
 
+    public void withdrawGroup() {
+        withdrawGroup(this.group);
+    }
+
     public void withdrawGroup(Group group) {
         delete();
         group.removeParticipant(this);
