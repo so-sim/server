@@ -3,8 +3,9 @@ package com.sosim.server.oauth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.jwt.JwtService;
-import com.sosim.server.jwt.dto.response.JwtResponse;
 import com.sosim.server.oauth.dto.request.OAuthTokenRequest;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import com.sosim.server.oauth.dto.response.LoginResponse;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
@@ -86,6 +88,10 @@ public class OAuthService {
     }
 
     private String getResponseBody(String uri, HttpMethod method, HttpEntity<?> request) {
-        return new RestTemplate().exchange(uri, method, request, String.class).getBody();
+        try {
+            return new RestTemplate().exchange(uri, method, request, String.class).getBody();
+        } catch (HttpClientErrorException ignore) {
+            throw new CustomException(ResponseCode.INCORRECT_OAUTH_CODE);
+        }
     }
 }
