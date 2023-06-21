@@ -3,6 +3,7 @@ name: Docs
 about: need to fix or write documents
 title: "[Docs]"
 labels: documentation
+assignees: ''
 
 ---
 
