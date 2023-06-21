@@ -52,10 +52,6 @@ class ParticipantServiceTest {
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
-        doReturn(false).when(participantRepository)
-                .existsByUserIdAndGroupIdAndStatus(userId, groupId, ACTIVE);
-        doReturn(false).when(participantRepository)
-                .existsByGroupIdAndNicknameAndStatus(groupId, nickname, ACTIVE);
 
         //when
         participantService.createParticipant(userId, groupId, nickname);
@@ -104,12 +100,12 @@ class ParticipantServiceTest {
         //given
         User user = makeUser();
         Group group = makeGroup();
+        addParticipantInGroup(group, userId + 1, true);
+        addParticipantInGroup(group, userId, false);
         String nickname = "닉네임";
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
-        doReturn(true).when(participantRepository)
-                .existsByUserIdAndGroupIdAndStatus(userId, groupId, ACTIVE);
 
         //when
         CustomException exception = assertThrows(CustomException.class, () ->
@@ -125,14 +121,12 @@ class ParticipantServiceTest {
         //given
         User user = makeUser();
         Group group = makeGroup();
-        String nickname = "닉네임";
+        String nickname = "닉네임" + (userId + 2);
+        addParticipantInGroup(group, userId + 1, true);
+        addParticipantInGroup(group, userId + 2, false);
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
-        doReturn(false).when(participantRepository)
-                .existsByUserIdAndGroupIdAndStatus(userId, groupId, ACTIVE);
-        doReturn(true).when(participantRepository)
-                .existsByGroupIdAndNicknameAndStatus(groupId, nickname, ACTIVE);
 
         //when
         CustomException exception = assertThrows(CustomException.class, () ->
@@ -445,4 +439,5 @@ class ParticipantServiceTest {
         ReflectionTestUtils.setField(user, "id", userId);
         return Participant.create(user, group, "닉네임" + userId, isAdmin);
     }
+
 }

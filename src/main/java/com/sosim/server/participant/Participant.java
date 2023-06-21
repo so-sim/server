@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-import static com.sosim.server.common.response.ResponseCode.ALREADY_USE_NICKNAME;
-import static com.sosim.server.common.response.ResponseCode.CANNOT_WITHDRAWAL_BY_GROUP_ADMIN;
+import static com.sosim.server.common.response.ResponseCode.*;
 
 @Entity
 @Getter
@@ -48,6 +47,9 @@ public class Participant extends BaseTimeEntity {
     }
 
     public static Participant create(User user, Group group, String nickname, boolean isAdmin) {
+        checkAlreadyIntoGroup(user.getId(), group);
+        checkUsedNickname(group, nickname);
+
         Participant participant = Participant.builder()
                 .user(user)
                 .group(group)
@@ -91,5 +93,17 @@ public class Participant extends BaseTimeEntity {
 
     public void signOn() {
         this.isAdmin = true;
+    }
+
+    private static void checkUsedNickname(Group group, String nickname) {
+        if (group.existThatNickname(nickname)) {
+            throw new CustomException(ALREADY_USE_NICKNAME);
+        }
+    }
+
+    private static void checkAlreadyIntoGroup(long userId, Group group) {
+        if (group.hasParticipant(userId)) {
+            throw new CustomException(ALREADY_INTO_GROUP);
+        }
     }
 }
