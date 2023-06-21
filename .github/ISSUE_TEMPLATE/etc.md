@@ -3,6 +3,7 @@ name: ETC
 about: etc
 title: "[Etc]"
 labels: ''
+assignees: ''
 
 ---
 

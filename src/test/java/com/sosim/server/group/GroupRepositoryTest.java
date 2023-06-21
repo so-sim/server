@@ -156,14 +156,13 @@ class GroupRepositoryTest {
     private int saveOneGroupAndParticipants() {
         Group group = groupRepository.save(makeGroup());
         groupId = group.getId();
-        User user = userRepository.save(makeUser());
-        userId = user.getId();
 
         int n = 10;
         int deletedN = 2;
         List<Participant> participants = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            participants.add(Participant.create(user, group, "닉네임" + nicknameNo, false));
+            User user = userRepository.save(makeUser());
+            participants.add(Participant.create(user, group, "닉네임" + nicknameNo++, false));
         }
         participants.get(0).signOn();
         for (int i = 1; i <= deletedN; i++) {

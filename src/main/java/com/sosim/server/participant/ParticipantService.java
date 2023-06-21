@@ -1,7 +1,6 @@
 package com.sosim.server.participant;
 
 import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
@@ -31,10 +30,8 @@ public class ParticipantService {
         User user = findUser(userId);
         Group group = findGroup(groupId);
 
-        checkAlreadyIntoGroup(user, group);
-        checkUsedNickname(group, nickname);
-
-        saveNewParticipant(user, group, nickname);
+        Participant participant = Participant.create(user, group, nickname, false);
+        participantRepository.save(participant);
     }
 
     @Transactional(readOnly = true)
@@ -43,8 +40,8 @@ public class ParticipantService {
         List<Participant> participants = getParticipants(group);
 
         Participant admin = removeAdminInList(participants);
-        if (userIsNotAdmin(userId, group)) {
-            changeRequestUserOrderToFirst(userId, participants);
+        if (userIsNotAdmin(userId, admin)) {
+            changeUserOrderToFirst(userId, participants);
         }
         return GetParticipantListResponse.toDto(admin.getNickname(), toNicknameList(participants));
     }
@@ -90,25 +87,8 @@ public class ParticipantService {
         return admin;
     }
 
-    private static boolean userIsNotAdmin(long userId, Group group) {
-        return !group.isAdminUser(userId);
-    }
-
-    private void saveNewParticipant(User user, Group group, String nickname) {
-        Participant participant = Participant.create(user, group, nickname, false);
-        participantRepository.save(participant);
-    }
-
-    private void checkUsedNickname(Group group, String nickname) {
-        if (participantRepository.existsByGroupIdAndNicknameAndStatus(group.getId(), nickname, Status.ACTIVE)) {
-            throw new CustomException(ALREADY_USE_NICKNAME);
-        }
-    }
-
-    private void checkAlreadyIntoGroup(User user, Group group) {
-        if (participantRepository.existsByUserIdAndGroupIdAndStatus(user.getId(), group.getId(), Status.ACTIVE)) {
-            throw new CustomException(ALREADY_INTO_GROUP);
-        }
+    private boolean userIsNotAdmin(long userId, Participant admin) {
+        return !admin.isMine(userId);
     }
 
     private User findUser(long userId) {
@@ -122,7 +102,7 @@ public class ParticipantService {
                 .collect(Collectors.toList());
     }
 
-    private void changeRequestUserOrderToFirst(long userId, List<Participant> participants) {
+    private void changeUserOrderToFirst(long userId, List<Participant> participants) {
         int index = getParticipantIndexOfUser(userId, participants);
         Participant participantOfUser = participants.remove(index);
         participants.add(0, participantOfUser);
