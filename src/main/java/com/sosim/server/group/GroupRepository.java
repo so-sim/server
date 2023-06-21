@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface GroupRepository extends JpaRepository<Group, Long>, GroupRepositoryDsl {
@@ -14,13 +13,9 @@ public interface GroupRepository extends JpaRepository<Group, Long>, GroupReposi
 
     @Query("SELECT g FROM Group g " +
             "JOIN FETCH g.participantList p " +
-            "WHERE g.id = :groupId AND g.status = 'ACTIVE'")
+            "WHERE g.id = :groupId AND g.status = 'ACTIVE' " +
+            "AND p.status = 'ACTIVE'")
     @EntityGraph(attributePaths = {"participantList"})
     Optional<Group> findByIdWithParticipants(@Param("groupId") long groupId);
-
-    @Query("select g from Group g " +
-            "join fetch g.participantList p where p.user.id in (:adminId) and g.status = 'ACTIVE' " +
-            "and p.status = 'ACTIVE'")
-    List<Group> findFetchJoinGroupByAdminId(@Param("adminId") long groupId);
 
 }

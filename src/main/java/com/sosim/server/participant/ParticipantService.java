@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,8 +75,14 @@ public class ParticipantService {
                 .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
     }
 
-    private ArrayList<Participant> getParticipants(Group group) {
-        return new ArrayList<>(group.getParticipantList());
+    private List<Participant> getParticipants(Group group) {
+        List<Participant> participants = new ArrayList<>(group.getParticipantList());
+        sortByNickname(participants);
+        return participants;
+    }
+
+    private void sortByNickname(List<Participant> participants) {
+        participants.sort(Comparator.comparing(Participant::getNickname));
     }
 
     private Participant removeAdminInList(List<Participant> participants) {
