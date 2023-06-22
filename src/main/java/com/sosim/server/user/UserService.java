@@ -21,6 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
 
+    @Transactional
     public User save(OAuthUserRequest oAuthUserRequest) {
         if (userRepository.findBySocialAndSocialId(
                 oAuthUserRequest.getOAuthSocial(), oAuthUserRequest.getOAuthId()).isPresent()) {
