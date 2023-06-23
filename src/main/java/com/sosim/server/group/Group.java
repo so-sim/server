@@ -20,7 +20,7 @@ import static com.sosim.server.common.response.ResponseCode.*;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "GROUPS")
+@Table(name = "`GROUPS`")
 public class Group extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
