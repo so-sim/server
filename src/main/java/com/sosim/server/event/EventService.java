@@ -6,7 +6,10 @@ import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.request.ModifySituationRequest;
-import com.sosim.server.event.dto.response.*;
+import com.sosim.server.event.dto.response.EventIdResponse;
+import com.sosim.server.event.dto.response.GetEventCalendarResponse;
+import com.sosim.server.event.dto.response.GetEventListResponse;
+import com.sosim.server.event.dto.response.GetEventOneResponse;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.participant.Participant;
@@ -29,6 +32,7 @@ public class EventService {
     private final GroupRepository groupRepository;
     private final ParticipantRepository participantRepository;
 
+    @Transactional
     public EventIdResponse createEvent(Long id, CreateEventRequest createEventRequest) {
         Group groupEntity = groupRepository.findById(createEventRequest.getGroupId())
                 .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_GROUP));
@@ -45,6 +49,7 @@ public class EventService {
         return EventIdResponse.create(eventEntity);
     }
 
+    @Transactional(readOnly = true)
     public GetEventOneResponse getEvent(long userId, long eventId) {
         Event eventEntity = getEventEntity(eventId);
 
@@ -71,9 +76,8 @@ public class EventService {
     @Transactional
     public void deleteEvent(long userId, long eventId) {
         Event eventEntity = getEventEntity(eventId);
-        isAdmin(eventEntity, userId, true);
 
-        eventEntity.delete();
+        eventEntity.delete(userId);
     }
 
     @Transactional
