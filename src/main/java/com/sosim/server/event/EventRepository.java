@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface EventRepository extends JpaRepository<Event, Long>, EventRepositoryDsl {
     List<Event> findByIdIn(List<Long> eventIdList);
 
-    @Query("select e from Event e join fetch e.group where e.id = :eventId")
+    @Query("SELECT e FROM Event e JOIN FETCH e.group " +
+            "WHERE e.id = :eventId AND e.status = 'ACTIVE'")
     Optional<Event> findByIdWithGroup(@Param("eventId") long eventId);
 }
