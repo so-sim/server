@@ -1,5 +1,6 @@
 package com.sosim.server.event.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sosim.server.event.Event;
 import lombok.Getter;
@@ -14,6 +15,7 @@ public class GetEventResponse {
     private Long id;
 
     @JsonProperty("date")
+    @JsonFormat(pattern = "yyyy.MM.dd")
     private LocalDate date;
 
     @JsonProperty("amount")
