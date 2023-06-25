@@ -1,5 +1,6 @@
 package com.sosim.server.event;
 
+import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
@@ -13,6 +14,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 import static com.sosim.server.common.auditing.Status.ACTIVE;
+import static com.sosim.server.common.response.ResponseCode.NONE_ADMIN;
 
 @Entity
 @Getter
@@ -91,5 +93,12 @@ public class Event extends BaseTimeEntity {
 
     public void modifySituation(String situation) {
         this.situation = situation;
+    }
+
+    public void delete(long userId) {
+        if (!group.isAdminUser(userId)) {
+            throw new CustomException(NONE_ADMIN);
+        }
+        super.delete();
     }
 }
