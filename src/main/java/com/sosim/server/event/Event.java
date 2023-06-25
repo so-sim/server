@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import static com.sosim.server.common.auditing.Status.ACTIVE;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -59,6 +61,7 @@ public class Event extends BaseTimeEntity {
         this.nickname = nickname;
         this.group = group;
         this.user = user;
+        status = ACTIVE;
     }
 
     public static Event create(Group group, User user, CreateEventRequest createEventRequest) {
