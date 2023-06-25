@@ -3,6 +3,7 @@ package com.sosim.server.event;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,9 +38,10 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
                         equalsGroup(filterEventRequest.getGroupId()),
                         betweenTime(filterEventRequest.getStartDate(), filterEventRequest.getEndDate()),
                         equalsNickname(filterEventRequest.getNickname()),
-                        equalsSituation(filterEventRequest.getSituation())
+                        equalsSituation(filterEventRequest.getSituation()),
+                        event.status.eq(Status.ACTIVE)
                 )
-                .orderBy(event.date.asc());
+                .orderBy(event.date.asc(), event.id.asc());
     }
 
     private BooleanExpression equalsGroup(long groupId) {
