@@ -6,10 +6,7 @@ import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.request.ModifySituationRequest;
-import com.sosim.server.event.dto.response.EventIdResponse;
-import com.sosim.server.event.dto.response.GetEventCalendarResponse;
-import com.sosim.server.event.dto.response.GetEventListResponse;
-import com.sosim.server.event.dto.response.GetEventOneResponse;
+import com.sosim.server.event.dto.response.*;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.participant.Participant;
@@ -81,13 +78,13 @@ public class EventService {
     }
 
     @Transactional
-    public List<Long> modifyEventSituation(long userId, ModifySituationRequest modifySituationRequest) {
+    public ModifySituationResponse modifyEventSituation(long userId, ModifySituationRequest modifySituationRequest) {
         List<Event> eventList = eventRepository.findByIdIn(modifySituationRequest.getEventIdList());
         for (Event event : eventList) {
             event.modifySituation(modifySituationRequest.getSituation());
         }
 
-        return eventList.stream().map(Event::getId).collect(Collectors.toList());
+        return ModifySituationResponse.toDto(modifySituationRequest.getSituation(), eventList.stream().map(Event::getId).collect(Collectors.toList()));
     }
 
     public GetEventCalendarResponse getEventCalendar(FilterEventRequest filterEventRequest) {
