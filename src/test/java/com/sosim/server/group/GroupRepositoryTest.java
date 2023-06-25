@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.util.StopWatch;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -101,8 +102,8 @@ class GroupRepositoryTest {
         //when
         Slice<Group> myGroups = groupRepository.findMyGroups(userId, pageDto.getOffset(), pageDto.getLimit());
 
-        assertThat(myGroups.hasNext()).isTrue();
         assertThat(myGroups.getNumberOfElements()).isEqualTo(17);
+        assertThat(myGroups.hasNext()).isTrue();
     }
 
     @DisplayName("findMyGroups / 내 그룹 조회 첫 페이지 아니면 18개")
@@ -121,11 +122,11 @@ class GroupRepositoryTest {
         Slice<Group> myGroups1 = groupRepository.findMyGroups(userId, pageDto1.getOffset(), pageDto1.getLimit());
         Slice<Group> myGroups2 = groupRepository.findMyGroups(userId, pageDto2.getOffset(), pageDto2.getLimit());
 
-        assertThat(myGroups1.hasNext()).isTrue();
         assertThat(myGroups1.getNumberOfElements()).isEqualTo(18);
+        assertThat(myGroups1.hasNext()).isTrue();
 
-        assertThat(myGroups2.hasNext()).isTrue();
         assertThat(myGroups2.getNumberOfElements()).isEqualTo(18);
+        assertThat(myGroups2.hasNext()).isTrue();
     }
 
     @Disabled
@@ -151,6 +152,63 @@ class GroupRepositoryTest {
         System.out.println(group.isAdminUser(1L));
         System.out.println(group.getAdminParticipant().getNickname());
         System.out.println(group.getNumberOfParticipants());
+    }
+
+    @Disabled
+    @DisplayName("findMyGroups / 속도 확인")
+    @Test
+    void findMyGroups_speed() {
+        //given
+        int size = 100;
+        saveMyGroupsData(size);
+
+        List<MyGroupPageDto> pageDtos = new ArrayList<>();
+        for (int page = 0; page < 5; page++) {
+            pageDtos.add(MyGroupPaginationUtil.calculateOffsetAndSize(page));
+        }
+
+        em.flush();
+        em.clear();
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        for (int i = 0; i < 5; i++) {
+            groupRepository.findMyGroups(userId, pageDtos.get(i).getOffset(), pageDtos.get(i).getLimit());
+        }
+        stopWatch.stop();
+
+        System.out.println("\n\n======= [Milli Time] = " + stopWatch.getTotalTimeMillis() + "ms =========\n\n");
+    }
+
+    @DisplayName("findMyGroups / Participant Fetch join 확인")
+    @Test
+    void findMyGroups_check_fetch_join_participantList() {
+        //given
+        User user1 = userRepository.save(makeUser());
+        User user2 = userRepository.save(makeUser());
+
+        Group group1 = groupRepository.save(makeGroup());
+        Group group2 = groupRepository.save(makeGroup());
+
+        List<Participant> participants = new ArrayList<>();
+        participants.add(Participant.create(user1, group1, "닉네임" + nicknameNo++, true));
+        participants.add(Participant.create(user1, group2, "닉네임" + nicknameNo++, false));
+        participants.add(Participant.create(user2, group1, "닉네임" + nicknameNo++, false));
+        participants.add(Participant.create(user2, group2, "닉네임" + nicknameNo++, true));
+
+        for (Participant participant : participants) {
+            participantRepository.save(participant);
+        }
+
+        em.flush();
+        em.clear();
+
+        Slice<Group> myGroups = groupRepository.findMyGroups(user1.getId(), 0, 2);
+
+        assertThat(myGroups.hasNext()).isFalse();
+        assertThat(myGroups.getNumberOfElements()).isEqualTo(2);
+        assertThat(myGroups.getContent().get(0).getId()).isEqualTo(2L);
+        assertThat(myGroups.getContent().get(0).getParticipantList().size()).isEqualTo(2);
     }
 
     private int saveOneGroupAndParticipants() {
