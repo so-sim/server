@@ -1,7 +1,8 @@
 package com.sosim.server.jwt.util;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.response.ResponseCode;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,10 +29,16 @@ public class JwtProvider {
         return Long.valueOf(getClaims(accessKey, accessToken).getSubject());
     }
 
-    private Claims getClaims(String key, String token){
-        return Jwts.parser()
-                .setSigningKey(key.getBytes(StandardCharsets.UTF_8))
-                .parseClaimsJws(token)
-                .getBody();
+    private Claims getClaims(String key, String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(key.getBytes(StandardCharsets.UTF_8))
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (SignatureException | MalformedJwtException | MissingClaimException ex) {
+            throw new CustomException(ResponseCode.MODULATION_JWT);
+        } catch (ExpiredJwtException ex) {
+            throw new CustomException(ResponseCode.EXPIRATION_JWT);
+        }
     }
 }
