@@ -5,6 +5,7 @@ import com.sosim.server.security.filter.AuthenticationFilter;
 import com.sosim.server.security.filter.JwtFailureFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -35,8 +36,9 @@ public class SecurityConfig {
         // 요청에 대한 권한 체크 파트
         http
                 .authorizeRequests()
-                .antMatchers("/**", "/api/group/{groupId}").permitAll()
-                .antMatchers("/api/**").authenticated();
+                .antMatchers("/api/group/{groupId}").permitAll()
+                .antMatchers("/api/**").authenticated()
+                .antMatchers("/**").permitAll();
 
         http
                 .addFilterBefore(new AuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
