@@ -7,10 +7,7 @@ import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.request.ModifySituationRequest;
-import com.sosim.server.event.dto.response.EventIdResponse;
-import com.sosim.server.event.dto.response.GetEventCalendarResponse;
-import com.sosim.server.event.dto.response.GetEventListResponse;
-import com.sosim.server.event.dto.response.GetEventOneResponse;
+import com.sosim.server.event.dto.response.*;
 import com.sosim.server.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -65,10 +62,10 @@ public class EventController {
     @PatchMapping("/penalty")
     public ResponseEntity<?> modifyEventSituation(@AuthUserId long userId,
                                                   @Validated @RequestBody ModifySituationRequest modifySituationRequest) {
-        List<Long> eventIdListResponse = eventService.modifyEventSituation(userId, modifySituationRequest);
+        ModifySituationResponse modifySituationResponse = eventService.modifyEventSituation(userId, modifySituationRequest);
         ResponseCode modifySituation = ResponseCode.MODIFY_EVENT_SITUATION;
 
-        return new ResponseEntity<>(Response.create(modifySituation, eventIdListResponse), modifySituation.getHttpStatus());
+        return new ResponseEntity<>(Response.create(modifySituation, modifySituationResponse), modifySituation.getHttpStatus());
     }
 
     @GetMapping("/penalty/calendar")
