@@ -1,6 +1,7 @@
 package com.sosim.server.group;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sosim.server.participant.QParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -20,9 +21,11 @@ public class GroupRepositoryImpl implements GroupRepositoryDsl {
 
     @Override
     public Slice<Group> findMyGroups(long userId, long offset, long limit) {
+        QParticipant participant2 = new QParticipant("participant2");
         List<Group> contents = jpaQueryFactory.selectFrom(group)
                 .join(group.participantList, participant).fetchJoin()
-                .where(participant.user.id.eq(userId),
+                .join(group.participantList, participant2)
+                .where(participant2.user.id.eq(userId), participant.status.eq(ACTIVE),
                         group.status.eq(ACTIVE))
                 .orderBy(group.id.desc())
                 .offset(offset)
