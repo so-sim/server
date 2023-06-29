@@ -28,7 +28,8 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
 
     @Override
     public Page<Event> searchAll(FilterEventRequest filterEventRequest, Pageable pageable) {
-        return doPageable(filterEvent(filterEventRequest), pageable);
+        JPAQuery<Event> filterEvent = filterEvent(filterEventRequest);
+        return doPageable(filterEvent, pageable, filterEvent.fetch().size());
     }
 
     private JPAQuery<Event> filterEvent(FilterEventRequest filterEventRequest) {
@@ -60,9 +61,9 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
         return situation == null ? null : event.situation.contains(situation);
     }
 
-    private Page<Event> doPageable(JPAQuery<Event> filterEvents, Pageable pageable) {
+    private Page<Event> doPageable(JPAQuery<Event> filterEvents, Pageable pageable, long totalSize) {
         return new PageImpl<>(filterEvents.offset(pageable.getOffset())
                         .limit(pageable.getPageSize())
-                        .fetch());
+                        .fetch(), pageable, totalSize);
     }
 }

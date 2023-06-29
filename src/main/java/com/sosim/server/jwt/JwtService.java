@@ -30,7 +30,7 @@ public class JwtService {
 
         RefreshToken refreshTokenEntity = getRefreshTokenEntity(refreshToken);
 
-        if (jwtProvider.checkRenewRefreshToken(refreshToken, 3L)) {
+        if (jwtProvider.checkRenewRefreshToken(refreshToken)) {
             return createToken(refreshTokenEntity.getUserId());
         }
 
@@ -44,6 +44,6 @@ public class JwtService {
 
     private RefreshToken getRefreshTokenEntity(String refreshToken) {
         return jwtRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_EXIST_TOKEN_COOKIE));
+                .orElseThrow(() -> new CustomException(ResponseCode.MODULATION_JWT));
     }
 }

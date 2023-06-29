@@ -1,6 +1,7 @@
-package com.sosim.server.security;
+package com.sosim.server.security.filter;
 
 import com.sosim.server.jwt.util.JwtProvider;
+import com.sosim.server.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
