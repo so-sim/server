@@ -1,14 +1,13 @@
 package com.sosim.server.jwt.util;
 
 import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.common.response.ResponseCode;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+
+import static com.sosim.server.common.response.ResponseCode.*;
 
 @Component
 public class JwtProvider {
@@ -19,10 +18,14 @@ public class JwtProvider {
     @Value("${jwt.refresh.key}")
     private String refreshKey;
 
-    public boolean checkRenewRefreshToken(String refreshToken, Long time){
-        Instant expiredTime = getClaims(refreshKey, refreshToken).getExpiration().toInstant();
-
-        return Instant.now().until(expiredTime, ChronoUnit.DAYS) < time;
+    public boolean checkRenewRefreshToken(String refreshToken) {
+        try {
+            getClaims(refreshKey, refreshToken);
+        } catch (CustomException e) {
+            if (e.getResponseCode().equals(EXPIRATION_JWT)) return true;
+            else throw e;
+        }
+        return false;
     }
 
     public Long getUserId(String accessToken) {
@@ -36,9 +39,9 @@ public class JwtProvider {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (SignatureException | MalformedJwtException | MissingClaimException ex) {
-            throw new CustomException(ResponseCode.MODULATION_JWT);
+            throw new CustomException(MODULATION_JWT);
         } catch (ExpiredJwtException ex) {
-            throw new CustomException(ResponseCode.EXPIRATION_JWT);
+            throw new CustomException(EXPIRATION_JWT);
         }
     }
 }
