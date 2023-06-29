@@ -54,7 +54,7 @@ public class EventService {
     }
 
     @Transactional
-    public EventIdResponse modifyEvent(long userId, long eventId, ModifyEventRequest modifyEventRequest) {
+    public GetEventResponse modifyEvent(long userId, long eventId, ModifyEventRequest modifyEventRequest) {
         Event eventEntity = getEventEntity(eventId);
         isAdmin(eventEntity, userId, true);
 
@@ -67,7 +67,7 @@ public class EventService {
 
         eventEntity.modify(userEntity, modifyEventRequest);
 
-        return EventIdResponse.create(eventEntity);
+        return GetEventOneResponse.toDto(eventEntity);
     }
 
     @Transactional
