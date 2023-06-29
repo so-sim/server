@@ -21,7 +21,9 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer configure() {
-        return (web) -> web.ignoring().antMatchers("/auth/**");
+        return (web) -> web.ignoring()
+                .antMatchers("/auth/**")
+                .antMatchers("/api/group/{groupId}");
     }
 
     @Bean
