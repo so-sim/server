@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class JwtResponse {
-    @JsonProperty("access_token")
+
     private String accessToken;
 
     @JsonIgnore
