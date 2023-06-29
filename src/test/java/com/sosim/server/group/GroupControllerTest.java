@@ -32,6 +32,7 @@ import java.util.List;
 import static com.sosim.server.common.response.ResponseCode.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -241,6 +242,23 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @DisplayName("그룹 조회 / 인증 없이 조회하는 경우")
+    @Test
+    void get_group_no_userId() throws Exception {
+        //given
+        GetGroupResponse getGroupResponse = makeGetGroupResponse();
+
+        doReturn(getGroupResponse).when(groupService).getGroup(0L, groupId);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d", groupId));
+        ResultActions resultActions = mvc.perform(get(url));
+
+        //then
+        resultActions.andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("$.status.code").value(GET_GROUP.getCode()));
     }
 
     @WithMockCustomUser
