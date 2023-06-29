@@ -2,6 +2,7 @@ package com.sosim.server.common.resolver;
 
 import com.sosim.server.security.AuthUser;
 import org.springframework.core.MethodParameter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -21,11 +22,15 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-        try {
-            AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AuthUserId annotation = parameter.getParameterAnnotation(AuthUserId.class);
+        assert annotation != null;
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+        if (annotation.required() || authentication != null) {
+            AuthUser authUser = (AuthUser) authentication.getPrincipal();
             return authUser.getId();
-        } catch (ClassCastException e) {
-            return 0L;
         }
+        return 0L;
     }
 }
