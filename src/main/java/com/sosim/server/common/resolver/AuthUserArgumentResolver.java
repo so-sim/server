@@ -21,11 +21,12 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-        try {
+        AuthUserId annotation = parameter.getParameterAnnotation(AuthUserId.class);
+        assert annotation != null;
+        if (annotation.required()) {
             AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             return authUser.getId();
-        } catch (ClassCastException e) {
-            return 0L;
         }
+        return 0L;
     }
 }
