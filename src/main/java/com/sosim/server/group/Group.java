@@ -82,7 +82,7 @@ public class Group extends BaseTimeEntity {
 
     public boolean hasParticipant(long userId) {
         return participantList.stream()
-                .anyMatch(p -> p.isActive() && p.getUser().getId().equals(userId));
+                .anyMatch(p -> p.isActive() && p.isMine(userId));
     }
 
     public boolean hasMoreParticipant() {

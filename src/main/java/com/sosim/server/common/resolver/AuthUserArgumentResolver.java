@@ -27,10 +27,14 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
-        if (annotation.required() || authentication != null) {
+        if (annotation.required() || hasPrincipal(authentication)) {
             AuthUser authUser = (AuthUser) authentication.getPrincipal();
             return authUser.getId();
         }
         return 0L;
+    }
+
+    private boolean hasPrincipal(Authentication authentication) {
+        return authentication != null && authentication.getPrincipal() != null;
     }
 }
