@@ -266,7 +266,7 @@ class GroupControllerTest {
     @Test
     void update_group() throws Exception {
         //given
-        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "스터디", "색");
+        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "스터디", "색", "닉네임");
         GroupIdResponse response = GroupIdResponse.builder().groupId(groupId).build();
 
         doReturn(response).when(groupService).updateGroup(userId, groupId, request);
@@ -292,7 +292,7 @@ class GroupControllerTest {
     void update_group_no_group() throws Exception {
         //given
         CustomException e = new CustomException(NOT_FOUND_GROUP);
-        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "스터디", "색");
+        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "스터디", "색", "닉네임");
 
         doThrow(e).when(groupService).updateGroup(userId, groupId, request);
 
@@ -315,7 +315,7 @@ class GroupControllerTest {
     void update_group_not_admin() throws Exception {
         //given
         CustomException e = new CustomException(NONE_ADMIN);
-        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "스터디", "색");
+        ModifyGroupRequest request = makeUpdateRequest("그루비룸", "스터디", "색", "닉네임");
 
         doThrow(e).when(groupService).updateGroup(userId, groupId, request);
 
@@ -337,8 +337,8 @@ class GroupControllerTest {
     @Test
     void update_title_fail() throws Exception {
         //given
-        ModifyGroupRequest shortTitle = makeUpdateRequest("", "스터디", "색");
-        ModifyGroupRequest longTitle = makeUpdateRequest("그루비룸그루비룸그루비룸그루비룸", "스터디", "색");
+        ModifyGroupRequest shortTitle = makeUpdateRequest("", "스터디", "색", "닉네임");
+        ModifyGroupRequest longTitle = makeUpdateRequest("그루비룸그루비룸그루비룸그루비룸", "스터디", "색", "닉네임");
 
         //when
         String url = URI_PREFIX.concat(String.format("/%d", groupId));
@@ -367,7 +367,7 @@ class GroupControllerTest {
     @Test
     void update_groupType_fail() throws Exception {
         //given
-        ModifyGroupRequest nullType = makeUpdateRequest("그루비룸", null, "색");
+        ModifyGroupRequest nullType = makeUpdateRequest("그루비룸", null, "색", "닉네임");
 
         //when
         String url = URI_PREFIX.concat(String.format("/%d", groupId));
@@ -387,7 +387,7 @@ class GroupControllerTest {
     @Test
     void update_coverColor_fail() throws Exception {
         //given
-        ModifyGroupRequest nullType = makeUpdateRequest("그루비룸", "타입", null);
+        ModifyGroupRequest nullType = makeUpdateRequest("그루비룸", "타입", null, "닉네임");
 
         //when
         String url = URI_PREFIX.concat(String.format("/%d", groupId));
@@ -597,11 +597,12 @@ class GroupControllerTest {
 
     //--- Private Method ---
 
-    private ModifyGroupRequest makeUpdateRequest(String title, String type, String color) {
+    private ModifyGroupRequest makeUpdateRequest(String title, String type, String color, String nickname) {
         return ModifyGroupRequest.builder()
                 .title(title)
                 .type(type)
                 .coverColor(color)
+                .nickname(nickname)
                 .build();
     }
 
