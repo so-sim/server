@@ -184,7 +184,7 @@ class GroupServiceTest {
         ReflectionTestUtils.setField(group, "id", groupId);
         addParticipantInGroup(group, userId, true);
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
 
         //when
         GroupIdResponse response = groupService.updateGroup(userId, groupId, request);
@@ -207,7 +207,7 @@ class GroupServiceTest {
         addParticipantInGroup(group, userId + 1, true);
         addParticipantInGroup(group, userId, false);
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
