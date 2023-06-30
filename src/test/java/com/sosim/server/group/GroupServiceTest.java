@@ -177,7 +177,8 @@ class GroupServiceTest {
         String title = "타이틀";
         String groupType = "그룹 타입";
         String colorType = "색";
-        ModifyGroupRequest request = makeUpdateGroupRequest(title, groupType, colorType);
+        String nickname = "닉네임";
+        ModifyGroupRequest request = makeUpdateGroupRequest(title, groupType, colorType, nickname);
 
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
@@ -199,7 +200,7 @@ class GroupServiceTest {
     @Test
     void modify_group_not_admin() {
         //given
-        ModifyGroupRequest request = makeUpdateGroupRequest("타이틀", "그룹 타입", "색");
+        ModifyGroupRequest request = makeUpdateGroupRequest("타이틀", "그룹 타입", "색", "닉네임");
 
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
@@ -307,9 +308,10 @@ class GroupServiceTest {
         return Participant.create(user, group, "닉네임" + userId, isAdmin);
     }
 
-    private static ModifyGroupRequest makeUpdateGroupRequest(String title, String groupType, String colorType) {
+    private static ModifyGroupRequest makeUpdateGroupRequest(String title, String groupType, String colorType, String nickname) {
         return ModifyGroupRequest.builder()
                 .title(title)
+                .nickname(nickname)
                 .type(groupType)
                 .coverColor(colorType)
                 .build();
