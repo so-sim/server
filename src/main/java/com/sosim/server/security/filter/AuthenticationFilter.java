@@ -40,7 +40,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void setAuthPrincipal(String token) {
-        AuthUser authUser = AuthUser.crate(jwtProvider.getUserId(token));
+        AuthUser authUser = AuthUser.create(jwtProvider.getUserId(token));
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(authUser, null, authUser.getAuthorities());
 

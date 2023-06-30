@@ -19,12 +19,12 @@ public class GetGroupResponse {
     private String adminNickname;
 
     @JsonProperty("isAdmin")
-    private Boolean isAdmin;
+    private boolean isAdmin;
 
     private int size;
 
     @JsonProperty("isInto")
-    private Boolean isInto;
+    private boolean isInto;
 
     @Builder
     public GetGroupResponse(long id, String title, String coverColor, String groupType, String adminNickname, Boolean isAdmin, int size, Boolean isInto) {

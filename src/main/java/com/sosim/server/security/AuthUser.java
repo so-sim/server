@@ -48,7 +48,7 @@ public class AuthUser implements UserDetails {
         return false;
     }
 
-    public static AuthUser crate(Long id) {
+    public static AuthUser create(Long id) {
         return AuthUser.builder().id(id).build();
     }
 }

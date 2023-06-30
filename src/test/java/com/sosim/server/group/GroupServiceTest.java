@@ -117,7 +117,7 @@ class GroupServiceTest {
         assertThat(response.getTitle()).isEqualTo(title);
         assertThat(response.getAdminNickname()).isEqualTo(admin.getNickname());
         assertThat(response.getSize()).isEqualTo(1);
-        assertThat(response.getIsInto()).isTrue();
+        assertThat(response.isInto()).isTrue();
     }
 
     @DisplayName("그룹 상세조회 / 참여하지 않은 그룹인 경우 isInto는 False")
@@ -134,7 +134,7 @@ class GroupServiceTest {
         GetGroupResponse response = groupService.getGroup(userId, groupId);
 
         //then
-        assertThat(response.getIsInto()).isFalse();
+        assertThat(response.isInto()).isFalse();
     }
 
     @DisplayName("그룹 상세조회 / 일반 유저인 경우 isAdmin은 False, isInto는 true")
@@ -152,8 +152,8 @@ class GroupServiceTest {
         GetGroupResponse response = groupService.getGroup(userId, groupId);
 
         //then
-        assertThat(response.getIsAdmin()).isFalse();
-        assertThat(response.getIsInto()).isTrue();
+        assertThat(response.isAdmin()).isFalse();
+        assertThat(response.isInto()).isTrue();
     }
 
     @DisplayName("그룹 상세조회 / 조회한 유저가 참가하지 않은 경우 IsInto는 False")

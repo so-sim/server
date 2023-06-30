@@ -35,11 +35,11 @@ public class GroupService {
     @Transactional
     public GroupIdResponse createGroup(long userId, CreateGroupRequest createGroupRequest) {
         User user = findUser(userId);
-        Group group = groupRepository.save(createGroupRequest.toEntity());
+        Group group = createGroupRequest.toEntity();
 
-        saveAdminParticipant(createGroupRequest, user, group);
+        long groupId = saveGroupAndAdmin(createGroupRequest, user, group);
 
-        return GroupIdResponse.toDto(group);
+        return GroupIdResponse.toDto(groupId);
     }
 
     @Transactional(readOnly = true)
@@ -57,7 +57,7 @@ public class GroupService {
         Group group = findGroup(groupId);
         group.update(userId, modifyGroupRequest);
 
-        return GroupIdResponse.toDto(group);
+        return GroupIdResponse.toDto(group.getId());
     }
 
     @Transactional
@@ -89,10 +89,12 @@ public class GroupService {
                 .collect(Collectors.toList());
     }
 
-    private void saveAdminParticipant(CreateGroupRequest createGroupRequest, User user, Group group) {
+    private long saveGroupAndAdmin(CreateGroupRequest createGroupRequest, User user, Group group) {
         String adminNickname = createGroupRequest.getNickname();
         Participant admin = Participant.create(user, group, adminNickname, true);
+        Group saveGroup = groupRepository.save(group);
         participantRepository.save(admin);
+        return saveGroup.getId();
     }
 
     private User findUser(long userId) {

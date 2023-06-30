@@ -24,13 +24,17 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         AuthUserId annotation = parameter.getParameterAnnotation(AuthUserId.class);
         assert annotation != null;
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-        if (annotation.required() || authentication != null) {
-            AuthUser authUser = (AuthUser) authentication.getPrincipal();
-            return authUser.getId();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!annotation.required() && hasNoPrincipal(authentication)) {
+            return 0L;
         }
-        return 0L;
+        AuthUser authUser = (AuthUser) authentication.getPrincipal();
+        return authUser.getId();
     }
+
+    private boolean hasNoPrincipal(Authentication authentication) {
+        return authentication == null || authentication.getPrincipal() == null
+                || !(authentication.getPrincipal() instanceof AuthUser);
+    }
+
 }
