@@ -36,7 +36,7 @@ public class EventController {
 
     @GetMapping("/penalty/{eventId}")
     public ResponseEntity<?> getEvent(@AuthUserId long userId, @PathVariable("eventId") long eventId) {
-        GetEventOneResponse getEventResponse = eventService.getEvent(userId, eventId);
+        GetEventResponse getEventResponse = eventService.getEvent(userId, eventId);
         ResponseCode getEvent = ResponseCode.GET_EVENT;
 
         return new ResponseEntity<>(Response.create(getEvent, getEventResponse), getEvent.getHttpStatus());
@@ -45,7 +45,7 @@ public class EventController {
     @PatchMapping("/penalty/{eventId}")
     public ResponseEntity<?> modifyEvent(@AuthUserId long userId, @PathVariable("eventId") long eventId,
                                          @Validated @RequestBody ModifyEventRequest modifyEventRequest) {
-        EventIdResponse eventIdResponse = eventService.modifyEvent(userId, eventId, modifyEventRequest);
+        GetEventResponse eventIdResponse = eventService.modifyEvent(userId, eventId, modifyEventRequest);
         ResponseCode modifyEvent = ResponseCode.MODIFY_EVENT;
 
         return new ResponseEntity<>(Response.create(modifyEvent, eventIdResponse), modifyEvent.getHttpStatus());
