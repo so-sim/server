@@ -608,8 +608,8 @@ class GroupControllerTest {
     private GetGroupResponse makeGetGroupResponse() {
         return GetGroupResponse.builder()
                 .id(groupId)
-                .isAdmin(false)
-                .isInto(true)
+                .admin(false)
+                .into(true)
                 .build();
     }
 
