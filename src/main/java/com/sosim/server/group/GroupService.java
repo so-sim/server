@@ -44,7 +44,7 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public GetGroupResponse getGroup(long userId, long groupId) {
-        Group group = findGroupWithParticipants(groupId);
+        Group group = findGroup(groupId);
 
         boolean isAdmin = group.isAdminUser(userId);
         boolean isInto = group.hasParticipant(userId);
@@ -57,19 +57,21 @@ public class GroupService {
         Group group = findGroup(groupId);
         group.update(userId, modifyGroupRequest);
 
+        changeAdminNickname(group, modifyGroupRequest.getNickname());
+
         return GroupIdResponse.toDto(group.getId());
     }
 
     @Transactional
     public void deleteGroup(long userId, long groupId) {
-        Group group = findGroupWithParticipants(groupId);
+        Group group = findGroup(groupId);
 
         group.deleteGroup(userId);
     }
 
     @Transactional
     public void modifyAdmin(long userId, long groupId, ParticipantNicknameRequest nicknameRequest) {
-        Group group = findGroupWithParticipants(groupId);
+        Group group = findGroup(groupId);
 
         group.modifyAdmin(userId, nicknameRequest.getNickname());
     }
@@ -83,7 +85,12 @@ public class GroupService {
         return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroupDtoList);
     }
 
-    private static List<MyGroupDto> toMyGroupDtoList(long userId, Slice<Group> myGroups) {
+    private void changeAdminNickname(Group group, String newNickname) {
+        Participant admin = group.getAdminParticipant();
+        admin.modifyNickname(group, newNickname);
+    }
+
+    private List<MyGroupDto> toMyGroupDtoList(long userId, Slice<Group> myGroups) {
         return myGroups.stream()
                 .map(g -> MyGroupDto.toDto(g, g.isAdminUser(userId)))
                 .collect(Collectors.toList());
@@ -103,11 +110,6 @@ public class GroupService {
     }
 
     private Group findGroup(long groupId) {
-        return groupRepository.findById(groupId)
-                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
-    }
-
-    private Group findGroupWithParticipants(long groupId) {
         return groupRepository.findByIdWithParticipants(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
