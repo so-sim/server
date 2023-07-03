@@ -29,7 +29,6 @@ public class UserController {
     @DeleteMapping
     public ResponseEntity<?> withdrawUser(@AuthUserId long userId, @RequestParam("reason") String withdrawReason,
                                           HttpServletResponse response) {
-        System.out.println(withdrawReason);
         userService.withdrawUser(userId, withdrawReason);
         CookieUtil.deleteRefreshToken(response);
 
