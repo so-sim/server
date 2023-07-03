@@ -44,7 +44,7 @@ public enum ResponseCode {
     NOT_EXIST_TOKEN_COOKIE(1200, HttpStatus.BAD_REQUEST, "리프레시 토큰이 존재하지 않습니다."),
     MODULATION_JWT(1201, HttpStatus.UNAUTHORIZED, "변조된 JWT 토큰 입니다."),
     EXPIRATION_JWT(1202, HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰 입니다."),
-    NOT_EXIST_TOKEN(1203, HttpStatus.UNAUTHORIZED, "엑세스 토큰이 존재하지 않습니다."),
+    NOT_EXIST_TOKEN(1203, HttpStatus.FORBIDDEN, "엑세스 토큰이 존재하지 않습니다."),
 
     NOT_FOUND_USER(1100, HttpStatus.NOT_FOUND, "존재하지 않는 회원 정보입니다."),
     USER_ALREADY_EXIST(1101, HttpStatus.BAD_REQUEST, "이미 존재하는 회원 정보입니다."),
