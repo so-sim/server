@@ -137,7 +137,7 @@ class UserControllerTest {
 
     private ResultActions withdrawAction(String withdrawReason) throws Exception {
         ResultActions actions = mvc.perform(delete(URI_PREFIX)
-                .param("withdrawReason", withdrawReason));
+                .param("reason", withdrawReason));
         return actions;
     }
 
