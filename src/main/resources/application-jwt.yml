@@ -1,0 +1,11 @@
+jwt:
+  cookie:
+    domain: ${DOMAIN}
+
+  access:
+    key: ${JWT_ACCESS}
+    expiration: 1800000 # 30분 - 30 * 60 * 1000
+
+  refresh:
+    key: ${JWT_REFRESH}
+    expiration: 1209600000 # (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h) * 24L(h -> 하루) * 14(2주))
