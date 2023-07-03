@@ -3,6 +3,7 @@ package com.sosim.server.config;
 import com.sosim.server.jwt.util.JwtProvider;
 import com.sosim.server.security.filter.AuthenticationFilter;
 import com.sosim.server.security.filter.JwtFailureFilter;
+import com.sosim.server.security.handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -49,6 +50,9 @@ public class SecurityConfig {
         http
                 .addFilterBefore(new AuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtFailureFilter(), AuthenticationFilter.class);
+
+        http
+                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint());
 
         return http.build();
     }
