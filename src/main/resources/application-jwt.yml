@@ -1,4 +1,7 @@
 jwt:
+  cookie:
+    domain: ${DOMAIN}
+
   access:
     key: ${JWT_ACCESS}
     expiration: 1800000 # 30분 - 30 * 60 * 1000

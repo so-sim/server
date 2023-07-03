@@ -40,7 +40,7 @@ jobs:
           # create application-prod.yaml
            cd ./src/main/resources
           # GitHub-Actions 에서 설정한 값을 application-database.yaml 파일에 쓰기
-          echo "${{ secrets.DATABASE_DEV }}" >> ./application-prod.yaml
+          echo "${{ secrets.DATABASE_PROD }}" >> ./application-prod.yaml
         shell: bash
 
       - name: Build with Gradle
