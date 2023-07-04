@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ParticipantRepository extends JpaRepository<Participant, java.lang.Long> {
+public interface ParticipantRepository extends JpaRepository<Participant, Long> {
 
     @Query("select p from Participant p where p.user.id = :userId " +
             "and p.group.id = :groupId and p.status = 'ACTIVE'")
@@ -25,10 +25,11 @@ public interface ParticipantRepository extends JpaRepository<Participant, java.l
             "ORDER BY p.nickname ASC")
     List<Participant> findGroupNormalParticipants(@Param("groupId") long groupId, @Param("adminNickname") String adminNickname);
 
-    @Query("SELECT p FROM Participant p " +
+    @Query("SELECT DISTINCT p FROM Participant p " +
+            "JOIN FETCH p.group g " +
+            "JOIN FETCH g.participantList " +
             "WHERE p.status = 'ACTIVE' " +
-            "AND p.user.id = :userId " +
-            "AND p.isAdmin = true")
+            "AND p.user.id = :userId AND p.isAdmin = true")
     List<Participant> findByUserIdAndIsAdminIsTrue(@Param("userId") long userId);
 
     @Query("SELECT p FROM Participant p " +

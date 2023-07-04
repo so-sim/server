@@ -117,7 +117,7 @@ class GroupServiceTest {
         assertThat(response.getTitle()).isEqualTo(title);
         assertThat(response.getAdminNickname()).isEqualTo(admin.getNickname());
         assertThat(response.getSize()).isEqualTo(1);
-        assertThat(response.getIsInto()).isTrue();
+        assertThat(response.isInto()).isTrue();
     }
 
     @DisplayName("그룹 상세조회 / 참여하지 않은 그룹인 경우 isInto는 False")
@@ -134,7 +134,7 @@ class GroupServiceTest {
         GetGroupResponse response = groupService.getGroup(userId, groupId);
 
         //then
-        assertThat(response.getIsInto()).isFalse();
+        assertThat(response.isInto()).isFalse();
     }
 
     @DisplayName("그룹 상세조회 / 일반 유저인 경우 isAdmin은 False, isInto는 true")
@@ -152,8 +152,8 @@ class GroupServiceTest {
         GetGroupResponse response = groupService.getGroup(userId, groupId);
 
         //then
-        assertThat(response.getIsAdmin()).isFalse();
-        assertThat(response.getIsInto()).isTrue();
+        assertThat(response.isAdmin()).isFalse();
+        assertThat(response.isInto()).isTrue();
     }
 
     @DisplayName("그룹 상세조회 / 조회한 유저가 참가하지 않은 경우 IsInto는 False")
@@ -177,13 +177,14 @@ class GroupServiceTest {
         String title = "타이틀";
         String groupType = "그룹 타입";
         String colorType = "색";
-        ModifyGroupRequest request = makeUpdateGroupRequest(title, groupType, colorType);
+        String nickname = "닉네임";
+        ModifyGroupRequest request = makeUpdateGroupRequest(title, groupType, colorType, nickname);
 
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
         addParticipantInGroup(group, userId, true);
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
 
         //when
         GroupIdResponse response = groupService.updateGroup(userId, groupId, request);
@@ -199,14 +200,14 @@ class GroupServiceTest {
     @Test
     void modify_group_not_admin() {
         //given
-        ModifyGroupRequest request = makeUpdateGroupRequest("타이틀", "그룹 타입", "색");
+        ModifyGroupRequest request = makeUpdateGroupRequest("타이틀", "그룹 타입", "색", "닉네임");
 
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
         addParticipantInGroup(group, userId + 1, true);
         addParticipantInGroup(group, userId, false);
 
-        doReturn(Optional.of(group)).when(groupRepository).findById(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -307,9 +308,10 @@ class GroupServiceTest {
         return Participant.create(user, group, "닉네임" + userId, isAdmin);
     }
 
-    private static ModifyGroupRequest makeUpdateGroupRequest(String title, String groupType, String colorType) {
+    private static ModifyGroupRequest makeUpdateGroupRequest(String title, String groupType, String colorType, String nickname) {
         return ModifyGroupRequest.builder()
                 .title(title)
+                .nickname(nickname)
                 .type(groupType)
                 .coverColor(colorType)
                 .build();

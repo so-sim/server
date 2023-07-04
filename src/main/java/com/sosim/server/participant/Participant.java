@@ -61,6 +61,9 @@ public class Participant extends BaseTimeEntity {
     }
 
     public void modifyNickname(Group group, String newNickname) {
+        if (nickname.equals(newNickname)) {
+            return;
+        }
         if (group.existThatNickname(newNickname)) {
             throw new CustomException(ALREADY_USE_NICKNAME);
         }

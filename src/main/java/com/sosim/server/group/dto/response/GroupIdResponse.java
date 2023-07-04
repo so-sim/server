@@ -1,7 +1,5 @@
 package com.sosim.server.group.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sosim.server.group.Group;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,9 +8,9 @@ import lombok.Getter;
 public class GroupIdResponse {
     private long groupId;
 
-    public static GroupIdResponse toDto(Group group) {
+    public static GroupIdResponse toDto(long groupId) {
         return GroupIdResponse.builder()
-                .groupId(group.getId())
+                .groupId(groupId)
                 .build();
     }
 }

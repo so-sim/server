@@ -14,7 +14,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
     public SecurityContext createSecurityContext(WithMockCustomUser annotation) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        AuthUser authUser = AuthUser.crate(USER_ID);
+        AuthUser authUser = AuthUser.create(USER_ID);
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(authUser, null, authUser.getAuthorities());
         context.setAuthentication(authentication);

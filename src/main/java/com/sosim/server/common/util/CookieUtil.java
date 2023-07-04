@@ -17,10 +17,16 @@ public class CookieUtil {
     private static final String REFRESH_HEADER = "RefreshToken";
 
     private static Long refreshExpiration;
+    private static String domain;
 
     @Value("${jwt.refresh.expiration}")
     public void setRefreshExpiration(Long refreshExpiration) {
         CookieUtil.refreshExpiration = refreshExpiration;
+    }
+
+    @Value("${jwt.cookie.domain}")
+    public void setDomain(String domain) {
+        CookieUtil.domain = domain;
     }
 
     public static void setCookieRefreshToken(HttpServletResponse response, String refreshToken) {
@@ -47,6 +53,7 @@ public class CookieUtil {
                 .secure(true)
                 .sameSite("None")
                 .maxAge(maxAge)
+                .domain(domain)
                 .path("/")
                 .build();
 

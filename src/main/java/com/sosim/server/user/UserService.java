@@ -60,9 +60,11 @@ public class UserService {
 
     private void checkCanWithdraw(long userId) {
         List<Participant> myParticipants = participantRepository.findByUserIdAndIsAdminIsTrue(userId);
-        if (myParticipants.stream().anyMatch(Participant::isAdmin)) {
-            throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
-        }
+        myParticipants.forEach(p -> {
+            if (p.getGroup().getNumberOfParticipants() > 1) {
+                throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
+            }
+        });
     }
 
     private User getUser(OAuthUserRequest oAuthUserRequest) {

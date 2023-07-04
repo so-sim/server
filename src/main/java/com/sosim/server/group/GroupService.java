@@ -35,16 +35,16 @@ public class GroupService {
     @Transactional
     public GroupIdResponse createGroup(long userId, CreateGroupRequest createGroupRequest) {
         User user = findUser(userId);
-        Group group = groupRepository.save(createGroupRequest.toEntity());
+        Group group = createGroupRequest.toEntity();
 
-        saveAdminParticipant(createGroupRequest, user, group);
+        long groupId = saveGroupAndAdmin(createGroupRequest, user, group);
 
-        return GroupIdResponse.toDto(group);
+        return GroupIdResponse.toDto(groupId);
     }
 
     @Transactional(readOnly = true)
     public GetGroupResponse getGroup(long userId, long groupId) {
-        Group group = findGroupWithParticipants(groupId);
+        Group group = findGroup(groupId);
 
         boolean isAdmin = group.isAdminUser(userId);
         boolean isInto = group.hasParticipant(userId);
@@ -57,19 +57,21 @@ public class GroupService {
         Group group = findGroup(groupId);
         group.update(userId, modifyGroupRequest);
 
-        return GroupIdResponse.toDto(group);
+        changeAdminNickname(group, modifyGroupRequest.getNickname());
+
+        return GroupIdResponse.toDto(group.getId());
     }
 
     @Transactional
     public void deleteGroup(long userId, long groupId) {
-        Group group = findGroupWithParticipants(groupId);
+        Group group = findGroup(groupId);
 
         group.deleteGroup(userId);
     }
 
     @Transactional
     public void modifyAdmin(long userId, long groupId, ParticipantNicknameRequest nicknameRequest) {
-        Group group = findGroupWithParticipants(groupId);
+        Group group = findGroup(groupId);
 
         group.modifyAdmin(userId, nicknameRequest.getNickname());
     }
@@ -83,16 +85,23 @@ public class GroupService {
         return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroupDtoList);
     }
 
-    private static List<MyGroupDto> toMyGroupDtoList(long userId, Slice<Group> myGroups) {
+    private void changeAdminNickname(Group group, String newNickname) {
+        Participant admin = group.getAdminParticipant();
+        admin.modifyNickname(group, newNickname);
+    }
+
+    private List<MyGroupDto> toMyGroupDtoList(long userId, Slice<Group> myGroups) {
         return myGroups.stream()
                 .map(g -> MyGroupDto.toDto(g, g.isAdminUser(userId)))
                 .collect(Collectors.toList());
     }
 
-    private void saveAdminParticipant(CreateGroupRequest createGroupRequest, User user, Group group) {
+    private long saveGroupAndAdmin(CreateGroupRequest createGroupRequest, User user, Group group) {
         String adminNickname = createGroupRequest.getNickname();
         Participant admin = Participant.create(user, group, adminNickname, true);
+        Group saveGroup = groupRepository.save(group);
         participantRepository.save(admin);
+        return saveGroup.getId();
     }
 
     private User findUser(long userId) {
@@ -101,11 +110,6 @@ public class GroupService {
     }
 
     private Group findGroup(long groupId) {
-        return groupRepository.findById(groupId)
-                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
-    }
-
-    private Group findGroupWithParticipants(long groupId) {
         return groupRepository.findByIdWithParticipants(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
