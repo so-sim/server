@@ -36,6 +36,14 @@ public class Notification extends BaseTimeEntity {
         this.groupId = groupId;
         this.content = content;
     }
+
+    public static Notification toEntity(long userId, long groupId, Content content) {
+        return Notification.builder()
+                .userId(userId)
+                .groupId(groupId)
+                .content(content)
+                .build();
+    }
 }
 
 

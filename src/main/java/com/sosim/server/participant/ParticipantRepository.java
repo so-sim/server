@@ -36,4 +36,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
             "WHERE p.status = 'ACTIVE' AND p.user.id = :userId")
     @EntityGraph(attributePaths = {"group"})
     List<Participant> findByUserIdWithGroup(@Param("userId") long userId);
+
+    @Query("SELECT p.user.id FROM Participant p " +
+            "WHERE p.status = 'ACTIVE' AND p.group.id = :groupId")
+    List<Long> getReceiverUserIdList(@Param("groupId") long groupId);
 }

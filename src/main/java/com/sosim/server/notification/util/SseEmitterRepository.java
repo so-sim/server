@@ -24,4 +24,8 @@ public class SseEmitterRepository {
     public void deleteById(long userId) {
         emitters.remove(userId);
     }
+
+    public SseEmitter findByUserId(long userId) {
+        return emitters.get(userId);
+    }
 }
