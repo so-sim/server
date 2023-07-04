@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long>, EventRepositoryDsl {
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Event e SET e.situation = :situation " +
             "WHERE e.id IN (:eventIdList)")
     void updateSituationAll(@Param("eventIdList") List<Long> eventIdList, @Param("situation") String situation);
