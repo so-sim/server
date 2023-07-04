@@ -13,6 +13,7 @@ import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final GroupRepository groupRepository;
     private final ParticipantRepository participantRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public EventIdResponse createEvent(Long id, CreateEventRequest createEventRequest) {
@@ -78,13 +80,10 @@ public class EventService {
     }
 
     @Transactional
-    public ModifySituationResponse modifyEventSituation(long userId, ModifySituationRequest modifySituationRequest) {
-        List<Event> eventList = eventRepository.findByIdIn(modifySituationRequest.getEventIdList());
-        for (Event event : eventList) {
-            event.modifySituation(modifySituationRequest.getSituation());
-        }
+    public ModifySituationResponse modifyEventSituation(ModifySituationRequest modifySituationRequest) {
+        eventRepository.updateSituationAll(modifySituationRequest.getEventIdList(), modifySituationRequest.getSituation());
 
-        return ModifySituationResponse.toDto(modifySituationRequest.getSituation(), eventList.stream().map(Event::getId).collect(Collectors.toList()));
+        return ModifySituationResponse.toDto(modifySituationRequest.getSituation(), modifySituationRequest.getEventIdList());
     }
 
     public GetEventCalendarResponse getEventCalendar(FilterEventRequest filterEventRequest) {
