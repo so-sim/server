@@ -2,6 +2,7 @@ package com.sosim.server.notification;
 
 import com.sosim.server.common.response.Response;
 import com.sosim.server.notification.dto.response.NotificationCountResponse;
+import com.sosim.server.notification.util.SseEmitterRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -15,11 +16,12 @@ import static com.sosim.server.common.response.ResponseCode.*;
 public class NotificationService {
 
     private final SseEmitterRepository sseEmitterRepository;
+    private final NotificationRepository notificationRepository;
 
     public SseEmitter subscribe(long userId) {
         SseEmitter sseEmitter = sseEmitterRepository.save(userId);
-        // TODO : 유저별 알림 개수
-        NotificationCountResponse notificationCount = NotificationCountResponse.toDto(0);
+        long userNotificationCount = notificationRepository.countByUserId(userId);
+        NotificationCountResponse notificationCount = NotificationCountResponse.toDto(userNotificationCount);
         Response<?> subscribeResponse = Response.create(SUCCESS_SUBSCRIBE, notificationCount);
         sendToClient(sseEmitter, userId, "subscribe", subscribeResponse);
 

@@ -7,9 +7,9 @@ import lombok.Getter;
 @Builder
 public class NotificationCountResponse {
 
-    private int count;
+    private long count;
 
-    public static NotificationCountResponse toDto(int count) {
+    public static NotificationCountResponse toDto(long count) {
         return NotificationCountResponse.builder()
                 .count(count)
                 .build();
