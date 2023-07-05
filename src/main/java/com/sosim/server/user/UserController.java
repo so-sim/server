@@ -3,15 +3,10 @@ package com.sosim.server.user;
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.common.util.CookieUtil;
-import com.sosim.server.user.dto.request.WithdrawRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static com.sosim.server.common.response.ResponseCode.CAN_WITHDRAW;
@@ -32,9 +27,9 @@ public class UserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> withdrawUser(@AuthUserId long userId, WithdrawRequest withdrawRequest,
-                                          HttpServletRequest request, HttpServletResponse response) {
-        userService.withdrawUser(userId, withdrawRequest);
+    public ResponseEntity<?> withdrawUser(@AuthUserId long userId, @RequestParam("reason") String withdrawReason,
+                                          HttpServletResponse response) {
+        userService.withdrawUser(userId, withdrawReason);
         CookieUtil.deleteRefreshToken(response);
 
         return new ResponseEntity<>(Response.create(SUCCESS_WITHDRAW, null), SUCCESS_WITHDRAW.getHttpStatus());

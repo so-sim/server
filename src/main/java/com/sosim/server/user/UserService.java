@@ -4,7 +4,6 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
-import com.sosim.server.user.dto.request.WithdrawRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,13 +40,13 @@ public class UserService {
     }
 
     @Transactional
-    public void withdrawUser(long userId, WithdrawRequest withdrawRequest) {
+    public void withdrawUser(long userId, String withdrawReason) {
         checkCanWithdraw(userId);
 
         User user = getUser(userId);
         List<Participant> myParticipants = participantRepository.findByUserIdWithGroup(userId);
 
-        user.delete(withdrawRequest.getWithdrawReason());
+        user.delete(withdrawReason);
         myParticipants.forEach(Participant::withdrawGroup);
     }
 
