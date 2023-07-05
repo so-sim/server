@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +31,9 @@ class ParticipantRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private EntityManager em;
+
     private long groupId;
     private long userId;
     private int nameNo;
@@ -45,6 +49,8 @@ class ParticipantRepositoryTest {
         admin = null;
         adminId = 0;
         adminName = "";
+        em.flush();
+        em.clear();
     }
 
     @Test
@@ -54,11 +60,36 @@ class ParticipantRepositoryTest {
         int size = 4;
         saveParticipantsInGroup(groupId, size);
 
+
         //when
         List<Participant> normalParticipants = participantRepository.findGroupNormalParticipants(groupId, adminName);
 
         //then
         assertThat(admin).isNotIn(normalParticipants);
+    }
+
+    @Test
+    @DisplayName("findByGroupAndNicknameContainsIgnoreCase 정상 작동")
+    void findByGroupAndNicknameContainsIgnoreCase() {
+        //given
+        int size = 5;
+        saveParticipantsInGroup(groupId, size);
+        Group group = groupRepository.findById(groupId).get();
+
+        em.flush();
+        em.clear();
+        //when
+        List<Participant> participants1 = participantRepository
+                .findByGroupAndNicknameContainsIgnoreCase(group, "닉");
+        List<Participant> participants2 = participantRepository
+                .findByGroupAndNicknameContainsIgnoreCase(group, "닉네임1");
+        List<Participant> participants3 = participantRepository
+                .findByGroupAndNicknameContainsIgnoreCase(group, "닉네임9");
+
+        //then
+        assertThat(participants1.size()).isEqualTo(size);
+        assertThat(participants2.size()).isEqualTo(1);
+        assertThat(participants3.size()).isEqualTo(size - 1);
     }
 
     private void saveParticipantsInGroup(long groupId, int size) {
