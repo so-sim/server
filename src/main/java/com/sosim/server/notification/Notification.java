@@ -27,7 +27,7 @@ public class Notification extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Content content;
 
-    @Column(name = "READ")
+    @Column(name = "`READ`")
     private boolean read;
 
     @Builder
