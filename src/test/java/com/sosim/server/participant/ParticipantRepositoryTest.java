@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -43,6 +42,13 @@ class ParticipantRepositoryTest {
 
     @BeforeEach
     void setUp() {
+        participantRepository.deleteAll();
+        groupRepository.deleteAll();
+        userRepository.deleteAll();
+
+        em.flush();
+        em.clear();
+
         groupId = 1L;
         userId = 1L;
         nameNo = 10000;
@@ -58,7 +64,7 @@ class ParticipantRepositoryTest {
     void findGroupNormalParticipants() throws Exception {
         //given
         int size = 4;
-        saveParticipantsInGroup(groupId, size);
+        saveParticipantsInGroup(size);
 
 
         //when
@@ -73,7 +79,7 @@ class ParticipantRepositoryTest {
     void findByGroupAndNicknameContainsIgnoreCase() {
         //given
         int size = 5;
-        saveParticipantsInGroup(groupId, size);
+        saveParticipantsInGroup(size);
         Group group = groupRepository.findById(groupId).get();
 
         em.flush();
@@ -92,8 +98,9 @@ class ParticipantRepositoryTest {
         assertThat(participants3.size()).isEqualTo(size - 1);
     }
 
-    private void saveParticipantsInGroup(long groupId, int size) {
+    private void saveParticipantsInGroup(int size) {
         Group group = makeGroup();
+        groupId = group.getId();
         admin = participantRepository.save(makeParticipant(group, makeNickname(), true));
         adminName = admin.getNickname();
         for (int i = 1; i < size; i++) {
@@ -118,7 +125,6 @@ class ParticipantRepositoryTest {
 
     private User makeUser() {
         User user = User.builder().build();
-        ReflectionTestUtils.setField(user, "id", userId++);
         return userRepository.save(user);
     }
 }
