@@ -16,6 +16,7 @@ public enum ResponseCode {
     CREATE_GROUP(successCode(), HttpStatus.CREATED, "모임이 성공적으로 생성되었습니다."),
     GET_GROUP(successCode(), HttpStatus.OK, "모임이 성공적으로 조회되었습니다."),
     GET_PARTICIPANTS(successCode(), HttpStatus.OK, "모임 참가자가 성공적으로 조회되었습니다."),
+    SEARCH_PARTICIPANTS(successCode(), HttpStatus.OK, "참가자 검색이 성공적으로 수행되었습니다."),
     MODIFY_GROUP(successCode(), HttpStatus.OK, "모임이 성공적으로 수정되었습니다."),
     DELETE_GROUP(successCode(), HttpStatus.OK, "모임이 성공적으로 삭제되었습니다."),
     INTO_GROUP(successCode(), HttpStatus.CREATED, "모임에 성공적으로 참가되었습니다."),
