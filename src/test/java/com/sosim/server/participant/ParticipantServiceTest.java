@@ -440,7 +440,7 @@ class ParticipantServiceTest {
         NicknameSearchResponse response = participantService.searchParticipants(groupId, request);
 
         //then
-        List<NicknameDto> list = response.getNicknameDtoList();
+        List<NicknameDto> list = response.getNicknameList();
         assertThat(list.size()).isEqualTo(2);
         assertThat(list.get(0).getNickname()).isEqualTo(nickname1);
         assertThat(list.get(1).getNickname()).isEqualTo(nickname2);
@@ -465,7 +465,7 @@ class ParticipantServiceTest {
         NicknameSearchResponse response = participantService.searchParticipants(groupId, request);
 
         //then
-        List<NicknameDto> list = response.getNicknameDtoList();
+        List<NicknameDto> list = response.getNicknameList();
         assertThat(list).isNotNull();
         assertThat(list.size()).isEqualTo(0);
     }

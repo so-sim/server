@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 public class NicknameSearchResponse {
-    private List<NicknameDto> nicknameDtoList;
+    private List<NicknameDto> nicknameList;
 
     public static NicknameSearchResponse toDto(List<Participant> participantList) {
         return new NicknameSearchResponse(mapNicknameDtoList(participantList));

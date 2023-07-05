@@ -34,7 +34,7 @@ public class ParticipantController {
         return new ResponseEntity<>(Response.create(GET_PARTICIPANTS, getGroupParticipants), GET_PARTICIPANTS.getHttpStatus());
     }
 
-    @GetMapping("/participant-nickname")
+    @GetMapping("/participants-nickname")
     public ResponseEntity<?> searchParticipants(@PathVariable long groupId, NicknameSearchRequest searchRequest) {
         NicknameSearchResponse response = participantService.searchParticipants(groupId, searchRequest);
 
