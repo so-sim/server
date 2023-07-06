@@ -10,7 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.sosim.server.common.response.ResponseCode.*;
+import static com.sosim.server.common.response.ResponseCode.NOT_FOUND_USER;
+import static com.sosim.server.common.response.ResponseCode.USER_ALREADY_EXIST;
 
 
 @Service
@@ -59,11 +60,7 @@ public class UserService {
 
     private void checkCanWithdraw(long userId) {
         List<Participant> myParticipants = participantRepository.findByUserIdAndIsAdminIsTrue(userId);
-        myParticipants.forEach(p -> {
-            if (p.getGroup().getNumberOfParticipants() > 1) {
-                throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
-            }
-        });
+        myParticipants.forEach(Participant::checkCanWithdrawGroup);
     }
 
     private User getUser(OAuthUserRequest oAuthUserRequest) {
