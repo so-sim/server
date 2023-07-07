@@ -23,7 +23,6 @@ public class NotificationService {
 
     private final SseEmitterRepository sseEmitterRepository;
     private final NotificationRepository notificationRepository;
-    private final ParticipantRepository participantRepository;
 
     @Transactional(readOnly = true)
     public SseEmitter subscribe(long userId) {
@@ -36,8 +35,7 @@ public class NotificationService {
         return sseEmitter;
     }
 
-    public void sendNotification(long groupId, String groupTitle, Content content) {
-        List<Long> receiverUserIdList = getReceiverUserIdList(groupId);
+    public void sendNotification(List<Long> receiverUserIdList, long groupId, String groupTitle, Content content) {
         Notification notification = saveAllNotification(receiverUserIdList, groupId, content);
 
         NotificationResponse notificationResponse = NotificationResponse.toDto(notification, groupTitle);
@@ -55,11 +53,6 @@ public class NotificationService {
         );
         notificationRepository.saveAll(notificationList);
         return notificationList.get(0);
-    }
-
-    @Transactional(readOnly = true)
-    private List<Long> getReceiverUserIdList(long groupId) {
-        return participantRepository.getReceiverUserIdList(groupId);
     }
 
     private void sendToClient(SseEmitter sseEmitter, long userId, String notificationName, Response<?> notificationData) {

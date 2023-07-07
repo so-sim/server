@@ -8,21 +8,24 @@ import java.util.List;
 
 @Getter
 @Builder
-public class ModifyAdminNotificationRequest {
+public class ModifySituationNotificationRequest {
 
     private long groupId;
 
     private String groupTitle;
 
-    private String adminNickname;
+    private String situation;
+
+    private String nickname;
 
     private List<Long> receiverUserIdList;
 
-    public static ModifyAdminNotificationRequest toDto(Group group, String adminNickname, List<Long> receiverUserIdList) {
-        return ModifyAdminNotificationRequest.builder()
+    public static ModifySituationNotificationRequest toDto(Group group, String situation, String nickname, List<Long> receiverUserIdList) {
+        return ModifySituationNotificationRequest.builder()
                 .groupId(group.getId())
                 .groupTitle(group.getTitle())
-                .adminNickname(adminNickname)
+                .situation(situation)
+                .nickname(nickname)
                 .receiverUserIdList(receiverUserIdList)
                 .build();
     }

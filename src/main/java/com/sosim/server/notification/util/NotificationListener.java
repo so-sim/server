@@ -3,6 +3,7 @@ package com.sosim.server.notification.util;
 import com.sosim.server.notification.Content;
 import com.sosim.server.notification.NotificationService;
 import com.sosim.server.notification.dto.request.ModifyAdminNotificationRequest;
+import com.sosim.server.notification.dto.request.ModifySituationNotificationRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -26,10 +27,19 @@ public class NotificationListener {
             ModifyAdminNotificationRequest notification = (ModifyAdminNotificationRequest) object;
             sendModifyAdminNotification(notification);
         }
+        if (object instanceof ModifySituationNotificationRequest) {
+            ModifySituationNotificationRequest notification = (ModifySituationNotificationRequest) object;
+            sendModifySituationNotification(notification);
+        }
     }
 
     private void sendModifyAdminNotification(ModifyAdminNotificationRequest notification) {
-        notificationService.sendNotification(notification.getGroupId(), notification.getGroupTitle(),
-                Content.create(CHANGE_ADMIN, notification.getAdminNickname()));
+        notificationService.sendNotification(notification.getReceiverUserIdList(), notification.getGroupId(),
+                notification.getGroupTitle(), Content.create(CHANGE_ADMIN, notification.getAdminNickname()));
+    }
+
+    private void sendModifySituationNotification(ModifySituationNotificationRequest notification) {
+        notificationService.sendNotification(notification.getReceiverUserIdList(), notification.getGroupId(),
+                notification.getGroupTitle(), Content.create(SITUATION_PAYMENT, notification.getNickname(), notification.getSituation()));
     }
 }
