@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public SseEmitter subscribe(long userId) {
         SseEmitter sseEmitter = sseEmitterRepository.save(userId);
-        long userNotificationCount = notificationRepository.countByUserId(userId);
+        long userNotificationCount = notificationRepository.countByUserIdBetweenMonth(userId, LocalDateTime.now().minusMonths(3));
         NotificationCountResponse notificationCount = NotificationCountResponse.toDto(userNotificationCount);
         Response<?> subscribeResponse = Response.create(SUCCESS_SUBSCRIBE, notificationCount);
         sendToClient(sseEmitter, userId, "subscribe", subscribeResponse);
