@@ -39,11 +39,11 @@ public class Content {
     private static String createMessage(String type, String data) {
         String message = "";
         if (type.equals(PAYMENT_DATE)) {
-            message = "오늘은 벌금 납부일입니다.\n미납 내역 확인 후, 벌금을 납부해주세요!";
+            message = "오늘은 벌금 납부일입니다." + System.lineSeparator() + "미납 내역 확인 후, 벌금을 납부해주세요!";
         }
 
         if (type.equals(NON_PAYMENT)) {
-            message = String.format("벌금 납부를 잊으셨나요?\n미납 내역 확인 후, %s원을 납부해주세요!", data);
+            message = String.format("벌금 납부를 잊으셨나요?" + System.lineSeparator() + "미납 내역 확인 후, %s원을 납부해주세요!", data);
         }
 
         if (type.equals(CHANGE_ADMIN)) {
