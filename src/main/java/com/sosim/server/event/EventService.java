@@ -1,7 +1,6 @@
 package com.sosim.server.event;
 
 import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
@@ -20,7 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.sosim.server.common.response.ResponseCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,13 +34,13 @@ public class EventService {
     @Transactional
     public EventIdResponse createEvent(Long id, CreateEventRequest createEventRequest) {
         Group groupEntity = groupRepository.findById(createEventRequest.getGroupId())
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_GROUP));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
         Participant participantEntity = participantRepository.findByNicknameAndGroupId(
                 createEventRequest.getNickname(), createEventRequest.getGroupId())
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_PARTICIPANT));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
 
         if (!groupEntity.isAdminUser(id)) {
-            throw new CustomException(ResponseCode.NONE_ADMIN);
+            throw new CustomException(NONE_ADMIN);
         }
 
         Event eventEntity = saveEventEntity(Event.create(groupEntity, participantEntity.getUser(), createEventRequest));
@@ -64,7 +64,7 @@ public class EventService {
         if (!eventEntity.getNickname().equals(modifyEventRequest.getNickname())) {
             userEntity = participantRepository.findByNicknameAndGroupId(
                             modifyEventRequest.getNickname(), eventEntity.getGroup().getId())
-                    .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_PARTICIPANT)).getUser();
+                    .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT)).getUser();
         }
 
         eventEntity.modify(userEntity, modifyEventRequest);
@@ -102,13 +102,13 @@ public class EventService {
 
     private Event getEventEntity(long eventId) {
         return eventRepository.findByIdWithGroup(eventId)
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_EVENT));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_EVENT));
     }
 
     private boolean isAdmin(Event event, long userId, boolean throwException) {
         boolean isAdmin = event.getGroup().isAdminUser(userId);
         if (!isAdmin && throwException) {
-            throw new CustomException(ResponseCode.NONE_ADMIN);
+            throw new CustomException(NONE_ADMIN);
         }
         return isAdmin;
     }
