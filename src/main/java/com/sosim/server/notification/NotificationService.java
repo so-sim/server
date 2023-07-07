@@ -4,7 +4,6 @@ import com.sosim.server.common.response.Response;
 import com.sosim.server.notification.dto.response.NotificationCountResponse;
 import com.sosim.server.notification.dto.response.NotificationResponse;
 import com.sosim.server.notification.util.SseEmitterRepository;
-import com.sosim.server.participant.ParticipantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +44,14 @@ public class NotificationService {
         );
     }
 
+    public void sendNotification(long receiverUserId, long groupId, String groupTitle, Content content) {
+        Notification notification = saveNotification(receiverUserId, groupId, content);
+
+        NotificationResponse notificationResponse = NotificationResponse.toDto(notification, groupTitle);
+        Response<?> response = Response.create(SUCCESS_SEND_NOTIFICATION, notificationResponse);
+        sendToClient(sseEmitterRepository.findByUserId(receiverUserId), receiverUserId, "notification", response);
+    }
+
     @Transactional
     private Notification saveAllNotification(List<Long> receiverUserIdList, long groupId, Content content) {
         List<Notification> notificationList = new ArrayList<>();
@@ -53,6 +60,12 @@ public class NotificationService {
         );
         notificationRepository.saveAll(notificationList);
         return notificationList.get(0);
+    }
+
+    @Transactional
+    private Notification saveNotification(long receiverUserId, long groupId, Content content) {
+        Notification notification = Notification.toEntity(receiverUserId, groupId, content);
+        return notificationRepository.save(notification);
     }
 
     private void sendToClient(SseEmitter sseEmitter, long userId, String notificationName, Response<?> notificationData) {
