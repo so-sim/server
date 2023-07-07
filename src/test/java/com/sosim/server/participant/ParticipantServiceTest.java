@@ -3,6 +3,9 @@ package com.sosim.server.participant;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
+import com.sosim.server.participant.dto.NicknameDto;
+import com.sosim.server.participant.dto.NicknameSearchRequest;
+import com.sosim.server.participant.dto.NicknameSearchResponse;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.user.User;
@@ -15,9 +18,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static com.sosim.server.common.auditing.Status.ACTIVE;
 import static com.sosim.server.common.response.ResponseCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -410,6 +414,60 @@ class ParticipantServiceTest {
 
         //then
         assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_PARTICIPANT);
+    }
+
+    @DisplayName("참가자 검색 / 정상")
+    @Test
+    void search_participant() {
+        //given
+        Group group = makeGroup();
+        String nicknamePrefix = "닉";
+        NicknameSearchRequest request = new NicknameSearchRequest();
+        request.setKeyword(nicknamePrefix);
+
+        String nickname1 = "닉네임1";
+        String nickname2 = "닉네임2";
+        List<Participant> participants = List.of(
+                makeParticipant(1L, userId, nickname1),
+                makeParticipant(2L, userId + 1, nickname2));
+
+        doReturn(Optional.of(group)).when(groupRepository)
+                .findById(groupId);
+        doReturn(participants).when(participantRepository)
+                .findByGroupAndNicknameContainsIgnoreCase(group, nicknamePrefix);
+
+        //when
+        NicknameSearchResponse response = participantService.searchParticipants(groupId, request);
+
+        //then
+        List<NicknameDto> list = response.getNicknameList();
+        assertThat(list.size()).isEqualTo(2);
+        assertThat(list.get(0).getNickname()).isEqualTo(nickname1);
+        assertThat(list.get(1).getNickname()).isEqualTo(nickname2);
+    }
+
+    @DisplayName("참가자 검색 / 결과 없을 시 빈 배열 리턴")
+    @Test
+    void search_participant_no_result() {
+        //given
+        Group group = makeGroup();
+        String nicknamePrefix = "닉";
+        NicknameSearchRequest request = new NicknameSearchRequest();
+        request.setKeyword(nicknamePrefix);
+
+        List<Participant> participants = new ArrayList<>();
+        doReturn(Optional.of(group)).when(groupRepository)
+                .findById(groupId);
+        doReturn(participants).when(participantRepository)
+                .findByGroupAndNicknameContainsIgnoreCase(group, nicknamePrefix);
+
+        //when
+        NicknameSearchResponse response = participantService.searchParticipants(groupId, request);
+
+        //then
+        List<NicknameDto> list = response.getNicknameList();
+        assertThat(list).isNotNull();
+        assertThat(list.size()).isEqualTo(0);
     }
 
     private Group makeGroup() {
