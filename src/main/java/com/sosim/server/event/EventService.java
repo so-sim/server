@@ -8,6 +8,7 @@ import com.sosim.server.event.dto.request.ModifySituationRequest;
 import com.sosim.server.event.dto.response.*;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
+import com.sosim.server.notification.dto.request.ModifySituationNotificationRequest;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.user.User;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.sosim.server.common.response.ResponseCode.*;
@@ -80,8 +82,15 @@ public class EventService {
     }
 
     @Transactional
-    public ModifySituationResponse modifyEventSituation(ModifySituationRequest modifySituationRequest) {
+    public ModifySituationResponse modifyEventSituation(long userId, ModifySituationRequest modifySituationRequest) {
         eventRepository.updateSituationAll(modifySituationRequest.getEventIdList(), modifySituationRequest.getSituation());
+
+        Group group = getEventEntity(modifySituationRequest.getEventIdList().get(0)).getGroup();
+        String nickname = getParticipantNickname(userId, group.getId());
+        List<Long> receiverUserIdList = getReceiverUserIdList(modifySituationRequest);
+        ModifySituationNotificationRequest notification = ModifySituationNotificationRequest.toDto(
+                group, modifySituationRequest.getSituation(), nickname, receiverUserIdList);
+        eventPublisher.publishEvent(notification);
 
         return ModifySituationResponse.toDto(modifySituationRequest.getSituation(), modifySituationRequest.getEventIdList());
     }
@@ -111,5 +120,21 @@ public class EventService {
             throw new CustomException(NONE_ADMIN);
         }
         return isAdmin;
+    }
+
+    private List<Long> getReceiverUserIdList(ModifySituationRequest modifySituationRequest) {
+        if (modifySituationRequest.getSituation().equals("확인 필요")) {
+            List<Long> receiverUserIdList = new ArrayList<>();
+            long adminUserId = eventRepository.getAdminUserId(modifySituationRequest.getEventIdList().get(0));
+            receiverUserIdList.add(adminUserId);
+            return receiverUserIdList;
+        }
+        return eventRepository.getReceiverUserIdList(modifySituationRequest.getEventIdList());
+    }
+
+    private String getParticipantNickname(long userId, long groupId) {
+        return participantRepository.findByUserIdAndGroupId(userId, groupId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT))
+                .getNickname();
     }
 }

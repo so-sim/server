@@ -60,8 +60,8 @@ public class EventController {
     }
 
     @PatchMapping("/penalty")
-    public ResponseEntity<?> modifyEventSituation(@Validated @RequestBody ModifySituationRequest modifySituationRequest) {
-        ModifySituationResponse modifySituationResponse = eventService.modifyEventSituation(modifySituationRequest);
+    public ResponseEntity<?> modifyEventSituation(@AuthUserId long userId, @Validated @RequestBody ModifySituationRequest modifySituationRequest) {
+        ModifySituationResponse modifySituationResponse = eventService.modifyEventSituation(userId, modifySituationRequest);
         ResponseCode modifySituation = ResponseCode.MODIFY_EVENT_SITUATION;
 
         return new ResponseEntity<>(Response.create(modifySituation, modifySituationResponse), modifySituation.getHttpStatus());
