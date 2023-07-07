@@ -77,4 +77,9 @@ public class NotificationService {
             sseEmitterRepository.deleteById(userId);
         }
     }
+
+    @Transactional
+    public void viewAllNotification(long userId) {
+        notificationRepository.updateViewByUserId(userId);
+    }
 }
