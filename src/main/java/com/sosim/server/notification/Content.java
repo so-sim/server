@@ -29,10 +29,10 @@ public class Content {
                 .build();
     }
 
-    public static Content create(String type, String data1, String data2) {
+    public static Content create(String type, String nickname, String situation) {
         return Content.builder()
                 .category(type)
-                .message(String.format("%s님이 벌금내역을 %s으로 변경하였습니다.", data1, data2))
+                .message(String.format("%s님이 벌금내역을 %s으로 변경하였습니다.", nickname, situation))
                 .build();
     }
 
