@@ -1,13 +1,11 @@
 package com.sosim.server.event;
 
 import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.event.dto.request.CreateEventRequest;
-import com.sosim.server.event.dto.request.FilterEventRequest;
-import com.sosim.server.event.dto.request.ModifyEventRequest;
-import com.sosim.server.event.dto.request.ModifySituationRequest;
+import com.sosim.server.event.dto.request.*;
 import com.sosim.server.event.dto.response.*;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
+import com.sosim.server.notification.dto.request.ManualNotificationRequest;
 import com.sosim.server.notification.dto.request.ModifySituationNotificationRequest;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
@@ -103,6 +101,14 @@ public class EventService {
     public GetEventListResponse getEvents(FilterEventRequest filterEventRequest, Pageable pageable) {
         Page<Event> events = eventRepository.searchAll(filterEventRequest, pageable);
         return GetEventListResponse.toDto(events.getContent(), events.getTotalElements());
+    }
+
+    @Transactional(readOnly = true)
+    public void notifyEvents(EventIdListRequest eventIdList) {
+        List<Event> eventList = eventRepository.findAllById(eventIdList.getEventIdList());
+        Group group = eventList.get(0).getGroup();
+        ManualNotificationRequest notification = ManualNotificationRequest.toDto(group, eventList);
+        eventPublisher.publishEvent(notification);
     }
 
     private Event saveEventEntity(Event event) {

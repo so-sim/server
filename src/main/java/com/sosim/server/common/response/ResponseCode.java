@@ -36,6 +36,7 @@ public enum ResponseCode {
     MODIFY_EVENT_SITUATION(successCode(), HttpStatus.OK, "상세 내역 납부 여부가 성공적으로 변경되었습니다."),
     GET_EVENT_CALENDAR(successCode(), HttpStatus.OK, "상세 내역 캘린더가 성공적으로 조회되었습니다."),
     GET_EVENTS(successCode(), HttpStatus.OK, "상세 내역 리스트가 성공적으로 조회되었습니다."),
+    EVENTS_NOTIFICATION(successCode(), HttpStatus.OK, "상세 내역 알림 발송이 성공적으로 완료되었습니다."),
 
     SUCCESS_SUBSCRIBE(successCode(), HttpStatus.OK, "알림 구독이 성공적으로 완료되었습니다."),
     SUCCESS_SEND_NOTIFICATION(successCode(), HttpStatus.OK, "알림이 성공적으로 전송되었습니다."),

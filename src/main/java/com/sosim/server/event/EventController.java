@@ -3,10 +3,7 @@ package com.sosim.server.event;
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.common.response.ResponseCode;
-import com.sosim.server.event.dto.request.CreateEventRequest;
-import com.sosim.server.event.dto.request.FilterEventRequest;
-import com.sosim.server.event.dto.request.ModifyEventRequest;
-import com.sosim.server.event.dto.request.ModifySituationRequest;
+import com.sosim.server.event.dto.request.*;
 import com.sosim.server.event.dto.response.*;
 import com.sosim.server.security.AuthUser;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -81,5 +76,13 @@ public class EventController {
         ResponseCode getEvents = ResponseCode.GET_EVENTS;
 
         return new ResponseEntity<>(Response.create(getEvents, eventList), getEvents.getHttpStatus());
+    }
+
+    @PostMapping("/notification")
+    public ResponseEntity<?> notifyEvents(@RequestBody EventIdListRequest eventIdListRequest) {
+        eventService.notifyEvents(eventIdListRequest);
+        ResponseCode eventsNotification = ResponseCode.EVENTS_NOTIFICATION;
+
+        return new ResponseEntity<>(Response.create(eventsNotification, null), eventsNotification.getHttpStatus());
     }
 }

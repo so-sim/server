@@ -1,5 +1,6 @@
 package com.sosim.server.event;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,9 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
             "JOIN g.participantList p " +
             "WHERE e.id = :eventId AND p.isAdmin = 'TRUE'")
     long getAdminUserId(@Param("eventId") long eventId);
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.id IN (:eventIdList)")
+    @EntityGraph(attributePaths = {"user", "group"})
+    List<Event> findAllById(@Param("eventIdList") List<Long> eventIdList);
 }
