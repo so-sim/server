@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     @Query("SELECT COUNT(*) FROM Notification n " +
-            "WHERE n.userId = :userId and n.createDate >= :time")
+            "WHERE n.userId = :userId AND n.createDate >= :time" +
+            "AND n.view = 'FALSE'")
     Long countByUserIdBetweenMonth(@Param("userId") long userId, @Param("time") LocalDateTime time);
 }
