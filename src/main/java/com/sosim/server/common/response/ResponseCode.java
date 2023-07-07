@@ -41,6 +41,7 @@ public enum ResponseCode {
     SUCCESS_SUBSCRIBE(successCode(), HttpStatus.OK, "알림 구독이 성공적으로 완료되었습니다."),
     SUCCESS_SEND_NOTIFICATION(successCode(), HttpStatus.OK, "알림이 성공적으로 전송되었습니다."),
     VIEW_ALL_NOTIFICATION(successCode(), HttpStatus.OK, "모든 알림이 성공적으로 읽음 처리되었습니다."),
+    GET_MY_NOTIFICATIONS(successCode(), HttpStatus.OK, "성공적으로 알림 목록이 조회되었습니다."),
 
     BINDING_ERROR(2000, HttpStatus.BAD_REQUEST, "입력값 중 검증에 실패한 값이 있습니다"),
 
