@@ -67,13 +67,21 @@ public class Participant extends BaseTimeEntity {
     }
 
     public void withdrawGroup(Group group) {
+        checkCanWithdrawGroup(group);
         delete();
         group.removeParticipant(this);
-        if (isAdmin && group.hasMoreParticipant()) {
-            throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
-        }
         if (group.hasNoParticipant()) {
             group.delete();
+        }
+    }
+
+    public void checkCanWithdrawGroup() {
+        checkCanWithdrawGroup(this.group);
+    }
+
+    public void checkCanWithdrawGroup(Group group) {
+        if (isAdmin && group.hasMoreNormalParticipant()) {
+            throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
         }
     }
 

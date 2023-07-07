@@ -100,9 +100,9 @@ public class Group extends BaseTimeEntity {
                 .anyMatch(p -> p.isActive() && p.isMine(userId));
     }
 
-    public boolean hasMoreParticipant() {
+    public boolean hasMoreNormalParticipant() {
         return participantList.stream()
-                .anyMatch(Participant::isActive);
+                .anyMatch(p -> p.isActive() && !p.isAdmin());
     }
 
     public Participant getAdminParticipant() {
