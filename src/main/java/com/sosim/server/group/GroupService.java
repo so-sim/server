@@ -76,8 +76,9 @@ public class GroupService {
     public void modifyAdmin(long userId, long groupId, ParticipantNicknameRequest nicknameRequest) {
         Group group = findGroup(groupId);
         group.modifyAdmin(userId, nicknameRequest.getNickname());
+        List<Long> receiverUserIdList = participantRepository.getReceiverUserIdList(groupId);
 
-        ModifyAdminNotificationRequest notification = ModifyAdminNotificationRequest.toDto(group, nicknameRequest.getNickname());
+        ModifyAdminNotificationRequest notification = ModifyAdminNotificationRequest.toDto(group, nicknameRequest.getNickname(), receiverUserIdList);
         eventPublisher.publishEvent(notification);
     }
 
