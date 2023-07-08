@@ -33,7 +33,7 @@ public class ParticipantService {
         User user = findUser(userId);
         Group group = findGroupWithParticipants(groupId);
 
-        Participant participant = Participant.create(user, group, nickname, false);
+        Participant participant = group.createParticipant(user, nickname, false);
         participantRepository.save(participant);
     }
 

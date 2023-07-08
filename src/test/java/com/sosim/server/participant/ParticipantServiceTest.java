@@ -495,7 +495,7 @@ class ParticipantServiceTest {
     private Participant addParticipantInGroup(Group group, long userId, boolean isAdmin) {
         User user = new User();
         ReflectionTestUtils.setField(user, "id", userId);
-        return Participant.create(user, group, "닉네임" + userId, isAdmin);
+        return group.createParticipant(user, "닉네임" + userId, isAdmin);
     }
 
 }

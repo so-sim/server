@@ -191,10 +191,10 @@ class GroupRepositoryTest {
         Group group2 = groupRepository.save(makeGroup());
 
         List<Participant> participants = new ArrayList<>();
-        participants.add(Participant.create(user1, group1, "닉네임" + nicknameNo++, true));
-        participants.add(Participant.create(user1, group2, "닉네임" + nicknameNo++, false));
-        participants.add(Participant.create(user2, group1, "닉네임" + nicknameNo++, false));
-        participants.add(Participant.create(user2, group2, "닉네임" + nicknameNo++, true));
+        participants.add(group1.createParticipant(user1, makeNickname(), true));
+        participants.add(group2.createParticipant(user1, makeNickname(), false));
+        participants.add(group1.createParticipant(user2, makeNickname(), false));
+        participants.add(group2.createParticipant(user2, makeNickname(), true));
 
         for (Participant participant : participants) {
             participantRepository.save(participant);
@@ -220,7 +220,7 @@ class GroupRepositoryTest {
         List<Participant> participants = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             User user = userRepository.save(makeUser());
-            participants.add(Participant.create(user, group, "닉네임" + nicknameNo++, false));
+            participants.add(group.createParticipant(user, makeNickname(), false));
         }
         participants.get(0).signOn();
         for (int i = 1; i <= deletedN; i++) {
@@ -235,6 +235,10 @@ class GroupRepositoryTest {
         return n - deletedN;
     }
 
+    private String makeNickname() {
+        return "닉네임" + nicknameNo++;
+    }
+
     private void saveMyGroupsData(int size) {
         User user = userRepository.save(makeUser());
         userId = user.getId();
@@ -246,7 +250,7 @@ class GroupRepositoryTest {
 
         List<Participant> participants = new ArrayList<>();
         for (int i = 0; i <= size; i++) {
-            participants.add(Participant.create(user, groups.get(i), "닉네임" + nicknameNo++, false));
+            participants.add(groups.get(i).createParticipant(user, makeNickname(), false));
         }
         participants.get(0).signOn();
         participants.get(size / 2).delete();

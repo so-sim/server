@@ -98,7 +98,7 @@ public class GroupService {
 
     private long saveGroupAndAdmin(CreateGroupRequest createGroupRequest, User user, Group group) {
         String adminNickname = createGroupRequest.getNickname();
-        Participant admin = Participant.create(user, group, adminNickname, true);
+        Participant admin = group.createParticipant(user, adminNickname, true);
         Group saveGroup = groupRepository.save(group);
         participantRepository.save(admin);
         return saveGroup.getId();

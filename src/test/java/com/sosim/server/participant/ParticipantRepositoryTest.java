@@ -119,7 +119,7 @@ class ParticipantRepositoryTest {
 
     private Participant makeParticipant(Group group, String nickname, boolean isAdmin) {
         User user = makeUser();
-        Participant participant = Participant.create(user, group, nickname, isAdmin);
+        Participant participant = group.createParticipant(user, nickname, isAdmin);
         return participant;
     }
 
