@@ -39,4 +39,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     List<Participant> findByUserIdWithGroup(@Param("userId") long userId);
 
     List<Participant> findByGroupAndNicknameContainsIgnoreCase(Group group, String nickname);
+  
+    @Query("SELECT p.user.id FROM Participant p " +
+            "WHERE p.status = 'ACTIVE' AND p.group.id = :groupId")
+    List<Long> getReceiverUserIdList(@Param("groupId") long groupId);
 }
