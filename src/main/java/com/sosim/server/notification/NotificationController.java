@@ -2,7 +2,6 @@ package com.sosim.server.notification;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
-import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.notification.dto.response.MyNotificationsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -10,10 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import static com.sosim.server.common.response.ResponseCode.*;
@@ -44,4 +40,11 @@ public class NotificationController {
 
         return new ResponseEntity<>(Response.create(GET_MY_NOTIFICATIONS, myNotifications), GET_MY_NOTIFICATIONS.getHttpStatus());
     }
+
+//    @PatchMapping("/group/{groupId}/notification")
+//    public ResponseEntity<?> setRegularNotification(@PathVariable long groupId,
+//                                                    @RequestBody SetNotificationRequest setNotificationRequest) {
+//        notificationService.setRegularNotification(groupId, setNotificationRequest);
+//        return new ResponseEntity<>(Response.create());
+//    }
 }

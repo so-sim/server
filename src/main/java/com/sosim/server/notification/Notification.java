@@ -21,8 +21,8 @@ public class Notification extends BaseTimeEntity {
     @Column(name = "USER_ID")
     private long userId;
 
-    @Column(name = "GROUP_ID")
-    private long groupId;
+    @Embedded
+    private GroupInfo groupInfo;
 
     @Enumerated(EnumType.STRING)
     private Content content;
@@ -31,16 +31,32 @@ public class Notification extends BaseTimeEntity {
     private boolean view;
 
     @Builder
-    public Notification(long userId, long groupId, Content content) {
+    public Notification(long userId, long groupId, String groupTitle, Content content) {
         this.userId = userId;
-        this.groupId = groupId;
+        this.groupInfo = setGroupInfo(groupId, groupTitle);
         this.content = content;
     }
 
-    public static Notification toEntity(long userId, long groupId, Content content) {
+    public long getGroupId() {
+        return groupInfo.getGroupId();
+    }
+
+    public String getGroupTitle() {
+        return groupInfo.getGroupTitle();
+    }
+
+    private GroupInfo setGroupInfo(long groupId, String groupTitle) {
+        return GroupInfo.builder()
+                .groupId(groupId)
+                .groupTitle(groupTitle)
+                .build();
+    }
+
+    public static Notification toEntity(long userId, long groupId, String groupTitle, Content content) {
         return Notification.builder()
                 .userId(userId)
                 .groupId(groupId)
+                .groupTitle(groupTitle)
                 .content(content)
                 .build();
     }
