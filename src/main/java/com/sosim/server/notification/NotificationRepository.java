@@ -21,7 +21,11 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             "WHERE n.userId = :userId")
     void updateViewByUserId(@Param("userId") long userId);
 
-    Slice<Notification> findByUserIdAndCreateDateGreaterThan(long userId, LocalDateTime time, Pageable pageable);
+    @Query("SELECT * FROM Notification n " +
+            "WHERE n.userId = :userId " +
+            "AND n.reserved = false " +
+            "AND n.sentDateTime >= :time")
+    Slice<Notification> findMyNotifications(@Param("userId") long userId, @Param("time") LocalDateTime time, Pageable pageable);
 
     @Query("SELECT * FROM Notification n " +
             "WHERE n.sentDate <= CURRENT_TIMESTAMP AND n.reserved = true ")

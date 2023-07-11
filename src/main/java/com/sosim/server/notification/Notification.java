@@ -32,34 +32,18 @@ public class Notification extends BaseTimeEntity {
     private boolean view;
 
     @Column(name = "SENT_DATE")
-    private LocalDateTime sentDate;
+    private LocalDateTime sentDateTime;
 
     @Column(name = "RESERVED")
     private boolean reserved;
 
-    //알림 상태 : 예약된, 전송된,
-
     @Builder
-    public Notification(long userId, long groupId, String groupTitle, Content content, boolean reserved) {
+    public Notification(long userId, long groupId, String groupTitle, Content content, LocalDateTime sentDateTime, boolean reserved) {
         this.userId = userId;
         this.groupInfo = setGroupInfo(groupId, groupTitle);
         this.content = content;
+        this.sentDateTime = setSentDateTime(sentDateTime);
         this.reserved = reserved;
-    }
-
-    public long getGroupId() {
-        return groupInfo.getGroupId();
-    }
-
-    public String getGroupTitle() {
-        return groupInfo.getGroupTitle();
-    }
-
-    private GroupInfo setGroupInfo(long groupId, String groupTitle) {
-        return GroupInfo.builder()
-                .groupId(groupId)
-                .groupTitle(groupTitle)
-                .build();
     }
 
     public static Notification toEntity(long userId, long groupId, String groupTitle, Content content) {
@@ -73,6 +57,25 @@ public class Notification extends BaseTimeEntity {
 
     public void sentComplete() {
         reserved = false;
+    }
+
+    public long getGroupId() {
+        return groupInfo.getGroupId();
+    }
+
+    public String getGroupTitle() {
+        return groupInfo.getGroupTitle();
+    }
+
+    private LocalDateTime setSentDateTime(LocalDateTime sentDate) {
+        return sentDate == null ? LocalDateTime.now() : sentDate;
+    }
+
+    private GroupInfo setGroupInfo(long groupId, String groupTitle) {
+        return GroupInfo.builder()
+                .groupId(groupId)
+                .groupTitle(groupTitle)
+                .build();
     }
 }
 

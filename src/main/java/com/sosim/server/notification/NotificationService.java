@@ -1,7 +1,6 @@
 package com.sosim.server.notification;
 
 import com.sosim.server.common.response.Response;
-import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.notification.dto.response.MyNotificationsResponse;
 import com.sosim.server.notification.dto.response.NotificationCountResponse;
@@ -17,9 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.sosim.server.common.response.ResponseCode.*;
@@ -94,7 +91,7 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public MyNotificationsResponse getMyNotifications(long userId, Pageable pageable) {
-        Slice<Notification> myNotifications = notificationRepository.findByUserIdAndCreateDateGreaterThan(userId, LocalDateTime.now().minusMonths(3), pageable);
+        Slice<Notification> myNotifications = notificationRepository.findMyNotifications(userId, LocalDateTime.now().minusMonths(3), pageable);
         List<NotificationResponse> notificationDtoList = toNotificationResponseList(myNotifications);
 
         return MyNotificationsResponse.toDto(notificationDtoList, myNotifications.hasNext());
@@ -102,14 +99,8 @@ public class NotificationService {
 
     private List<NotificationResponse> toNotificationResponseList(Slice<Notification> myNotifications) {
         return myNotifications.stream()
-                .map(n -> NotificationResponse.toDto(n))
+                .map(NotificationResponse::toDto)
                 .collect(Collectors.toList());
     }
 
-    private Map<Long, String> createGroupTitleMap(List<Long> groupIdList) {
-        Map<Long, String> groupTitleMap = new HashMap<>();
-        List<Group> groupList = groupRepository.findAllById(groupIdList);
-        groupList.forEach(g -> groupTitleMap.put(g.getId(), g.getTitle()));
-        return groupTitleMap;
-    }
 }
