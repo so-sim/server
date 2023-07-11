@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -30,11 +31,20 @@ public class Notification extends BaseTimeEntity {
     @Column(name = "VIEW")
     private boolean view;
 
+    @Column(name = "SENT_DATE")
+    private LocalDateTime sentDate;
+
+    @Column(name = "RESERVED")
+    private boolean reserved;
+
+    //알림 상태 : 예약된, 전송된,
+
     @Builder
-    public Notification(long userId, long groupId, String groupTitle, Content content) {
+    public Notification(long userId, long groupId, String groupTitle, Content content, boolean reserved) {
         this.userId = userId;
         this.groupInfo = setGroupInfo(groupId, groupTitle);
         this.content = content;
+        this.reserved = reserved;
     }
 
     public long getGroupId() {
@@ -59,6 +69,10 @@ public class Notification extends BaseTimeEntity {
                 .groupTitle(groupTitle)
                 .content(content)
                 .build();
+    }
+
+    public void sentComplete() {
+        reserved = false;
     }
 }
 

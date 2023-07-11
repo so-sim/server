@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     @Query("SELECT COUNT(*) FROM Notification n " +
@@ -21,4 +22,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     void updateViewByUserId(@Param("userId") long userId);
 
     Slice<Notification> findByUserIdAndCreateDateGreaterThan(long userId, LocalDateTime time, Pageable pageable);
+
+    @Query("SELECT * FROM Notification n " +
+            "WHERE n.sentDate <= CURRENT_TIMESTAMP AND n.reserved = true ")
+    List<Notification> findReservedNotifications();
 }
