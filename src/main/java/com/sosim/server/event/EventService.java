@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,19 +32,14 @@ public class EventService {
 
     @Transactional
     public EventIdResponse createEvent(Long id, CreateEventRequest createEventRequest) {
-        Group groupEntity = groupRepository.findById(createEventRequest.getGroupId())
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_GROUP));
-        Participant participantEntity = participantRepository.findByNicknameAndGroupId(
-                createEventRequest.getNickname(), createEventRequest.getGroupId())
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_PARTICIPANT));
+        Group group = findGroupWithParticipants(createEventRequest.getGroupId());
+        User user = findParticipantWithUser(createEventRequest.getGroupId(), createEventRequest.getNickname()).getUser();
 
-        if (!groupEntity.isAdminUser(id)) {
-            throw new CustomException(ResponseCode.NONE_ADMIN);
-        }
+        isAdmin(group, user.getId());
 
-        Event eventEntity = saveEventEntity(Event.create(groupEntity, participantEntity.getUser(), createEventRequest));
+        Event event = saveEventEntity(createEventRequest.toEntity(group, user));
 
-        return EventIdResponse.create(eventEntity);
+        return EventIdResponse.toDto(event);
     }
 
     @Transactional(readOnly = true)
@@ -58,7 +52,7 @@ public class EventService {
     @Transactional
     public GetEventResponse modifyEvent(long userId, long eventId, ModifyEventRequest modifyEventRequest) {
         Event eventEntity = getEventEntity(eventId);
-        isAdmin(eventEntity, userId, true);
+        isAdmin(eventEntity.getGroup(), userId);
 
         User userEntity = null;
         if (!eventEntity.getNickname().equals(modifyEventRequest.getNickname())) {
@@ -105,11 +99,19 @@ public class EventService {
                 .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_EVENT));
     }
 
-    private boolean isAdmin(Event event, long userId, boolean throwException) {
-        boolean isAdmin = event.getGroup().isAdminUser(userId);
-        if (!isAdmin && throwException) {
+    private void isAdmin(Group group, long userId) {
+        if (!group.isAdminUser(userId)) {
             throw new CustomException(ResponseCode.NONE_ADMIN);
         }
-        return isAdmin;
+    }
+
+    private Group findGroupWithParticipants(long groupId) {
+        return groupRepository.findByIdWithParticipants(groupId)
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_GROUP));
+    }
+
+    private Participant findParticipantWithUser(long groupId, String nickname) {
+        return participantRepository.findByNicknameAndGroupId(nickname, groupId)
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_PARTICIPANT));
     }
 }
