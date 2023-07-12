@@ -2,10 +2,13 @@ package com.sosim.server.event.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sosim.server.event.Event;
+import com.sosim.server.event.Situation;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.*;
+
+import static com.sosim.server.event.Situation.*;
 
 @Getter
 @NoArgsConstructor
@@ -34,9 +37,9 @@ public class GetEventCalendarResponse {
         @JsonProperty("확인중")
         private int check;
 
-        private Payment increaseStatus(String situation) {
-            if (situation.equals("미납")) non++;
-            else if (situation.equals("완납")) full++;
+        private Payment increaseStatus(Situation situation) {
+            if (situation.equals(NON)) non++;
+            else if (situation.equals(FULL)) full++;
             else check++;
             return this;
         }
