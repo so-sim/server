@@ -7,7 +7,6 @@ import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.notification.dto.request.ManualNotificationRequest;
 import com.sosim.server.notification.dto.request.ModifySituationNotificationRequest;
-import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.user.User;
 import lombok.RequiredArgsConstructor;
@@ -111,7 +110,7 @@ public class EventService {
 
     private Event findEventWithGroup(long eventId) {
         return eventRepository.findByIdWithGroup(eventId)
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_EVENT));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_EVENT));
     }
 
     private void isAdmin(Group group, long userId) {
@@ -122,12 +121,12 @@ public class EventService {
 
     private Group findGroupWithParticipants(long groupId) {
         return groupRepository.findByIdWithParticipants(groupId)
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_GROUP));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
 
     private User findUserByParticipant(long groupId, String nickname) {
         return participantRepository.findByNicknameAndGroupId(nickname, groupId)
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_PARTICIPANT))
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT))
                 .getUser();
     }
 
