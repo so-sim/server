@@ -31,11 +31,11 @@ public class EventService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public EventIdResponse createEvent(Long id, CreateEventRequest createEventRequest) {
+    public EventIdResponse createEvent(Long userId, CreateEventRequest createEventRequest) {
         Group group = findGroupWithParticipants(createEventRequest.getGroupId());
         User user = findUserByParticipant(createEventRequest.getGroupId(), createEventRequest.getNickname());
 
-        checkIsAdmin(group, user.getId());
+        checkIsAdmin(group, userId);
 
         Event event = saveEventEntity(createEventRequest.toEntity(group, user));
 
