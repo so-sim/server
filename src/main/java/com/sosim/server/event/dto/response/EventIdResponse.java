@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class EventIdResponse {
-    @JsonProperty("eventId")
+
     private Long eventId;
 
     public static EventIdResponse toDto(Event event) {
