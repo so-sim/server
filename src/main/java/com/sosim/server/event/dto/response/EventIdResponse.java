@@ -12,7 +12,7 @@ public class EventIdResponse {
     @JsonProperty("eventId")
     private Long eventId;
 
-    public static EventIdResponse create(Event event) {
+    public static EventIdResponse toDto(Event event) {
         return EventIdResponse.builder()
                 .eventId(event.getId())
                 .build();
