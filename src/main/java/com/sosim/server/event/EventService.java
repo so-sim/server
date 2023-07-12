@@ -76,7 +76,7 @@ public class EventService {
     public ModifySituationResponse modifyEventSituation(long userId, ModifySituationRequest modifySituationRequest) {
         eventRepository.updateSituationAll(modifySituationRequest.getEventIdList(), modifySituationRequest.getSituation());
 
-        Group group = getEventEntity(modifySituationRequest.getEventIdList().get(0)).getGroup();
+        Group group = findEventWithGroup(modifySituationRequest.getEventIdList().get(0)).getGroup();
         String nickname = getParticipantNickname(userId, group.getId());
         List<Long> receiverUserIdList = getReceiverUserIdList(modifySituationRequest);
         ModifySituationNotificationRequest notification = ModifySituationNotificationRequest.toDto(
