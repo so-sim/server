@@ -66,19 +66,6 @@ public class Event extends BaseTimeEntity {
         status = ACTIVE;
     }
 
-    public static Event create(Group group, User user, CreateEventRequest createEventRequest) {
-        return Event.builder()
-                .date(createEventRequest.getDate())
-                .amount(createEventRequest.getAmount())
-                .ground(createEventRequest.getGround())
-                .memo(createEventRequest.getMemo())
-                .situation(createEventRequest.getSituation())
-                .nickname(createEventRequest.getNickname())
-                .group(group)
-                .user(user)
-                .build();
-    }
-
     public void modify(User user, ModifyEventRequest modifyEventRequest) {
         if (user != null) {
             this.nickname = modifyEventRequest.getNickname();

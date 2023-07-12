@@ -2,6 +2,9 @@ package com.sosim.server.event.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sosim.server.event.Event;
+import com.sosim.server.group.Group;
+import com.sosim.server.user.User;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -29,4 +32,17 @@ public class CreateEventRequest {
 
     @JsonProperty("situation")
     private String situation;
+
+    public Event toEntity(Group group, User user) {
+        return Event.builder()
+                .date(date)
+                .amount(amount)
+                .ground(ground)
+                .memo(memo)
+                .situation(situation)
+                .nickname(nickname)
+                .group(group)
+                .user(user)
+                .build();
+    }
 }
