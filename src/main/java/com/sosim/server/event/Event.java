@@ -67,7 +67,7 @@ public class Event extends BaseTimeEntity {
     }
 
     public void modify(User user, ModifyEventRequest modifyEventRequest) {
-        if (!modifyEventRequest.getNickname().equals(nickname)) {
+        if (isDiffUser(modifyEventRequest.getNickname())) {
             this.nickname = modifyEventRequest.getNickname();
             this.user = user;
         }
@@ -87,5 +87,9 @@ public class Event extends BaseTimeEntity {
             throw new CustomException(NONE_ADMIN);
         }
         super.delete();
+    }
+
+    private boolean isDiffUser(String nickname) {
+        return !this.nickname.equals(nickname);
     }
 }
