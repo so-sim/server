@@ -78,17 +78,6 @@ public class Event extends BaseTimeEntity {
         this.situation = modifyEventRequest.getSituation();
     }
 
-    public void modifySituation(String situation) {
-        this.situation = situation;
-    }
-
-    public void delete(long userId) {
-        if (!group.isAdminUser(userId)) {
-            throw new CustomException(NONE_ADMIN);
-        }
-        super.delete();
-    }
-
     private boolean isDiffUser(String nickname) {
         return !this.nickname.equals(nickname);
     }

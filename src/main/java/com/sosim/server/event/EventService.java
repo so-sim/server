@@ -69,7 +69,7 @@ public class EventService {
         Group group = event.getGroup();
         checkIsAdmin(group, userId);
 
-        event.delete(userId);
+        event.delete();
     }
 
     @Transactional
