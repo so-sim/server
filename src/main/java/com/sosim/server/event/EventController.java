@@ -43,7 +43,7 @@ public class EventController {
     }
 
     @PatchMapping("/penalty/{eventId}")
-    public ResponseEntity<?> modifyEvent(@AuthUserId long userId, @PathVariable("eventId") long eventId,
+    public ResponseEntity<?> modifyEvent(@AuthUserId long userId, @PathVariable long eventId,
                                          @Validated @RequestBody ModifyEventRequest modifyEventRequest) {
         GetEventResponse eventIdResponse = eventService.modifyEvent(userId, eventId, modifyEventRequest);
 
@@ -51,7 +51,7 @@ public class EventController {
     }
 
     @DeleteMapping("/penalty/{eventId}")
-    public ResponseEntity<?> deleteEvent(@AuthUserId long userId, @PathVariable("eventId") long eventId) {
+    public ResponseEntity<?> deleteEvent(@AuthUserId long userId, @PathVariable long eventId) {
         eventService.deleteEvent(userId, eventId);
 
         return new ResponseEntity<>(Response.create(DELETE_EVENT, null), DELETE_EVENT.getHttpStatus());
