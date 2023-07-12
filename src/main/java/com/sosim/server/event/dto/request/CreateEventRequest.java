@@ -1,18 +1,21 @@
 package com.sosim.server.event.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sosim.server.event.Event;
 import com.sosim.server.group.Group;
 import com.sosim.server.user.User;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 public class CreateEventRequest {
-    @JsonProperty("groupId")
-    private Long groupId;
+
+    private long groupId;
 
     private String nickname;
 
