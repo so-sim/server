@@ -33,7 +33,7 @@ public class EventService {
     @Transactional
     public EventIdResponse createEvent(Long id, CreateEventRequest createEventRequest) {
         Group group = findGroupWithParticipants(createEventRequest.getGroupId());
-        User user = findParticipantWithUser(createEventRequest.getGroupId(), createEventRequest.getNickname()).getUser();
+        User user = findUserByParticipant(createEventRequest.getGroupId(), createEventRequest.getNickname());
 
         isAdmin(group, user.getId());
 
@@ -51,19 +51,15 @@ public class EventService {
 
     @Transactional
     public GetEventResponse modifyEvent(long userId, long eventId, ModifyEventRequest modifyEventRequest) {
-        Event eventEntity = findEventWithGroup(eventId);
-        isAdmin(eventEntity.getGroup(), userId);
+        Event event = findEventWithGroup(eventId);
 
-        User userEntity = null;
-        if (!eventEntity.getNickname().equals(modifyEventRequest.getNickname())) {
-            userEntity = participantRepository.findByNicknameAndGroupId(
-                            modifyEventRequest.getNickname(), eventEntity.getGroup().getId())
-                    .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_PARTICIPANT)).getUser();
-        }
+        Group group = event.getGroup();
+        isAdmin(group, userId);
 
-        eventEntity.modify(userEntity, modifyEventRequest);
+        User user = findUserByParticipant(group.getId(), modifyEventRequest.getNickname());
+        event.modify(user, modifyEventRequest);
 
-        return GetEventResponse.toDto(eventEntity);
+        return GetEventResponse.toDto(event);
     }
 
     @Transactional
@@ -110,8 +106,9 @@ public class EventService {
                 .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_GROUP));
     }
 
-    private Participant findParticipantWithUser(long groupId, String nickname) {
+    private User findUserByParticipant(long groupId, String nickname) {
         return participantRepository.findByNicknameAndGroupId(nickname, groupId)
-                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_PARTICIPANT));
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_PARTICIPANT))
+                .getUser();
     }
 }

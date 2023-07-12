@@ -67,7 +67,7 @@ public class Event extends BaseTimeEntity {
     }
 
     public void modify(User user, ModifyEventRequest modifyEventRequest) {
-        if (user != null) {
+        if (!modifyEventRequest.getNickname().equals(nickname)) {
             this.nickname = modifyEventRequest.getNickname();
             this.user = user;
         }
