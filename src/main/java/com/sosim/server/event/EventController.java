@@ -36,8 +36,8 @@ public class EventController {
     }
 
     @GetMapping("/penalty/{eventId}")
-    public ResponseEntity<?> getEvent(@AuthUserId long userId, @PathVariable("eventId") long eventId) {
-        GetEventResponse getEventResponse = eventService.getEvent(userId, eventId);
+    public ResponseEntity<?> getEvent(@PathVariable long eventId) {
+        GetEventResponse getEventResponse = eventService.getEvent(eventId);
 
         return new ResponseEntity<>(Response.create(GET_EVENT, getEventResponse), GET_EVENT.getHttpStatus());
     }

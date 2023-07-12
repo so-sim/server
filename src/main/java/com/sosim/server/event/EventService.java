@@ -43,15 +43,15 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public GetEventResponse getEvent(long userId, long eventId) {
-        Event eventEntity = getEventEntity(eventId);
+    public GetEventResponse getEvent(long eventId) {
+        Event event = findEventWithGroup(eventId);
 
-        return GetEventResponse.toDto(eventEntity);
+        return GetEventResponse.toDto(event);
     }
 
     @Transactional
     public GetEventResponse modifyEvent(long userId, long eventId, ModifyEventRequest modifyEventRequest) {
-        Event eventEntity = getEventEntity(eventId);
+        Event eventEntity = findEventWithGroup(eventId);
         isAdmin(eventEntity.getGroup(), userId);
 
         User userEntity = null;
@@ -68,7 +68,7 @@ public class EventService {
 
     @Transactional
     public void deleteEvent(long userId, long eventId) {
-        Event eventEntity = getEventEntity(eventId);
+        Event eventEntity = findEventWithGroup(eventId);
 
         eventEntity.delete(userId);
     }
@@ -94,7 +94,7 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-    private Event getEventEntity(long eventId) {
+    private Event findEventWithGroup(long eventId) {
         return eventRepository.findByIdWithGroup(eventId)
                 .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_EVENT));
     }
