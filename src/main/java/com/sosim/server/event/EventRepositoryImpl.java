@@ -39,7 +39,7 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
                         equalsGroup(filterEventRequest.getGroupId()),
                         betweenTime(filterEventRequest.getStartDate(), filterEventRequest.getEndDate()),
                         equalsNickname(filterEventRequest.getNickname()),
-                        equalsSituation(filterEventRequest.getSituation()),
+                        equalsSituation(String.valueOf(filterEventRequest.getSituation())),
                         event.status.eq(Status.ACTIVE)
                 )
                 .orderBy(event.date.asc(), event.id.asc());
@@ -58,7 +58,7 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
     }
 
     private BooleanExpression equalsSituation(String situation) {
-        return situation == null ? null : event.situation.contains(situation);
+        return situation == null ? null : event.situation.eq(situation);
     }
 
     private Page<Event> doPageable(JPAQuery<Event> filterEvents, Pageable pageable, long totalSize) {
