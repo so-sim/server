@@ -35,7 +35,7 @@ public class EventService {
         Group group = findGroupWithParticipants(createEventRequest.getGroupId());
         User user = findUserByParticipant(createEventRequest.getGroupId(), createEventRequest.getNickname());
 
-        isAdmin(group, user.getId());
+        checkIsAdmin(group, user.getId());
 
         Event event = saveEventEntity(createEventRequest.toEntity(group, user));
 
@@ -54,7 +54,7 @@ public class EventService {
         Event event = findEventWithGroup(eventId);
 
         Group group = event.getGroup();
-        isAdmin(group, userId);
+        checkIsAdmin(group, userId);
 
         User user = findUserByParticipant(group.getId(), modifyEventRequest.getNickname());
         event.modify(user, modifyEventRequest);
@@ -67,7 +67,7 @@ public class EventService {
         Event event = findEventWithGroup(eventId);
 
         Group group = event.getGroup();
-        isAdmin(group, userId);
+        checkIsAdmin(group, userId);
 
         event.delete(userId);
     }
@@ -113,7 +113,7 @@ public class EventService {
                 .orElseThrow(() -> new CustomException(NOT_FOUND_EVENT));
     }
 
-    private void isAdmin(Group group, long userId) {
+    private void checkIsAdmin(Group group, long userId) {
         if (!group.isAdminUser(userId)) {
             throw new CustomException(NONE_ADMIN);
         }
