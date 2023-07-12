@@ -66,21 +66,8 @@ public class Event extends BaseTimeEntity {
         status = ACTIVE;
     }
 
-    public static Event create(Group group, User user, CreateEventRequest createEventRequest) {
-        return Event.builder()
-                .date(createEventRequest.getDate())
-                .amount(createEventRequest.getAmount())
-                .ground(createEventRequest.getGround())
-                .memo(createEventRequest.getMemo())
-                .situation(createEventRequest.getSituation())
-                .nickname(createEventRequest.getNickname())
-                .group(group)
-                .user(user)
-                .build();
-    }
-
     public void modify(User user, ModifyEventRequest modifyEventRequest) {
-        if (user != null) {
+        if (isDiffUser(modifyEventRequest.getNickname())) {
             this.nickname = modifyEventRequest.getNickname();
             this.user = user;
         }
@@ -100,5 +87,9 @@ public class Event extends BaseTimeEntity {
             throw new CustomException(NONE_ADMIN);
         }
         super.delete();
+    }
+
+    private boolean isDiffUser(String nickname) {
+        return !this.nickname.equals(nickname);
     }
 }

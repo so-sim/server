@@ -14,23 +14,17 @@ public class GetEventResponse {
     @JsonProperty("eventId")
     private Long id;
 
-    @JsonProperty("date")
     @JsonFormat(pattern = "yyyy.MM.dd")
     private LocalDate date;
 
-    @JsonProperty("amount")
     private int amount;
 
-    @JsonProperty("ground")
     private String ground;
 
-    @JsonProperty("memo")
     private String memo;
 
-    @JsonProperty("situation")
     private String situation;
 
-    @JsonProperty("nickname")
     private String nickname;
 
     public static GetEventResponse toDto(Event event) {

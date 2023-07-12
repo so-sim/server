@@ -7,7 +7,6 @@ import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.notification.dto.request.ManualNotificationRequest;
 import com.sosim.server.notification.dto.request.ModifySituationNotificationRequest;
-import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.user.User;
 import lombok.RequiredArgsConstructor;
@@ -33,57 +32,51 @@ public class EventService {
 
     @Transactional
     public EventIdResponse createEvent(Long id, CreateEventRequest createEventRequest) {
-        Group groupEntity = groupRepository.findById(createEventRequest.getGroupId())
-                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
-        Participant participantEntity = participantRepository.findByNicknameAndGroupId(
-                createEventRequest.getNickname(), createEventRequest.getGroupId())
-                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
+        Group group = findGroupWithParticipants(createEventRequest.getGroupId());
+        User user = findUserByParticipant(createEventRequest.getGroupId(), createEventRequest.getNickname());
 
-        if (!groupEntity.isAdminUser(id)) {
-            throw new CustomException(NONE_ADMIN);
-        }
+        checkIsAdmin(group, user.getId());
 
-        Event eventEntity = saveEventEntity(Event.create(groupEntity, participantEntity.getUser(), createEventRequest));
+        Event event = saveEventEntity(createEventRequest.toEntity(group, user));
 
-        return EventIdResponse.create(eventEntity);
+        return EventIdResponse.toDto(event);
     }
 
     @Transactional(readOnly = true)
-    public GetEventResponse getEvent(long userId, long eventId) {
-        Event eventEntity = getEventEntity(eventId);
+    public GetEventResponse getEvent(long eventId) {
+        Event event = findEventWithGroup(eventId);
 
-        return GetEventResponse.toDto(eventEntity);
+        return GetEventResponse.toDto(event);
     }
 
     @Transactional
     public GetEventResponse modifyEvent(long userId, long eventId, ModifyEventRequest modifyEventRequest) {
-        Event eventEntity = getEventEntity(eventId);
-        isAdmin(eventEntity, userId, true);
+        Event event = findEventWithGroup(eventId);
 
-        User userEntity = null;
-        if (!eventEntity.getNickname().equals(modifyEventRequest.getNickname())) {
-            userEntity = participantRepository.findByNicknameAndGroupId(
-                            modifyEventRequest.getNickname(), eventEntity.getGroup().getId())
-                    .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT)).getUser();
-        }
+        Group group = event.getGroup();
+        checkIsAdmin(group, userId);
 
-        eventEntity.modify(userEntity, modifyEventRequest);
+        User user = findUserByParticipant(group.getId(), modifyEventRequest.getNickname());
+        event.modify(user, modifyEventRequest);
 
-        return GetEventResponse.toDto(eventEntity);
+        return GetEventResponse.toDto(event);
     }
 
     @Transactional
     public void deleteEvent(long userId, long eventId) {
-        Event eventEntity = getEventEntity(eventId);
+        Event event = findEventWithGroup(eventId);
 
-        eventEntity.delete(userId);
+        Group group = event.getGroup();
+        checkIsAdmin(group, userId);
+
+        event.delete(userId);
     }
 
     @Transactional
     public ModifySituationResponse modifyEventSituation(long userId, ModifySituationRequest modifySituationRequest) {
         eventRepository.updateSituationAll(modifySituationRequest.getEventIdList(), modifySituationRequest.getSituation());
 
-        Group group = getEventEntity(modifySituationRequest.getEventIdList().get(0)).getGroup();
+        Group group = findEventWithGroup(modifySituationRequest.getEventIdList().get(0)).getGroup();
         String nickname = getParticipantNickname(userId, group.getId());
         List<Long> receiverUserIdList = getReceiverUserIdList(modifySituationRequest);
         ModifySituationNotificationRequest notification = ModifySituationNotificationRequest.toDto(
@@ -115,17 +108,26 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-    private Event getEventEntity(long eventId) {
+    private Event findEventWithGroup(long eventId) {
         return eventRepository.findByIdWithGroup(eventId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_EVENT));
     }
 
-    private boolean isAdmin(Event event, long userId, boolean throwException) {
-        boolean isAdmin = event.getGroup().isAdminUser(userId);
-        if (!isAdmin && throwException) {
+    private void checkIsAdmin(Group group, long userId) {
+        if (!group.isAdminUser(userId)) {
             throw new CustomException(NONE_ADMIN);
         }
-        return isAdmin;
+    }
+
+    private Group findGroupWithParticipants(long groupId) {
+        return groupRepository.findByIdWithParticipants(groupId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
+    }
+
+    private User findUserByParticipant(long groupId, String nickname) {
+        return participantRepository.findByNicknameAndGroupId(nickname, groupId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT))
+                .getUser();
     }
 
     private List<Long> getReceiverUserIdList(ModifySituationRequest modifySituationRequest) {
