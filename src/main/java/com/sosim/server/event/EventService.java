@@ -64,9 +64,12 @@ public class EventService {
 
     @Transactional
     public void deleteEvent(long userId, long eventId) {
-        Event eventEntity = findEventWithGroup(eventId);
+        Event event = findEventWithGroup(eventId);
 
-        eventEntity.delete(userId);
+        Group group = event.getGroup();
+        isAdmin(group, userId);
+
+        event.delete(userId);
     }
 
     @Transactional
