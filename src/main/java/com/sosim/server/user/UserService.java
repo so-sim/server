@@ -4,14 +4,14 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
-import com.sosim.server.user.dto.request.WithdrawRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.sosim.server.common.response.ResponseCode.*;
+import static com.sosim.server.common.response.ResponseCode.NOT_FOUND_USER;
+import static com.sosim.server.common.response.ResponseCode.USER_ALREADY_EXIST;
 
 
 @Service
@@ -41,13 +41,13 @@ public class UserService {
     }
 
     @Transactional
-    public void withdrawUser(long userId, WithdrawRequest withdrawRequest) {
+    public void withdrawUser(long userId, String withdrawReason) {
         checkCanWithdraw(userId);
 
         User user = getUser(userId);
         List<Participant> myParticipants = participantRepository.findByUserIdWithGroup(userId);
 
-        user.delete(withdrawRequest.getWithdrawReason());
+        user.delete(withdrawReason);
         myParticipants.forEach(Participant::withdrawGroup);
     }
 
@@ -60,11 +60,7 @@ public class UserService {
 
     private void checkCanWithdraw(long userId) {
         List<Participant> myParticipants = participantRepository.findByUserIdAndIsAdminIsTrue(userId);
-        myParticipants.forEach(p -> {
-            if (p.getGroup().getNumberOfParticipants() > 1) {
-                throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
-            }
-        });
+        myParticipants.forEach(Participant::checkCanWithdrawGroup);
     }
 
     private User getUser(OAuthUserRequest oAuthUserRequest) {

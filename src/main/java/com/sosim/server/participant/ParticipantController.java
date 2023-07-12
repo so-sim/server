@@ -2,6 +2,8 @@ package com.sosim.server.participant;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
+import com.sosim.server.participant.dto.NicknameSearchRequest;
+import com.sosim.server.participant.dto.NicknameSearchResponse;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
@@ -30,6 +32,13 @@ public class ParticipantController {
         GetParticipantListResponse getGroupParticipants = participantService.getGroupParticipants(userId, groupId);
 
         return new ResponseEntity<>(Response.create(GET_PARTICIPANTS, getGroupParticipants), GET_PARTICIPANTS.getHttpStatus());
+    }
+
+    @GetMapping("/participants-nickname")
+    public ResponseEntity<?> searchParticipants(@PathVariable long groupId, NicknameSearchRequest searchRequest) {
+        NicknameSearchResponse response = participantService.searchParticipants(groupId, searchRequest);
+
+        return new ResponseEntity<>(Response.create(SEARCH_PARTICIPANTS, response), SEARCH_PARTICIPANTS.getHttpStatus());
     }
 
     @PostMapping("/participant")

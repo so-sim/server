@@ -104,7 +104,7 @@ class GroupServiceTest {
         ReflectionTestUtils.setField(user, "id", userId);
 
         String nickname = "닉네임";
-        Participant admin = Participant.create(user, group, nickname, true);
+        Participant admin = group.createParticipant(user, nickname, true);
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
 
@@ -305,7 +305,7 @@ class GroupServiceTest {
     private Participant addParticipantInGroup(Group group, long userId, boolean isAdmin) {
         User user = new User();
         ReflectionTestUtils.setField(user, "id", userId);
-        return Participant.create(user, group, "닉네임" + userId, isAdmin);
+        return group.createParticipant(user, "닉네임" + userId, isAdmin);
     }
 
     private static ModifyGroupRequest makeUpdateGroupRequest(String title, String groupType, String colorType, String nickname) {

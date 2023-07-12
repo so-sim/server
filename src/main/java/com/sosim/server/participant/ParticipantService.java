@@ -3,6 +3,8 @@ package com.sosim.server.participant;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
+import com.sosim.server.participant.dto.NicknameSearchRequest;
+import com.sosim.server.participant.dto.NicknameSearchResponse;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
 import com.sosim.server.user.User;
@@ -29,15 +31,15 @@ public class ParticipantService {
     @Transactional
     public void createParticipant(long userId, long groupId, String nickname) {
         User user = findUser(userId);
-        Group group = findGroup(groupId);
+        Group group = findGroupWithParticipants(groupId);
 
-        Participant participant = Participant.create(user, group, nickname, false);
+        Participant participant = group.createParticipant(user, nickname, false);
         participantRepository.save(participant);
     }
 
     @Transactional(readOnly = true)
     public GetParticipantListResponse getGroupParticipants(long userId, long groupId) {
-        Group group = findGroup(groupId);
+        Group group = findGroupWithParticipants(groupId);
         List<Participant> participants = getParticipants(group);
 
         Participant admin = removeAdminInList(participants);
@@ -49,7 +51,7 @@ public class ParticipantService {
 
     @Transactional
     public void deleteParticipant(long userId, long groupId) {
-        Group group = findGroup(groupId);
+        Group group = findGroupWithParticipants(groupId);
         Participant participant = findParticipant(userId, groupId);
 
         participant.withdrawGroup(group);
@@ -57,7 +59,7 @@ public class ParticipantService {
 
     @Transactional
     public void modifyNickname(long userId, long groupId, String newNickname) {
-        Group group = findGroup(groupId);
+        Group group = findGroupWithParticipants(groupId);
         Participant participant = findParticipant(userId, groupId);
 
         participant.modifyNickname(group, newNickname);
@@ -68,6 +70,14 @@ public class ParticipantService {
         Participant participant = findParticipant(userId, groupId);
 
         return GetNicknameResponse.toDto(participant);
+    }
+
+    @Transactional(readOnly = true)
+    public NicknameSearchResponse searchParticipants(long groupId, NicknameSearchRequest searchRequest) {
+        Group group = findGroup(groupId);
+        List<Participant> participantList = participantRepository.findByGroupAndNicknameContainsIgnoreCase(group, searchRequest.getKeyword());
+
+        return NicknameSearchResponse.toDto(participantList);
     }
 
     private Participant findParticipant(long userId, long groupId) {
@@ -129,8 +139,14 @@ public class ParticipantService {
         return participant.getUser().getId().equals(userId);
     }
 
-    private Group findGroup(long groupId) {
+    private Group findGroupWithParticipants(long groupId) {
         return groupRepository.findByIdWithParticipants(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
+
+    private Group findGroup(long groupId) {
+        return groupRepository.findById(groupId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
+    }
+
 }

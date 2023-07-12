@@ -16,6 +16,7 @@ public enum ResponseCode {
     CREATE_GROUP(successCode(), HttpStatus.CREATED, "모임이 성공적으로 생성되었습니다."),
     GET_GROUP(successCode(), HttpStatus.OK, "모임이 성공적으로 조회되었습니다."),
     GET_PARTICIPANTS(successCode(), HttpStatus.OK, "모임 참가자가 성공적으로 조회되었습니다."),
+    SEARCH_PARTICIPANTS(successCode(), HttpStatus.OK, "참가자 검색이 성공적으로 수행되었습니다."),
     MODIFY_GROUP(successCode(), HttpStatus.OK, "모임이 성공적으로 수정되었습니다."),
     DELETE_GROUP(successCode(), HttpStatus.OK, "모임이 성공적으로 삭제되었습니다."),
     INTO_GROUP(successCode(), HttpStatus.CREATED, "모임에 성공적으로 참가되었습니다."),
@@ -35,6 +36,12 @@ public enum ResponseCode {
     MODIFY_EVENT_SITUATION(successCode(), HttpStatus.OK, "상세 내역 납부 여부가 성공적으로 변경되었습니다."),
     GET_EVENT_CALENDAR(successCode(), HttpStatus.OK, "상세 내역 캘린더가 성공적으로 조회되었습니다."),
     GET_EVENTS(successCode(), HttpStatus.OK, "상세 내역 리스트가 성공적으로 조회되었습니다."),
+    EVENTS_NOTIFICATION(successCode(), HttpStatus.OK, "상세 내역 알림 발송이 성공적으로 완료되었습니다."),
+
+    SUCCESS_SUBSCRIBE(successCode(), HttpStatus.OK, "알림 구독이 성공적으로 완료되었습니다."),
+    SUCCESS_SEND_NOTIFICATION(successCode(), HttpStatus.OK, "알림이 성공적으로 전송되었습니다."),
+    VIEW_ALL_NOTIFICATION(successCode(), HttpStatus.OK, "모든 알림이 성공적으로 읽음 처리되었습니다."),
+    GET_MY_NOTIFICATIONS(successCode(), HttpStatus.OK, "성공적으로 알림 목록이 조회되었습니다."),
 
     BINDING_ERROR(2000, HttpStatus.BAD_REQUEST, "입력값 중 검증에 실패한 값이 있습니다"),
 

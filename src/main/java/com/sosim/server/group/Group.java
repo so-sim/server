@@ -5,6 +5,7 @@ import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.participant.Participant;
+import com.sosim.server.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,6 +49,20 @@ public class Group extends BaseTimeEntity {
         status = ACTIVE;
     }
 
+    public Participant createParticipant(User user, String nickname, boolean isAdmin) {
+        checkAlreadyIntoGroup(user.getId());
+        checkUsedNickname(nickname);
+
+        Participant participant = Participant.builder()
+                .user(user)
+                .group(this)
+                .nickname(nickname)
+                .isAdmin(isAdmin)
+                .build();
+        participant.addGroup(this);
+        return participant;
+    }
+
     public void update(long userId, ModifyGroupRequest updateGroupRequest) {
         checkIsAdmin(userId);
         this.title = updateGroupRequest.getTitle();
@@ -85,9 +100,9 @@ public class Group extends BaseTimeEntity {
                 .anyMatch(p -> p.isActive() && p.isMine(userId));
     }
 
-    public boolean hasMoreParticipant() {
+    public boolean hasMoreNormalParticipant() {
         return participantList.stream()
-                .anyMatch(Participant::isActive);
+                .anyMatch(p -> p.isActive() && !p.isAdmin());
     }
 
     public Participant getAdminParticipant() {
@@ -147,4 +162,15 @@ public class Group extends BaseTimeEntity {
         }
     }
 
+    private void checkUsedNickname(String nickname) {
+        if (existThatNickname(nickname)) {
+            throw new CustomException(ALREADY_USE_NICKNAME);
+        }
+    }
+
+    private void checkAlreadyIntoGroup(long userId) {
+        if (hasParticipant(userId)) {
+            throw new CustomException(ALREADY_INTO_GROUP);
+        }
+    }
 }

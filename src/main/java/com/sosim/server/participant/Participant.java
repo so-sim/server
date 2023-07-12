@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-import static com.sosim.server.common.response.ResponseCode.*;
+import static com.sosim.server.common.response.ResponseCode.ALREADY_USE_NICKNAME;
+import static com.sosim.server.common.response.ResponseCode.CANNOT_WITHDRAWAL_BY_GROUP_ADMIN;
 
 @Entity
 @Getter
@@ -46,20 +47,6 @@ public class Participant extends BaseTimeEntity {
         status = Status.ACTIVE;
     }
 
-    public static Participant create(User user, Group group, String nickname, boolean isAdmin) {
-        checkAlreadyIntoGroup(user.getId(), group);
-        checkUsedNickname(group, nickname);
-
-        Participant participant = Participant.builder()
-                .user(user)
-                .group(group)
-                .nickname(nickname)
-                .isAdmin(isAdmin)
-                .build();
-        participant.addGroup(group);
-        return participant;
-    }
-
     public void modifyNickname(Group group, String newNickname) {
         if (nickname.equals(newNickname)) {
             return;
@@ -80,13 +67,21 @@ public class Participant extends BaseTimeEntity {
     }
 
     public void withdrawGroup(Group group) {
+        checkCanWithdrawGroup(group);
         delete();
         group.removeParticipant(this);
-        if (isAdmin && group.hasMoreParticipant()) {
-            throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
-        }
         if (group.hasNoParticipant()) {
             group.delete();
+        }
+    }
+
+    public void checkCanWithdrawGroup() {
+        checkCanWithdrawGroup(this.group);
+    }
+
+    public void checkCanWithdrawGroup(Group group) {
+        if (isAdmin && group.hasMoreNormalParticipant()) {
+            throw new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
         }
     }
 
@@ -102,15 +97,4 @@ public class Participant extends BaseTimeEntity {
         this.isAdmin = true;
     }
 
-    private static void checkUsedNickname(Group group, String nickname) {
-        if (group.existThatNickname(nickname)) {
-            throw new CustomException(ALREADY_USE_NICKNAME);
-        }
-    }
-
-    private static void checkAlreadyIntoGroup(long userId, Group group) {
-        if (group.hasParticipant(userId)) {
-            throw new CustomException(ALREADY_INTO_GROUP);
-        }
-    }
 }

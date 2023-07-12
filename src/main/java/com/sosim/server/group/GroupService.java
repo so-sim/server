@@ -8,12 +8,14 @@ import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupDto;
 import com.sosim.server.group.dto.response.MyGroupsResponse;
+import com.sosim.server.notification.dto.request.ModifyAdminNotificationRequest;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final ParticipantRepository participantRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public GroupIdResponse createGroup(long userId, CreateGroupRequest createGroupRequest) {
@@ -72,8 +75,11 @@ public class GroupService {
     @Transactional
     public void modifyAdmin(long userId, long groupId, ParticipantNicknameRequest nicknameRequest) {
         Group group = findGroup(groupId);
-
         group.modifyAdmin(userId, nicknameRequest.getNickname());
+        List<Long> receiverUserIdList = participantRepository.getReceiverUserIdList(groupId);
+
+        ModifyAdminNotificationRequest notification = ModifyAdminNotificationRequest.toDto(group, nicknameRequest.getNickname(), receiverUserIdList);
+        eventPublisher.publishEvent(notification);
     }
 
     @Transactional(readOnly = true)
@@ -98,7 +104,7 @@ public class GroupService {
 
     private long saveGroupAndAdmin(CreateGroupRequest createGroupRequest, User user, Group group) {
         String adminNickname = createGroupRequest.getNickname();
-        Participant admin = Participant.create(user, group, adminNickname, true);
+        Participant admin = group.createParticipant(user, adminNickname, true);
         Group saveGroup = groupRepository.save(group);
         participantRepository.save(admin);
         return saveGroup.getId();
