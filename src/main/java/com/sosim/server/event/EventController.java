@@ -28,9 +28,9 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping("/penalty")
-    public ResponseEntity<?> createEvent(@AuthenticationPrincipal AuthUser authUser,
+    public ResponseEntity<?> createEvent(@AuthUserId long userId,
                                          @Validated @RequestBody CreateEventRequest createEventRequest) {
-        EventIdResponse eventIdResponse = eventService.createEvent(authUser.getId(), createEventRequest);
+        EventIdResponse eventIdResponse = eventService.createEvent(userId, createEventRequest);
 
         return new ResponseEntity<>(Response.create(CREATE_EVENT, eventIdResponse), CREATE_EVENT.getHttpStatus());
     }
