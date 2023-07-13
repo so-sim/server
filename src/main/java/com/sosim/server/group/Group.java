@@ -41,6 +41,9 @@ public class Group extends BaseTimeEntity {
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<Participant> participantList = new ArrayList<>();
 
+    @Embedded
+    private NotificationSettingInfo notificationSettingInfo;
+
     @Builder
     private Group(String title, String coverColor, String groupType) {
         this.title = title;
