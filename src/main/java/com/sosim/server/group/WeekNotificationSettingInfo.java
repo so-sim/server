@@ -19,47 +19,48 @@ import static java.time.DayOfWeek.SUNDAY;
 @DiscriminatorValue("W")
 public class WeekNotificationSettingInfo extends NotificationSettingInfo {
 
-    private DaysOfWeek weeks;
+    private DaysOfWeek daysOfWeek;
 
-    public WeekNotificationSettingInfo(boolean allowedNotification, int repeatCycle, LocalTime sendTime, DaysOfWeek weeks) {
-        super(allowedNotification, repeatCycle, sendTime);
+    public WeekNotificationSettingInfo(boolean allowedNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime, DaysOfWeek daysOfWeek) {
+        super(allowedNotification, startDate, repeatCycle, sendTime);
         setStartSendDate();
-        this.weeks = weeks;
+        this.daysOfWeek = daysOfWeek;
     }
 
     private void setStartSendDate() {
-        nextSendDateTime = LocalDateTime.now();
-        nextSendDateTime = getNextNotifyDateTime();
+        nextSendDateTime = LocalDateTime.of(startDate, sendTime);
+        nextSendDateTime = calculateNextSendDateTime();
     }
 
     @Override
-    public LocalDateTime getNextNotifyDateTime() {
-        LocalDateTime now = LocalDateTime.now();
-        if (nextSendDateTime.isAfter(now)) {
-            return nextSendDateTime;
-        }
+    public LocalDateTime calculateNextSendDateTime() {
+        LocalDateTime sendDateTime = LocalDateTime.of(nextSendDateTime.toLocalDate(), sendTime);
 
-        LocalDate sendDate = calculateNextSendDate();
-        nextSendDateTime = LocalDateTime.of(sendDate, sendTime);
-        return nextSendDateTime;
-    }
-
-    private LocalDate calculateNextSendDate() {
-        LocalDate sendDate = nextSendDateTime.toLocalDate().plusDays(1);
-        DayOfWeek currentWeek = sendDate.getDayOfWeek();
-        int cycle = 0;
-        while (!isSendCondition(currentWeek, cycle)) {
+        DayOfWeek currentWeek = sendDateTime.getDayOfWeek();
+        int diffCycle = 0;
+        while (!isSendCondition(currentWeek, diffCycle, sendDateTime)) {
             if (SUNDAY.equals(currentWeek)) {
-                cycle++;
+                diffCycle++;
             }
-            sendDate = sendDate.plusDays(1);
-            currentWeek = sendDate.getDayOfWeek();
+            sendDateTime = sendDateTime.plusDays(1);
+            currentWeek = sendDateTime.getDayOfWeek();
         }
-        return sendDate;
+        return sendDateTime;
     }
 
-    private boolean isSendCondition(DayOfWeek currentWeek, int cycle) {
-        return cycle % repeatCycle == 0 && weeks.contain(currentWeek);
+    @Override
+    public String getSettingType() {
+        return "W";
+    }
+
+    private boolean isSendCondition(DayOfWeek currentWeek, int diffCycle, LocalDateTime sendDateTime) {
+        return diffCycle % repeatCycle == 0 && daysOfWeek.contain(currentWeek)
+                && isAfterOrEqualsNow(sendDateTime);
+    }
+
+    private boolean isAfterOrEqualsNow(LocalDateTime sendDateTime) {
+        LocalDateTime now = LocalDateTime.now();
+        return sendDateTime.isAfter(now) || sendDateTime.isEqual(now);
     }
 }
 

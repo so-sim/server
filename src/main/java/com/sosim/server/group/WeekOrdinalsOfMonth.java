@@ -1,19 +1,31 @@
 package com.sosim.server.group;
 
 import javax.persistence.Embeddable;
+import java.util.Arrays;
 
 @Embeddable
-public class WeeksOfMonth {
+public class WeekOrdinalsOfMonth {
     private static final String DELIMITER = ",";
 
     private String ordinalNumbers;
 
-    public WeeksOfMonth(String ordinalNumbers) {
+    public WeekOrdinalsOfMonth(String ordinalNumbers) {
         this.ordinalNumbers = ordinalNumbers;
     }
 
-    public WeeksOfMonth(int... ordinalNo) {
+    public WeekOrdinalsOfMonth(int... ordinalNo) {
         this.ordinalNumbers = makeOrdinalNumberString(ordinalNo);
+    }
+
+    public int[] getOrdinalNumbers() {
+        return Arrays.stream(ordinalNumbers.split(DELIMITER))
+                .mapToInt(Integer::parseInt)
+                .toArray();
+    }
+
+    public int getLastOrdinalNumber() {
+        String[] split = ordinalNumbers.split(DELIMITER);
+        return Integer.parseInt(split[split.length - 1]);
     }
 
     private String makeOrdinalNumberString(int[] ordinalNo) {

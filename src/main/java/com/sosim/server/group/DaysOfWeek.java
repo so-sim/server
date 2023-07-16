@@ -32,6 +32,10 @@ public class DaysOfWeek {
         return false;
     }
 
+    public String[] getDaysOfWeekValues() {
+        return daysOfWeek.split(DELIMITER);
+    }
+
     private String makeString(DayOfWeek[] dayOfWeeks) {
         StringBuilder sb = new StringBuilder();
         for (DayOfWeek dayOfWeek : dayOfWeeks) {
@@ -39,5 +43,10 @@ public class DaysOfWeek {
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
+    }
+
+    public DayOfWeek getLastWeek() {
+        int lastDelimiterIndex = daysOfWeek.lastIndexOf(DELIMITER);
+        return DayOfWeek.valueOf(daysOfWeek.substring(lastDelimiterIndex + 1));
     }
 }

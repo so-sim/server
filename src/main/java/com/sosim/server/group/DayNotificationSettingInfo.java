@@ -16,36 +16,35 @@ import java.time.LocalTime;
 @DiscriminatorValue("D")
 public class DayNotificationSettingInfo extends NotificationSettingInfo {
 
-    public DayNotificationSettingInfo(boolean allowedNotification, int repeatCycle, LocalTime sendTime) {
-        super(allowedNotification, repeatCycle, sendTime);
+    public DayNotificationSettingInfo(boolean allowedNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime) {
+        super(allowedNotification, startDate, repeatCycle, sendTime);
         setStartSendDate();
     }
 
     private void setStartSendDate() {
         nextSendDateTime = LocalDateTime.of(LocalDate.now(), sendTime);
-        if (nextSendDateTime.isBefore(LocalDateTime.now())) {
-            //현재 정책: 알림 설정 했을 때, 시간이 현재보다 이전이면 내일부터 알림 주기 시작
+        while (isBeforeThanNowOrStartDate()) {
             nextSendDateTime = nextSendDateTime.plusDays(1);
         }
     }
 
-    @Override
-    public LocalDateTime getNextNotifyDateTime() {
-        LocalDateTime now = LocalDateTime.now();
-        if (nextSendDateTime.isAfter(now)) {
-            return nextSendDateTime;
-        }
-        nextSendDateTime = calculateNextSendDateTime();
-        return nextSendDateTime;
+    private boolean isBeforeThanNowOrStartDate() {
+        return nextSendDateTime.isBefore(LocalDateTime.now()) || nextSendDateTime.toLocalDate().isBefore(startDate);
     }
 
-    private LocalDateTime calculateNextSendDateTime() {
-        LocalDateTime sendDateTime = nextSendDateTime.plusDays(1);
-        int cycle = 1;
-        while (cycle++ < repeatCycle) {
-            sendDateTime = sendDateTime.plusDays(1);
+    @Override
+    public LocalDateTime calculateNextSendDateTime() {
+        LocalDateTime sendDateTime = LocalDateTime.of(nextSendDateTime.toLocalDate(), sendTime);
+        LocalDateTime now = LocalDateTime.now();
+        while (sendDateTime.isBefore(now)) {
+            sendDateTime = sendDateTime.plusDays(repeatCycle);
         }
         return sendDateTime;
+    }
+
+    @Override
+    public String getSettingType() {
+        return "W";
     }
 
 }

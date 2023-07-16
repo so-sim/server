@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -20,20 +21,34 @@ public abstract class NotificationSettingInfo {
 
     private boolean enableNotification;
 
+    protected LocalDate startDate;
+
     protected int repeatCycle;
 
     protected LocalTime sendTime;
 
     protected LocalDateTime nextSendDateTime;
 
-    public NotificationSettingInfo(boolean enableNotification, int repeatCycle, LocalTime sendTime) {
+    public NotificationSettingInfo(boolean enableNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime) {
         this.enableNotification = enableNotification;
+        this.startDate = startDate;
         this.repeatCycle = repeatCycle;
         this.sendTime = sendTime;
         nextSendDateTime = LocalDateTime.now();
     }
 
-    public abstract LocalDateTime getNextNotifyDateTime();
+    public LocalDateTime getNextNotifyDateTime() {
+        if (nextSendDateTime.isAfter(LocalDateTime.now())) {
+            return nextSendDateTime;
+        }
+
+        nextSendDateTime = calculateNextSendDateTime();
+        return nextSendDateTime;
+    }
+
+    public abstract LocalDateTime calculateNextSendDateTime();
+
+    public abstract String getSettingType();
 
 //TODO    public abstract void changeSettingInfo();
 
@@ -47,11 +62,4 @@ public abstract class NotificationSettingInfo {
         this.enableNotification = false;
     }
 
-    public int getHour() {
-        return sendTime.getHour();
-    }
-
-    public int getMinute() {
-        return sendTime.getMinute();
-    }
 }

@@ -6,6 +6,7 @@ import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.user.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ import static com.sosim.server.common.auditing.Status.ACTIVE;
 import static com.sosim.server.common.response.ResponseCode.*;
 
 @Entity
-@Getter
+@Getter()
 @NoArgsConstructor
 @Table(name = "`GROUPS`")
 public class Group extends BaseTimeEntity {
@@ -41,7 +42,9 @@ public class Group extends BaseTimeEntity {
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<Participant> participantList = new ArrayList<>();
 
-    @Embedded
+    @Getter(AccessLevel.NONE)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "NOTIFICATION_SETTING_INFO_ID")
     private NotificationSettingInfo notificationSettingInfo;
 
     @Builder
@@ -113,6 +116,11 @@ public class Group extends BaseTimeEntity {
                 .filter(Participant::isAdmin)
                 .findFirst()
                 .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_ADMIN));
+    }
+
+    public NotificationSettingInfo getNotificationSettingInfo(long userId) {
+        checkIsAdmin(userId);
+        return notificationSettingInfo;
     }
 
     private Participant getParticipantByNickname(String nickname) {
