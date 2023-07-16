@@ -4,10 +4,8 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.group.dto.MyGroupPageDto;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
-import com.sosim.server.group.dto.response.GetGroupResponse;
-import com.sosim.server.group.dto.response.GroupIdResponse;
-import com.sosim.server.group.dto.response.MyGroupDto;
-import com.sosim.server.group.dto.response.MyGroupsResponse;
+import com.sosim.server.group.dto.request.NotificationSettingRequest;
+import com.sosim.server.group.dto.response.*;
 import com.sosim.server.notification.dto.request.ModifyAdminNotificationRequest;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
@@ -38,6 +36,7 @@ public class GroupService {
     @Transactional
     public GroupIdResponse createGroup(long userId, CreateGroupRequest createGroupRequest) {
         User user = findUser(userId);
+        //TODO: Group Setting Info 추가
         Group group = createGroupRequest.toEntity();
 
         long groupId = saveGroupAndAdmin(createGroupRequest, user, group);
@@ -91,6 +90,22 @@ public class GroupService {
         return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroupDtoList);
     }
 
+    @Transactional(readOnly = true)
+    public NotificationSettingResponse getNotificationSetting(long userId, long groupId) {
+        Group group = findGroupWithNotificationSettingInfo(groupId);
+        NotificationSettingInfo settingInfo = group.getNotificationSettingInfo(userId);
+
+        return NotificationSettingResponse.toResponse(settingInfo);
+    }
+
+    @Transactional
+    public void setNotificationSetting(long userId, long groupId, NotificationSettingRequest settingRequest) {
+        //Group 꺼내기
+
+        //Group의 Setting 정보 변경
+
+    }
+
     private void changeAdminNickname(Group group, String newNickname) {
         Participant admin = group.getAdminParticipant();
         admin.modifyNickname(group, newNickname);
@@ -119,4 +134,10 @@ public class GroupService {
         return groupRepository.findByIdWithParticipants(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
+
+    private Group findGroupWithNotificationSettingInfo(long groupId) {
+        return groupRepository.findByIdWithNotificationSettingInfo(groupId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
+    }
+
 }

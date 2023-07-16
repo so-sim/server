@@ -41,10 +41,4 @@ public class NotificationController {
         return new ResponseEntity<>(Response.create(GET_MY_NOTIFICATIONS, myNotifications), GET_MY_NOTIFICATIONS.getHttpStatus());
     }
 
-//    @PatchMapping("/group/{groupId}/notification")
-//    public ResponseEntity<?> setRegularNotification(@PathVariable long groupId,
-//                                                    @RequestBody SetNotificationRequest setNotificationRequest) {
-//        notificationService.setRegularNotification(groupId, setNotificationRequest);
-//        return new ResponseEntity<>(Response.create());
-//    }
 }
