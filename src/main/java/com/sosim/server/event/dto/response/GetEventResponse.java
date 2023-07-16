@@ -1,18 +1,17 @@
 package com.sosim.server.event.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sosim.server.event.Event;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
 @Getter
-@SuperBuilder
+@Builder
 public class GetEventResponse {
-    @JsonProperty("eventId")
-    private Long id;
+
+    private long eventId;
 
     @JsonFormat(pattern = "yyyy.MM.dd")
     private LocalDate date;
@@ -29,12 +28,12 @@ public class GetEventResponse {
 
     public static GetEventResponse toDto(Event event) {
         return GetEventResponse.builder()
-                .id(event.getId())
+                .eventId(event.getId())
                 .date(event.getDate())
                 .amount(event.getAmount())
-                .ground(event.getGround())
+                .ground(event.getGround().getComment())
                 .memo(event.getMemo())
-                .situation(event.getSituation())
+                .situation(event.getSituation().getComment())
                 .nickname(event.getNickname())
                 .build();
     }

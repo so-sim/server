@@ -69,7 +69,7 @@ public class EventService {
         Group group = event.getGroup();
         checkIsAdmin(group, userId);
 
-        event.delete(userId);
+        event.delete();
     }
 
     @Transactional
@@ -80,7 +80,7 @@ public class EventService {
         String nickname = getParticipantNickname(userId, group.getId());
         List<Long> receiverUserIdList = getReceiverUserIdList(modifySituationRequest);
         ModifySituationNotificationRequest notification = ModifySituationNotificationRequest.toDto(
-                group, modifySituationRequest.getSituation(), nickname, receiverUserIdList);
+                group, modifySituationRequest.getSituation().getComment(), nickname, receiverUserIdList);
         eventPublisher.publishEvent(notification);
 
         return ModifySituationResponse.toDto(modifySituationRequest.getSituation(), modifySituationRequest.getEventIdList());
