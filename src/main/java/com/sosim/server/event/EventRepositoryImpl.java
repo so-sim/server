@@ -58,7 +58,7 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
     }
 
     private BooleanExpression equalsSituation(Situation situation) {
-        return situation == null ? null : event.situation.eq(String.valueOf(situation));
+        return situation == null ? null : event.situation.eq(situation);
     }
 
     private Page<Event> doPageable(JPAQuery<Event> filterEvents, Pageable pageable, long totalSize) {
