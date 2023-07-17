@@ -55,7 +55,7 @@ public class EventControllerTest {
     @Test
     void create_event() throws Exception {
         // given
-        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "사유", "메모", "미납");
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "미납");
         EventIdResponse response = EventIdResponse.builder().eventId(eventId).build();
 
         doReturn(response).when(eventService).createEvent(userId, request);
@@ -63,7 +63,7 @@ public class EventControllerTest {
         // when
         ResultActions resultActions = mvc.perform(post(URI_PREFIX)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(request)));
+                .content(convertGroundAndSituation(request, request.getGround(), request.getSituation())));
 
         // then
         resultActions.andExpect(status().is(CREATE_EVENT.getHttpStatus().value()))
@@ -79,7 +79,7 @@ public class EventControllerTest {
     @Test
     void create_event_not_found_group() throws Exception {
         // given
-        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "사유", "메모", "미납");
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "미납");
         CustomException e = new CustomException(NOT_FOUND_GROUP);
 
         doThrow(e).when(eventService).createEvent(userId, request);
@@ -87,7 +87,7 @@ public class EventControllerTest {
         // when
         ResultActions resultActions = mvc.perform(post(URI_PREFIX)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(request)));
+                .content(convertGroundAndSituation(request, request.getGround(), request.getSituation())));
 
         // then
         resultActions.andExpect(status().is(NOT_FOUND_GROUP.getHttpStatus().value()))
@@ -102,7 +102,7 @@ public class EventControllerTest {
     @Test
     void create_event_not_found_participant() throws Exception {
         // given
-        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "사유", "메모", "미납");
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "미납");
         CustomException e = new CustomException(NOT_FOUND_PARTICIPANT);
 
         doThrow(e).when(eventService).createEvent(userId, request);
@@ -110,7 +110,7 @@ public class EventControllerTest {
         // when
         ResultActions resultActions = mvc.perform(post(URI_PREFIX)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(request)));
+                .content(convertGroundAndSituation(request, request.getGround(), request.getSituation())));
 
         // then
         resultActions.andExpect(status().is(NOT_FOUND_PARTICIPANT.getHttpStatus().value()))
@@ -125,7 +125,7 @@ public class EventControllerTest {
     @Test
     void create_event_none_admin() throws Exception {
         // given
-        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "사유", "메모", "미납");
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "미납");
         CustomException e = new CustomException(NONE_ADMIN);
 
         doThrow(e).when(eventService).createEvent(userId, request);
@@ -133,7 +133,7 @@ public class EventControllerTest {
         // when
         ResultActions resultActions = mvc.perform(post(URI_PREFIX)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(request)));
+                .content(convertGroundAndSituation(request, request.getGround(), request.getSituation())));
 
         // then
         resultActions.andExpect(status().is(NONE_ADMIN.getHttpStatus().value()))
@@ -149,9 +149,15 @@ public class EventControllerTest {
                 .nickname(nickname)
                 .date(date)
                 .amount(amount)
-                .ground(ground)
+                .ground(Ground.getGround(ground))
                 .memo(memo)
-                .situation(situation)
+                .situation(Situation.getSituation(situation))
                 .build();
+    }
+
+    private String convertGroundAndSituation(Object request, Ground ground, Situation situation) throws Exception {
+        String requestBody = om.writeValueAsString(request);
+        String replace = requestBody.replace(ground.name(), ground.getComment()).replace(situation.name(), situation.getComment());
+        return replace;
     }
 }
