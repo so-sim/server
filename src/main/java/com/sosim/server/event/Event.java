@@ -1,8 +1,6 @@
 package com.sosim.server.event;
 
-import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
-import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.group.Group;
 import com.sosim.server.user.User;
@@ -14,7 +12,6 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 import static com.sosim.server.common.auditing.Status.ACTIVE;
-import static com.sosim.server.common.response.ResponseCode.NONE_ADMIN;
 
 @Entity
 @Getter
@@ -33,13 +30,15 @@ public class Event extends BaseTimeEntity {
     private int amount;
 
     @Column(name = "GROUND")
-    private String ground;
+    @Enumerated(EnumType.STRING)
+    private Ground ground;
 
     @Column(name = "MEMO")
     private String memo;
 
     @Column(name = "SITUATION")
-    private String situation;
+    @Enumerated(EnumType.STRING)
+    private Situation situation;
 
     @Column(name = "NICKNAME")
     private String nickname;
@@ -53,7 +52,7 @@ public class Event extends BaseTimeEntity {
     private User user;
 
     @Builder
-    private Event(LocalDate date, int amount, String ground, String memo, String situation,
+    private Event(LocalDate date, int amount, Ground ground, String memo, Situation situation,
                   String nickname, Group group, User user) {
         this.date = date;
         this.amount = amount;
@@ -76,17 +75,6 @@ public class Event extends BaseTimeEntity {
         this.ground = modifyEventRequest.getGround();
         this.memo = modifyEventRequest.getMemo();
         this.situation = modifyEventRequest.getSituation();
-    }
-
-    public void modifySituation(String situation) {
-        this.situation = situation;
-    }
-
-    public void delete(long userId) {
-        if (!group.isAdminUser(userId)) {
-            throw new CustomException(NONE_ADMIN);
-        }
-        super.delete();
     }
 
     private boolean isDiffUser(String nickname) {
