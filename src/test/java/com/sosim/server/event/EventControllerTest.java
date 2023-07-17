@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.response.EventIdResponse;
+import com.sosim.server.event.dto.response.GetEventResponse;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 
 import static com.sosim.server.common.response.ResponseCode.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -94,7 +96,6 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_GROUP.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_GROUP.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
-
     }
 
     @WithMockCustomUser
@@ -117,7 +118,6 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_PARTICIPANT.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_PARTICIPANT.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
-
     }
 
     @WithMockCustomUser
@@ -140,7 +140,111 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
+    }
 
+    @WithMockCustomUser
+    @DisplayName("상세 내역 생성 / amount 유효성 검사")
+    @Test
+    void create_event_valid_amount() throws Exception {
+        // given
+        CreateEventRequest overAmount = makeCreateRequest(groupId, "닉네임", LocalDate.now(), -1, "기타", "메모", "미납");
+        CreateEventRequest underAmount = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1_000_001, "기타", "메모", "미납");
+
+        // when
+        ResultActions overResult = mvc.perform(post(URI_PREFIX)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertGroundAndSituation(overAmount, overAmount.getGround(), overAmount.getSituation())));
+        ResultActions underResult = mvc.perform(post(URI_PREFIX)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertGroundAndSituation(underAmount, underAmount.getGround(), underAmount.getSituation())));
+
+        // then
+        overResult.andExpect(status().is(BINDING_ERROR.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(BINDING_ERROR.getCode()))
+                .andExpect(jsonPath("$.status.message").value(BINDING_ERROR.getMessage()))
+                .andExpect(jsonPath("$.content.field").value("amount"));
+        underResult.andExpect(status().is(BINDING_ERROR.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(BINDING_ERROR.getCode()))
+                .andExpect(jsonPath("$.status.message").value(BINDING_ERROR.getMessage()))
+                .andExpect(jsonPath("$.content.field").value("amount"));
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 생성 / ground 유효성 검사")
+    @Test
+    void create_event_valid_ground() throws Exception {
+        // given
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, null, "메모", "미납");
+
+        // when
+        ResultActions resultActions = mvc.perform(post(URI_PREFIX)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertGroundAndSituation(request, request.getGround(), request.getSituation())));
+
+        // then
+        resultActions.andExpect(status().is(BINDING_ERROR.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(BINDING_ERROR.getCode()))
+                .andExpect(jsonPath("$.status.message").value(BINDING_ERROR.getMessage()))
+                .andExpect(jsonPath("$.content.field").value("ground"));
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 생성 / situation 유효성 검사")
+    @Test
+    void create_event_valid_situation() throws Exception {
+        // given
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", null);
+
+        // when
+        ResultActions resultActions = mvc.perform(post(URI_PREFIX)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertGroundAndSituation(request, request.getGround(), request.getSituation())));
+
+        // then
+        resultActions.andExpect(status().is(BINDING_ERROR.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(BINDING_ERROR.getCode()))
+                .andExpect(jsonPath("$.status.message").value(BINDING_ERROR.getMessage()))
+                .andExpect(jsonPath("$.content.field").value("situation"));
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 단건 조회 / 성공")
+    @Test
+    void get_event() throws Exception {
+        // given
+        GetEventResponse getEventResponse = makeGetEventResponse();
+        doReturn(getEventResponse).when(eventService).getEvent(eventId);
+
+        // when
+        String url = URI_PREFIX.concat(String.format("/%d", eventId));
+        ResultActions resultActions = mvc.perform(get(url));
+
+        // then
+        resultActions.andExpect(status().is(GET_EVENT.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(GET_EVENT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(GET_EVENT.getMessage()))
+                .andExpect(jsonPath("$.content.eventId").value(eventId));
+
+        verify(eventService, times(1)).getEvent(eventId);
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 단건 조회 / 상세 내역이 없는 경우")
+    @Test
+    void get_event_not_found_event() throws Exception {
+        // given
+        CustomException e = new CustomException(NOT_FOUND_EVENT);
+        doThrow(e).when(eventService).getEvent(eventId);
+
+        // when
+        String url = URI_PREFIX.concat(String.format("/%d", eventId));
+        ResultActions resultActions = mvc.perform(get(url));
+
+        // then
+        resultActions.andExpect(status().is(NOT_FOUND_EVENT.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(NOT_FOUND_EVENT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NOT_FOUND_EVENT.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     private CreateEventRequest makeCreateRequest(long groupId, String nickname, LocalDate date, int amount, String ground, String memo, String situation) {
@@ -155,9 +259,20 @@ public class EventControllerTest {
                 .build();
     }
 
+    private GetEventResponse makeGetEventResponse() {
+        return GetEventResponse.builder()
+                .eventId(eventId)
+                .build();
+    }
+
     private String convertGroundAndSituation(Object request, Ground ground, Situation situation) throws Exception {
         String requestBody = om.writeValueAsString(request);
-        String replace = requestBody.replace(ground.name(), ground.getComment()).replace(situation.name(), situation.getComment());
-        return replace;
+        if (ground != null) {
+            requestBody = requestBody.replace(ground.name(), ground.getComment());
+        }
+        if (situation != null) {
+            requestBody = requestBody.replace(situation.name(), situation.getComment());
+        }
+        return requestBody;
     }
 }
