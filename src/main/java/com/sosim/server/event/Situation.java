@@ -17,7 +17,7 @@ public enum Situation {
     private String comment;
 
     @JsonCreator
-    public static Situation getGround(String comment) {
+    public static Situation getSituation(String comment) {
         return Arrays.stream(Situation.values())
                 .filter(situation -> situation.getComment().equals(comment))
                 .findFirst()
