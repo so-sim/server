@@ -146,6 +146,20 @@ public class Group extends BaseTimeEntity {
                 .count();
     }
 
+    public void changeNotificationSettingInfo(long userId, NotificationSettingInfo settingInfo) {
+        checkIsAdmin(userId);
+        //TODO: 타입이 다른 경우 아예 갈아끼워야 하는데, 정상 작동 여부 테스트 필요
+        if (notificationSettingInfo == null || !isSameSettingType(settingInfo)) {
+            notificationSettingInfo = settingInfo;
+            return;
+        }
+        notificationSettingInfo.changeSettingInfo(settingInfo);
+    }
+
+    private boolean isSameSettingType(NotificationSettingInfo newSettingInfo) {
+        return notificationSettingInfo.getSettingType().equals(newSettingInfo.getSettingType());
+    }
+
     private void deleteGroupAndAdmin() {
         Participant adminParticipant = getAdminParticipant();
         adminParticipant.withdrawGroup(this);
@@ -184,4 +198,5 @@ public class Group extends BaseTimeEntity {
             throw new CustomException(ALREADY_INTO_GROUP);
         }
     }
+
 }

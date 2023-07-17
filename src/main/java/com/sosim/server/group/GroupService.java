@@ -100,10 +100,10 @@ public class GroupService {
 
     @Transactional
     public void setNotificationSetting(long userId, long groupId, NotificationSettingRequest settingRequest) {
-        //Group 꺼내기
+        NotificationSettingInfo settingInfo = settingRequest.toSettingInfoVO();
 
-        //Group의 Setting 정보 변경
-
+        Group group = findGroupWithNotificationSettingInfo(groupId);
+        group.changeNotificationSettingInfo(userId, settingInfo);
     }
 
     private void changeAdminNickname(Group group, String newNickname) {

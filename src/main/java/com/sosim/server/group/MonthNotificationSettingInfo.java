@@ -36,10 +36,10 @@ public class MonthNotificationSettingInfo extends NotificationSettingInfo {
         this.weekOrdinalsOfMonth = weekOrdinalsOfMonth;
         this.daysOfWeek = daysOfWeek;
         this.sendDay = sendDay;
-        setNextSendTime(startDate, sendTime);
+        setNextSendTime();
     }
 
-    private void setNextSendTime(LocalDate startDate, LocalTime sendTime) {
+    private void setNextSendTime() {
         nextSendDateTime = LocalDateTime.of(startDate, sendTime);
         nextSendDateTime = calculateNextSendDateTime();
     }
@@ -55,6 +55,18 @@ public class MonthNotificationSettingInfo extends NotificationSettingInfo {
     @Override
     public String getSettingType() {
         return "M";
+    }
+
+    @Override
+    public void changeSettingInfoDetail(NotificationSettingInfo newSettingInfo) {
+        MonthNotificationSettingInfo monthSettingInfo = (MonthNotificationSettingInfo) newSettingInfo;
+        if (SIMPLE_DATE.equals(monthSettingInfo.getMonthSettingType())) {
+            sendDay = monthSettingInfo.getSendDay();
+        } else {
+            weekOrdinalsOfMonth = monthSettingInfo.getWeekOrdinalsOfMonth();
+            daysOfWeek = monthSettingInfo.getDaysOfWeek();
+        }
+        setNextSendTime();
     }
 
     private LocalDateTime calcNextSimpleDateTime() {

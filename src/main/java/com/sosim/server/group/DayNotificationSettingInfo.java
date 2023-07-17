@@ -18,10 +18,10 @@ public class DayNotificationSettingInfo extends NotificationSettingInfo {
 
     public DayNotificationSettingInfo(boolean allowedNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime) {
         super(allowedNotification, startDate, repeatCycle, sendTime);
-        setStartSendDate();
+        setNextSendDate();
     }
 
-    private void setStartSendDate() {
+    private void setNextSendDate() {
         nextSendDateTime = LocalDateTime.of(LocalDate.now(), sendTime);
         while (isBeforeThanNowOrStartDate()) {
             nextSendDateTime = nextSendDateTime.plusDays(1);
@@ -47,6 +47,10 @@ public class DayNotificationSettingInfo extends NotificationSettingInfo {
         return "W";
     }
 
+    @Override
+    public void changeSettingInfoDetail(NotificationSettingInfo newSettingInfo) {
+        setNextSendDate();
+    }
 }
 
 

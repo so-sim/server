@@ -46,11 +46,22 @@ public abstract class NotificationSettingInfo {
         return nextSendDateTime;
     }
 
+    public void changeSettingInfo(NotificationSettingInfo newSettingInfo) {
+        enableNotification = newSettingInfo.isEnableNotification();
+        if (!enableNotification) {
+            return;
+        }
+        startDate = newSettingInfo.getStartDate();
+        repeatCycle = newSettingInfo.getRepeatCycle();
+        sendTime = newSettingInfo.getSendTime();
+        changeSettingInfoDetail(newSettingInfo);
+    }
+
     public abstract LocalDateTime calculateNextSendDateTime();
 
     public abstract String getSettingType();
 
-//TODO    public abstract void changeSettingInfo();
+    public abstract void changeSettingInfoDetail(NotificationSettingInfo newSettingInfo);
 
     public void enableNotification() {
         if (!enableNotification) {

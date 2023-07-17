@@ -23,11 +23,11 @@ public class WeekNotificationSettingInfo extends NotificationSettingInfo {
 
     public WeekNotificationSettingInfo(boolean allowedNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime, DaysOfWeek daysOfWeek) {
         super(allowedNotification, startDate, repeatCycle, sendTime);
-        setStartSendDate();
+        setNextSendDate();
         this.daysOfWeek = daysOfWeek;
     }
 
-    private void setStartSendDate() {
+    private void setNextSendDate() {
         nextSendDateTime = LocalDateTime.of(startDate, sendTime);
         nextSendDateTime = calculateNextSendDateTime();
     }
@@ -51,6 +51,13 @@ public class WeekNotificationSettingInfo extends NotificationSettingInfo {
     @Override
     public String getSettingType() {
         return "W";
+    }
+
+    @Override
+    public void changeSettingInfoDetail(NotificationSettingInfo newSettingInfo) {
+        WeekNotificationSettingInfo weekSettingInfo = (WeekNotificationSettingInfo) newSettingInfo;
+        daysOfWeek = weekSettingInfo.getDaysOfWeek();
+        setNextSendDate();
     }
 
     private boolean isSendCondition(DayOfWeek currentWeek, int diffCycle, LocalDateTime sendDateTime) {
