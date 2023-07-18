@@ -131,7 +131,7 @@ public class EventService {
     }
 
     private List<Long> getReceiverUserIdList(ModifySituationRequest modifySituationRequest) {
-        if (modifySituationRequest.getSituation().equals("확인 필요")) {
+        if (modifySituationRequest.getSituation().equals(Situation.CHECK)) {
             List<Long> receiverUserIdList = new ArrayList<>();
             long adminUserId = eventRepository.getAdminUserId(modifySituationRequest.getEventIdList().get(0));
             receiverUserIdList.add(adminUserId);
