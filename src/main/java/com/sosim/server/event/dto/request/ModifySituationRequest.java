@@ -1,12 +1,16 @@
 package com.sosim.server.event.dto.request;
 
 import com.sosim.server.event.Situation;
-import lombok.Getter;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 public class ModifySituationRequest {
 
     private List<Long> eventIdList;

@@ -66,6 +66,7 @@ public enum ResponseCode {
     NOT_FOUND_ADMIN(1008, HttpStatus.NOT_FOUND, "모임의 총무를 찾을 수 없습니다."),
 
     NOT_FOUND_EVENT(1300, HttpStatus.BAD_REQUEST, "해당 상세 내역을 찾을 수 없습니다."),
+    FAIL_TO_CHECK(1301, HttpStatus.BAD_REQUEST, "완납인 상세 내역은 확인중으로 변경 불가능합니다."),
 
     ;
 

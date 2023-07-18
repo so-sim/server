@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
+import com.sosim.server.event.dto.request.ModifySituationRequest;
 import com.sosim.server.event.dto.response.EventIdResponse;
 import com.sosim.server.event.dto.response.GetEventResponse;
+import com.sosim.server.event.dto.response.ModifySituationResponse;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -462,6 +464,74 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
+    @WithMockCustomUser
+    @DisplayName("상세 내역 납부여부 변경 / 성공")
+    @Test
+    void modify_event_situation() throws Exception {
+        // given
+        String situation = "확인중";
+        ModifySituationRequest request = makeModifySituationRequest(situation);
+        ModifySituationResponse response = makeModifySituationResponse(situation);
+        doReturn(response).when(eventService).modifyEventSituation(userId, request);
+
+        // when
+        ResultActions resultActions = mvc.perform(patch(URI_PREFIX)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertGroundAndSituation(request, null, request.getSituation())));
+
+        // then
+        resultActions.andExpect(status().is(MODIFY_EVENT_SITUATION.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(MODIFY_EVENT_SITUATION.getCode()))
+                .andExpect(jsonPath("$.status.message").value(MODIFY_EVENT_SITUATION.getMessage()))
+                .andExpect(jsonPath("$.content.situation").value(situation));
+
+        verify(eventService, times(1)).modifyEventSituation(userId, request);
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 납부여부 변경 / 완납 변경 시 총무 권한 없는 경우")
+    @Test
+    void modify_event_situation_none_admin() throws Exception {
+        // given
+        String situation = "완납";
+        ModifySituationRequest request = makeModifySituationRequest(situation);
+        CustomException e = new CustomException(NONE_ADMIN);
+        doThrow(e).when(eventService).modifyEventSituation(userId, request);
+
+        // when
+        ResultActions resultActions = mvc.perform(patch(URI_PREFIX)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertGroundAndSituation(request, null, request.getSituation())));
+
+        // then
+        resultActions.andExpect(status().is(NONE_ADMIN.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 납부여부 변경 / 확인중 변경 시 이미 완납인 경우")
+    @Test
+    void modify_event_situation_fail_to_check() throws Exception {
+        // given
+        String situation = "확인중";
+        ModifySituationRequest request = makeModifySituationRequest(situation);
+        CustomException e = new CustomException(FAIL_TO_CHECK);
+        doThrow(e).when(eventService).modifyEventSituation(userId, request);
+
+        // when
+        ResultActions resultActions = mvc.perform(patch(URI_PREFIX)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertGroundAndSituation(request, null, request.getSituation())));
+
+        // then
+        resultActions.andExpect(status().is(FAIL_TO_CHECK.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(FAIL_TO_CHECK.getCode()))
+                .andExpect(jsonPath("$.status.message").value(FAIL_TO_CHECK.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
     private CreateEventRequest makeCreateRequest(long groupId, String nickname, LocalDate date, int amount, String ground, String memo, String situation) {
         return CreateEventRequest.builder()
                 .groupId(groupId)
@@ -487,6 +557,18 @@ public class EventControllerTest {
                 .ground(Ground.getGround(ground))
                 .memo(memo)
                 .situation(Situation.getSituation(situation))
+                .build();
+    }
+
+    private ModifySituationRequest makeModifySituationRequest(String situation) {
+        return ModifySituationRequest.builder()
+                .situation(Situation.getSituation(situation))
+                .build();
+    }
+
+    private ModifySituationResponse makeModifySituationResponse(String situation) {
+        return ModifySituationResponse.builder()
+                .situation(situation)
                 .build();
     }
 
