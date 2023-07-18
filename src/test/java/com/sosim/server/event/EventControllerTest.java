@@ -405,6 +405,63 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.content.field").value("situation"));
     }
 
+    @WithMockCustomUser
+    @DisplayName("상세 내역 삭제 / 성공")
+    @Test
+    void delete_event() throws Exception {
+        // given
+
+        // when
+        String url = URI_PREFIX.concat(String.format("/%d", eventId));
+        ResultActions resultActions = mvc.perform(delete(url));
+
+        // then
+        resultActions.andExpect(status().is(DELETE_EVENT.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(DELETE_EVENT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(DELETE_EVENT.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+
+        verify(eventService, times(1)).deleteEvent(userId, eventId);
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 삭제 / 상세 내역이 없는 경우")
+    @Test
+    void delete_event_not_found_event() throws Exception {
+        // given
+        CustomException e = new CustomException(NOT_FOUND_EVENT);
+        doThrow(e).when(eventService).deleteEvent(userId, eventId);
+
+        // when
+        String url = URI_PREFIX.concat(String.format("/%d", eventId));
+        ResultActions resultActions = mvc.perform(delete(url));
+
+        // then
+        resultActions.andExpect(status().is(NOT_FOUND_EVENT.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(NOT_FOUND_EVENT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NOT_FOUND_EVENT.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 삭제 / 총무 권한이 없는 경우")
+    @Test
+    void delete_event_none_admin() throws Exception {
+        // given
+        CustomException e = new CustomException(NONE_ADMIN);
+        doThrow(e).when(eventService).deleteEvent(userId, eventId);
+
+        // when
+        String url = URI_PREFIX.concat(String.format("/%d", eventId));
+        ResultActions resultActions = mvc.perform(delete(url));
+
+        // then
+        resultActions.andExpect(status().is(NONE_ADMIN.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
     private CreateEventRequest makeCreateRequest(long groupId, String nickname, LocalDate date, int amount, String ground, String memo, String situation) {
         return CreateEventRequest.builder()
                 .groupId(groupId)
