@@ -30,4 +30,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query("SELECT * FROM Notification n " +
             "WHERE n.sentDate <= CURRENT_TIMESTAMP AND n.reserved = true ")
     List<Notification> findReservedNotifications();
+
+    @Query("DELETE FROM Notification n " +
+            "WHERE n.groupId = :groupId AND n.reserved = true")
+    void deleteReservedNotifications(@Param("groupId") long groupId);
 }

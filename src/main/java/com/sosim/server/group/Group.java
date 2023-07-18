@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,6 +122,10 @@ public class Group extends BaseTimeEntity {
     public NotificationSettingInfo getNotificationSettingInfo(long userId) {
         checkIsAdmin(userId);
         return notificationSettingInfo;
+    }
+
+    public LocalDateTime getNextNotifyDateTime() {
+        return notificationSettingInfo.getNextNotifyDateTime();
     }
 
     private Participant getParticipantByNickname(String nickname) {

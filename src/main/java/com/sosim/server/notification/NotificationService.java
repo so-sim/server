@@ -19,7 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.sosim.server.common.response.ResponseCode.*;
+import static com.sosim.server.common.response.ResponseCode.SUCCESS_SEND_NOTIFICATION;
+import static com.sosim.server.common.response.ResponseCode.SUCCESS_SUBSCRIBE;
 
 @Service
 @RequiredArgsConstructor

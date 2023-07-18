@@ -1,6 +1,7 @@
 package com.sosim.server.notification;
 
 import com.sosim.server.common.auditing.BaseTimeEntity;
+import com.sosim.server.group.Group;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ public class Notification extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "NOTIFICATION_ID")
-    private long id;
+    private Long id;
 
     @Column(name = "USER_ID")
     private long userId;
@@ -31,19 +32,23 @@ public class Notification extends BaseTimeEntity {
     @Column(name = "VIEW")
     private boolean view;
 
-    @Column(name = "SENT_DATE")
-    private LocalDateTime sentDateTime;
+    @Column(name = "SEND_DATETIME")
+    private LocalDateTime sendDateTime;
 
     @Column(name = "RESERVED")
     private boolean reserved;
 
     @Builder
-    public Notification(long userId, long groupId, String groupTitle, Content content, LocalDateTime sentDateTime, boolean reserved) {
+    public Notification(long userId, long groupId, String groupTitle, Content content, LocalDateTime sendDateTime, boolean reserved) {
         this.userId = userId;
         this.groupInfo = setGroupInfo(groupId, groupTitle);
         this.content = content;
-        this.sentDateTime = setSentDateTime(sentDateTime);
+        this.sendDateTime = setSendDateTime(sendDateTime);
         this.reserved = reserved;
+    }
+
+    public static Notification toEntity(long userId, Group group, Content content) {
+        return toEntity(userId, group.getId(), group.getTitle(), content);
     }
 
     public static Notification toEntity(long userId, long groupId, String groupTitle, Content content) {
@@ -55,7 +60,7 @@ public class Notification extends BaseTimeEntity {
                 .build();
     }
 
-    public void sentComplete() {
+    public void sendComplete() {
         reserved = false;
     }
 
@@ -67,7 +72,7 @@ public class Notification extends BaseTimeEntity {
         return groupInfo.getGroupTitle();
     }
 
-    private LocalDateTime setSentDateTime(LocalDateTime sentDate) {
+    private LocalDateTime setSendDateTime(LocalDateTime sentDate) {
         return sentDate == null ? LocalDateTime.now() : sentDate;
     }
 

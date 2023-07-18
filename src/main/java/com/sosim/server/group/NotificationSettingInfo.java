@@ -13,7 +13,7 @@ import java.time.LocalTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "NOTIFICATION_SETTINGS")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "SETTING_TYPE")
 public abstract class NotificationSettingInfo {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
