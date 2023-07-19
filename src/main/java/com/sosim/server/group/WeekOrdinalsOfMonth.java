@@ -13,7 +13,7 @@ public class WeekOrdinalsOfMonth {
         this.ordinalNumbers = ordinalNumbers;
     }
 
-    public WeekOrdinalsOfMonth(int... ordinalNo) {
+    public WeekOrdinalsOfMonth(int[] ordinalNo) {
         this.ordinalNumbers = makeOrdinalNumberString(ordinalNo);
     }
 

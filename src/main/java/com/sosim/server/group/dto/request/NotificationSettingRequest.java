@@ -1,7 +1,6 @@
 package com.sosim.server.group.dto.request;
 
-import com.sosim.server.group.MonthSettingType;
-import com.sosim.server.group.NotificationSettingInfo;
+import com.sosim.server.group.*;
 import lombok.Data;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DirectFieldBindingResult;
@@ -36,10 +35,48 @@ public class NotificationSettingRequest {
 
     private String[] daysOfWeek;
 
-    public NotificationSettingInfo toSettingInfoVO() {
-        //TODO: settingType에 따라 VO값 바인딩해서 리턴
-
+    public NotificationSettingInfo toNotificationSettingInfo() {
+        switch (settingType) {
+            case "M":
+                return makeMonthNotificationSettingInfo();
+            case "W":
+                return makeWeekNotificationSettingInfo();
+            case "D":
+                return makeDayNotificationSettingInfo();
+        }
         return null;
+    }
+
+    private NotificationSettingInfo makeDayNotificationSettingInfo() {
+        return DayNotificationSettingInfo.builder()
+                .enableNotification(enableNotification)
+                .startDate(startDate)
+                .repeatCycle(repeatCycle)
+                .sendTime(sendTime)
+                .build();
+    }
+
+    private NotificationSettingInfo makeWeekNotificationSettingInfo() {
+        return WeekNotificationSettingInfo.builder()
+                .enableNotification(enableNotification)
+                .startDate(startDate)
+                .repeatCycle(repeatCycle)
+                .sendTime(sendTime)
+                .daysOfWeek(new DaysOfWeek(daysOfWeek))
+                .build();
+    }
+
+    private NotificationSettingInfo makeMonthNotificationSettingInfo() {
+        return MonthNotificationSettingInfo.builder()
+                .enableNotification(enableNotification)
+                .startDate(startDate)
+                .repeatCycle(repeatCycle)
+                .sendTime(sendTime)
+                .monthSettingType(monthSettingType)
+                .sendDay(sendDay)
+                .weekOrdinalsOfMonth(new WeekOrdinalsOfMonth(ordinalNumbers))
+                .daysOfWeek(new DaysOfWeek(daysOfWeek))
+                .build();
     }
 
     public void validate() throws BindException {
@@ -54,18 +91,18 @@ public class NotificationSettingRequest {
                 validateWeekRequest();
                 return;
             case "D":
-                validateDayRequest();
+//                validateDayRequest();
                 return;
         }
         throwBindException("settingType", "settingType is not valid.");
     }
 
-    private void validateDayRequest() {
-        
-    }
+//    private void validateDayRequest() {
+        //검사할 값이 없어서 주석처리
+//    }
 
-    private void validateWeekRequest() {
-        
+    private void validateWeekRequest() throws BindException {
+        checkDaysOfWeek();
     }
 
     private void validateMonthRequest() throws BindException {
@@ -78,6 +115,10 @@ public class NotificationSettingRequest {
         if (!hasValidOrdinalNumbers()) {
             throwBindException("ordinalNumbers", "ordinalNumbers are not valid.");
         }
+        checkDaysOfWeek();
+    }
+
+    private void checkDaysOfWeek() throws BindException {
         if (!hasValidDaysOfWeek()) {
             throwBindException("daysOfWeek", "daysOfWeek is not Valid.");
         }

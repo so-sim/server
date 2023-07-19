@@ -1,6 +1,7 @@
 package com.sosim.server.group;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,8 +17,9 @@ import java.time.LocalTime;
 @DiscriminatorValue("D")
 public class DayNotificationSettingInfo extends NotificationSettingInfo {
 
-    public DayNotificationSettingInfo(boolean allowedNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime) {
-        super(allowedNotification, startDate, repeatCycle, sendTime);
+    @Builder
+    public DayNotificationSettingInfo(boolean enableNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime) {
+        super(enableNotification, startDate, repeatCycle, sendTime);
         setNextSendDate();
     }
 

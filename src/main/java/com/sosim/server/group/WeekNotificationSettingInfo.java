@@ -1,6 +1,7 @@
 package com.sosim.server.group;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,8 +22,9 @@ public class WeekNotificationSettingInfo extends NotificationSettingInfo {
 
     private DaysOfWeek daysOfWeek;
 
-    public WeekNotificationSettingInfo(boolean allowedNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime, DaysOfWeek daysOfWeek) {
-        super(allowedNotification, startDate, repeatCycle, sendTime);
+    @Builder
+    public WeekNotificationSettingInfo(boolean enableNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime, DaysOfWeek daysOfWeek) {
+        super(enableNotification, startDate, repeatCycle, sendTime);
         setNextSendDate();
         this.daysOfWeek = daysOfWeek;
     }

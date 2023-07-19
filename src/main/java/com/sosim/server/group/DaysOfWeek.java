@@ -17,7 +17,7 @@ public class DaysOfWeek {
         this.daysOfWeek = daysOfWeek;
     }
 
-    public DaysOfWeek(DayOfWeek... dayOfWeeks) {
+    public DaysOfWeek(String[] dayOfWeeks) {
         this.daysOfWeek = makeString(dayOfWeeks);
     }
 
@@ -36,10 +36,10 @@ public class DaysOfWeek {
         return daysOfWeek.split(DELIMITER);
     }
 
-    private String makeString(DayOfWeek[] dayOfWeeks) {
+    private String makeString(String[] dayOfWeeks) {
         StringBuilder sb = new StringBuilder();
-        for (DayOfWeek dayOfWeek : dayOfWeeks) {
-            sb.append(dayOfWeek.name()).append(DELIMITER);
+        for (String week : dayOfWeeks) {
+            sb.append(week).append(DELIMITER);
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();

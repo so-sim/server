@@ -27,7 +27,7 @@ public class GroupNotificationSettingService {
 
     @Transactional
     public void setNotificationSetting(long userId, long groupId, NotificationSettingRequest settingRequest) {
-        NotificationSettingInfo settingInfo = settingRequest.toSettingInfoVO();
+        NotificationSettingInfo settingInfo = settingRequest.toNotificationSettingInfo();
 
         Group group = findGroupWithNotificationSettingInfo(groupId);
         group.changeNotificationSettingInfo(userId, settingInfo);

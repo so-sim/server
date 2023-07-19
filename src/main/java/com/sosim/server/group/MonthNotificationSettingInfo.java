@@ -1,6 +1,7 @@
 package com.sosim.server.group;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +30,7 @@ public class MonthNotificationSettingInfo extends NotificationSettingInfo {
 
     private int sendDay;
 
+    @Builder
     public MonthNotificationSettingInfo(boolean enableNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime,
                                         MonthSettingType monthSettingType, WeekOrdinalsOfMonth weekOrdinalsOfMonth, DaysOfWeek daysOfWeek, int sendDay) {
         super(enableNotification, startDate, repeatCycle, sendTime);
