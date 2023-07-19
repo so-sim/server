@@ -1,5 +1,6 @@
 package com.sosim.server.event.dto.request;
 
+import com.sosim.server.event.Situation;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,5 +21,5 @@ public class FilterEventRequest {
 
     private String nickname;
 
-    private String situation;
+    private Situation situation;
 }
