@@ -38,9 +38,9 @@ public class EventController {
     @PatchMapping("/penalty/{eventId}")
     public ResponseEntity<?> modifyEvent(@AuthUserId long userId, @PathVariable long eventId,
                                          @Validated @RequestBody ModifyEventRequest modifyEventRequest) {
-        GetEventResponse eventIdResponse = eventService.modifyEvent(userId, eventId, modifyEventRequest);
+        GetEventResponse eventModifyResponse = eventService.modifyEvent(userId, eventId, modifyEventRequest);
 
-        return new ResponseEntity<>(Response.create(MODIFY_EVENT, eventIdResponse), MODIFY_EVENT.getHttpStatus());
+        return new ResponseEntity<>(Response.create(MODIFY_EVENT, eventModifyResponse), MODIFY_EVENT.getHttpStatus());
     }
 
     @DeleteMapping("/penalty/{eventId}")

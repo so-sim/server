@@ -3,8 +3,7 @@ package com.sosim.server.event.dto.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sosim.server.event.Ground;
 import com.sosim.server.event.Situation;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -12,7 +11,10 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 public class ModifyEventRequest {
 
     private String nickname;

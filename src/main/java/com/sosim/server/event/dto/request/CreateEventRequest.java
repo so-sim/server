@@ -6,12 +6,16 @@ import com.sosim.server.event.Ground;
 import com.sosim.server.event.Situation;
 import com.sosim.server.group.Group;
 import com.sosim.server.user.User;
-import lombok.Getter;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 public class CreateEventRequest {
 
     private long groupId;
