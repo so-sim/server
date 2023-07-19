@@ -44,7 +44,7 @@ public class Group extends BaseTimeEntity {
     private List<Participant> participantList = new ArrayList<>();
 
     @Getter(AccessLevel.NONE)
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL}, orphanRemoval = true)
     @JoinColumn(name = "NOTIFICATION_SETTING_INFO_ID")
     private NotificationSettingInfo notificationSettingInfo;
 
