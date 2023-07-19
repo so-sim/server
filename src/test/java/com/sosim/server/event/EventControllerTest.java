@@ -1,28 +1,43 @@
 package com.sosim.server.event;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.dto.request.CreateEventRequest;
+import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.request.ModifySituationRequest;
-import com.sosim.server.event.dto.response.EventIdResponse;
-import com.sosim.server.event.dto.response.GetEventResponse;
-import com.sosim.server.event.dto.response.ModifySituationResponse;
+import com.sosim.server.event.dto.response.*;
+import com.sosim.server.group.Group;
+import com.sosim.server.group.dto.response.MyGroupDto;
+import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static com.sosim.server.common.response.ResponseCode.*;
 import static org.mockito.Mockito.*;
@@ -532,6 +547,56 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
+    @WithMockCustomUser
+    @DisplayName("상세 내역 캘린더 조회 / 성공")
+    @Test
+    void get_event_calendar() throws Exception {
+        // given
+        FilterEventRequest request = makeFilterEventRequest(LocalDate.now(), LocalDate.now());
+        GetEventCalendarResponse response = GetEventCalendarResponse.toDto(new ArrayList<>());
+
+        doReturn(response).when(eventService).getEventCalendar(request);
+
+        // when
+        String url = "/api/event/penalty/calendar";
+        ResultActions resultActions = mvc.perform(get(url)
+                .param("groupId", String.valueOf(groupId))
+                .param("startDate", "2023.01.01")
+                .param("endDate", "2023.01.01")
+        );
+
+        // then
+        resultActions.andExpect(status().is(GET_EVENT_CALENDAR.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(GET_EVENT_CALENDAR.getCode()))
+                .andExpect(jsonPath("$.status.message").value(GET_EVENT_CALENDAR.getMessage()));
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 필터링 / 성공")
+    @Test
+    void get_event_list_filter() throws Exception {
+        //given
+        FilterEventRequest request = makeFilterEventRequest(LocalDate.now(), LocalDate.now());
+        GetEventListResponse response = GetEventListResponse.toDto(new ArrayList<>(), 0);
+
+        doReturn(response).when(eventService).getEvents(request, PageRequest.of(0, 15));
+
+        //when
+        String url = "/api/event/penalties";
+        ResultActions resultActions = mvc.perform(get(url)
+                .param("page", "0")
+                .param("size", "15")
+                .param("groupId", String.valueOf(groupId))
+                .param("startDate", "2023.01.01")
+                .param("endDate", "2023.01.01")
+        );
+
+        //then
+        resultActions.andExpect(status().is(GET_EVENTS.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(GET_EVENTS.getCode()))
+                .andExpect(jsonPath("$.status.message").value(GET_EVENTS.getMessage()));
+    }
+
     private CreateEventRequest makeCreateRequest(long groupId, String nickname, LocalDate date, int amount, String ground, String memo, String situation) {
         return CreateEventRequest.builder()
                 .groupId(groupId)
@@ -569,6 +634,14 @@ public class EventControllerTest {
     private ModifySituationResponse makeModifySituationResponse(String situation) {
         return ModifySituationResponse.builder()
                 .situation(situation)
+                .build();
+    }
+
+    private FilterEventRequest makeFilterEventRequest(LocalDate startDate, LocalDate endDate) {
+        return FilterEventRequest.builder()
+                .groupId(groupId)
+                .startDate(startDate)
+                .endDate(endDate)
                 .build();
     }
 
