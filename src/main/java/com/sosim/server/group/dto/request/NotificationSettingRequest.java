@@ -5,7 +5,7 @@ import com.sosim.server.group.NotificationSettingInfo;
 import lombok.Data;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DirectFieldBindingResult;
-import org.springframework.validation.ObjectError;
+import org.springframework.validation.FieldError;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -83,9 +83,10 @@ public class NotificationSettingRequest {
         }
     }
 
-    private void throwBindException(String name, String message) throws BindException {
-        DirectFieldBindingResult bindingResult = new DirectFieldBindingResult(this, this.getClass().getSimpleName());
-        ObjectError error = new ObjectError("sendDay", "sendDay is not Valid.");
+    private void throwBindException(String fieldName, String message) throws BindException {
+        String objectName = this.getClass().getSimpleName();
+        DirectFieldBindingResult bindingResult = new DirectFieldBindingResult(this, objectName);
+        FieldError error = new FieldError(objectName, fieldName, message);
         bindingResult.addError(error);
         throw new BindException(bindingResult);
     }
