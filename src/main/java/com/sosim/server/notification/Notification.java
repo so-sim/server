@@ -72,8 +72,8 @@ public class Notification extends BaseTimeEntity {
         return groupInfo.getGroupTitle();
     }
 
-    private LocalDateTime setSendDateTime(LocalDateTime sentDate) {
-        return sentDate == null ? LocalDateTime.now() : sentDate;
+    private LocalDateTime setSendDateTime(LocalDateTime sendDateTime) {
+        return sendDateTime == null ? LocalDateTime.now() : sendDateTime;
     }
 
     private GroupInfo setGroupInfo(long groupId, String groupTitle) {

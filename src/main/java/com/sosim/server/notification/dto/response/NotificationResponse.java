@@ -22,7 +22,7 @@ public class NotificationResponse {
 
     public static NotificationResponse toDto(Notification notification) {
         return NotificationResponse.builder()
-                .date(notification.getCreateDate().toLocalDate())
+                .date(notification.getSendDateTime().toLocalDate())
                 .category(notification.getContent().getCategory())
                 .groupTitle(notification.getGroupTitle())
                 .message(notification.getContent().getMessage())
