@@ -9,7 +9,7 @@ import java.util.Arrays;
 @Getter
 @AllArgsConstructor
 public enum Situation {
-    NON("미납"),
+    NONE("미납"),
     FULL("완납"),
     CHECK("확인중"),
     ;

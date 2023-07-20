@@ -72,6 +72,21 @@ public class NotificationUtil {
         reserveNextRegularNotifications(group);
     }
 
+    @Async
+    @Transactional
+    public void sendNotifications(List<Notification> notifications) {
+        for (Notification notification : notifications) {
+            sendNotification(notification);
+        }
+    }
+
+    @Async
+    @Transactional
+    public void sendNotification(Notification notification) {
+        Response<?> response = makeNotificationResponse(notification);
+        sendToClient(notification, response);
+    }
+
     private Set<Long> makeGroupIdSet(List<Notification> reservedNotifications) {
         return reservedNotifications.stream()
                 .map(Notification::getGroupId)
@@ -90,8 +105,7 @@ public class NotificationUtil {
     }
 
     private void sendReservedNotification(Notification notification) {
-        Response<?> response = makeNotificationResponse(notification);
-        sendToClient(notification, response);
+        sendNotification(notification);
         notification.sendComplete();
     }
 

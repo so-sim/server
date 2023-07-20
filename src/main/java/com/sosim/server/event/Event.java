@@ -77,6 +77,10 @@ public class Event extends BaseTimeEntity {
         this.situation = modifyEventRequest.getSituation();
     }
 
+    public boolean isNotNonePaymentSituation() {
+        return !Situation.NONE.equals(situation);
+    }
+
     private boolean isDiffUser(String nickname) {
         return !this.nickname.equals(nickname);
     }
