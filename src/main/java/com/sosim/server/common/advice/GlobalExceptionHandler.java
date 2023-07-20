@@ -22,12 +22,30 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
-    public ResponseEntity<?> bindingException(MethodArgumentNotValidException e) {
+    public ResponseEntity<?> bindingException(BindException e) {
         BindingResult bindingResult = e.getBindingResult();
-        String field = bindingResult.getFieldError().getField();
-        String message = bindingResult.getFieldError().getDefaultMessage();
+        String field = getFieldName(bindingResult);
+        String message = getDefaultMessage(bindingResult);
 
         ExceptionContent content = new ExceptionContent(field, message);
         return new ResponseEntity<>(Response.create(BINDING_ERROR, content), HttpStatus.BAD_REQUEST);
+    }
+
+    private String getDefaultMessage(BindingResult bindingResult) {
+        String defaultMessage = "";
+        try {
+            defaultMessage = bindingResult.getFieldError().getDefaultMessage();
+        } catch (NullPointerException e) {
+        }
+        return defaultMessage;
+    }
+
+    private String getFieldName(BindingResult bindingResult) {
+        String fieldName = "";
+        try {
+            fieldName = bindingResult.getFieldError().getField();
+        } catch (NullPointerException e) {
+        }
+        return fieldName;
     }
 }

@@ -18,4 +18,8 @@ public interface GroupRepository extends JpaRepository<Group, Long>, GroupReposi
     @EntityGraph(attributePaths = {"participantList"})
     Optional<Group> findByIdWithParticipants(@Param("groupId") long groupId);
 
+    @Query("SELECT g FROM Group g " +
+            "WHERE g.id = :groupId AND g.status = 'ACTIVE'")
+    @EntityGraph(attributePaths = {"participantList", "notificationSettingInfo"})
+    Optional<Group> findByIdWithNotificationSettingInfo(long groupId);
 }

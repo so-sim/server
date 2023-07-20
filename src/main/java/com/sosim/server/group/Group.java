@@ -6,12 +6,14 @@ import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.user.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +21,7 @@ import static com.sosim.server.common.auditing.Status.ACTIVE;
 import static com.sosim.server.common.response.ResponseCode.*;
 
 @Entity
-@Getter
+@Getter()
 @NoArgsConstructor
 @Table(name = "`GROUPS`")
 public class Group extends BaseTimeEntity {
@@ -40,6 +42,11 @@ public class Group extends BaseTimeEntity {
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<Participant> participantList = new ArrayList<>();
+
+    @Getter(AccessLevel.NONE)
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @JoinColumn(name = "NOTIFICATION_SETTING_INFO_ID")
+    private NotificationSettingInfo notificationSettingInfo;
 
     @Builder
     private Group(String title, String coverColor, String groupType) {
@@ -112,6 +119,15 @@ public class Group extends BaseTimeEntity {
                 .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_ADMIN));
     }
 
+    public NotificationSettingInfo getNotificationSettingInfo(long userId) {
+        checkIsAdmin(userId);
+        return notificationSettingInfo;
+    }
+
+    public LocalDateTime getNextNotifyDateTime() {
+        return notificationSettingInfo.getNextNotifyDateTime();
+    }
+
     private Participant getParticipantByNickname(String nickname) {
         return participantList.stream()
                 .filter(p -> p.isActive() && p.getNickname().equals(nickname))
@@ -133,6 +149,20 @@ public class Group extends BaseTimeEntity {
         return (int) participantList.stream()
                 .filter(p -> ACTIVE.equals(p.getStatus()))
                 .count();
+    }
+
+    public void changeNotificationSettingInfo(long userId, NotificationSettingInfo settingInfo) {
+        checkIsAdmin(userId);
+        //TODO: 타입이 다른 경우 아예 갈아끼워야 하는데, 정상 작동 여부 테스트 필요
+        if (notificationSettingInfo == null || !isSameSettingType(settingInfo)) {
+            notificationSettingInfo = settingInfo;
+            return;
+        }
+        notificationSettingInfo.changeSettingInfo(settingInfo);
+    }
+
+    private boolean isSameSettingType(NotificationSettingInfo newSettingInfo) {
+        return notificationSettingInfo.getSettingType().equals(newSettingInfo.getSettingType());
     }
 
     private void deleteGroupAndAdmin() {
@@ -173,4 +203,5 @@ public class Group extends BaseTimeEntity {
             throw new CustomException(ALREADY_INTO_GROUP);
         }
     }
+
 }

@@ -1,7 +1,6 @@
 package com.sosim.server.notification;
 
 import com.sosim.server.common.response.Response;
-import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.notification.dto.response.MyNotificationsResponse;
 import com.sosim.server.notification.dto.response.NotificationCountResponse;
@@ -17,13 +16,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.sosim.server.common.response.ResponseCode.*;
+import static com.sosim.server.common.response.ResponseCode.SUCCESS_SEND_NOTIFICATION;
+import static com.sosim.server.common.response.ResponseCode.SUCCESS_SUBSCRIBE;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +42,9 @@ public class NotificationService {
     }
 
     public void sendNotification(List<Long> receiverUserIdList, long groupId, String groupTitle, Content content) {
-        Notification notification = saveAllNotification(receiverUserIdList, groupId, content);
+        Notification notification = saveAllNotification(receiverUserIdList, groupId, groupTitle, content);
 
-        NotificationResponse notificationResponse = NotificationResponse.toDto(notification, groupTitle);
+        NotificationResponse notificationResponse = NotificationResponse.toDto(notification);
         Response<?> response = Response.create(SUCCESS_SEND_NOTIFICATION, notificationResponse);
         receiverUserIdList.forEach(id ->
                 sendToClient(sseEmitterRepository.findByUserId(id), id, "notification", response)
@@ -55,26 +52,26 @@ public class NotificationService {
     }
 
     public void sendNotification(long receiverUserId, long groupId, String groupTitle, Content content) {
-        Notification notification = saveNotification(receiverUserId, groupId, content);
+        Notification notification = saveNotification(receiverUserId, groupId, groupTitle, content);
 
-        NotificationResponse notificationResponse = NotificationResponse.toDto(notification, groupTitle);
+        NotificationResponse notificationResponse = NotificationResponse.toDto(notification);
         Response<?> response = Response.create(SUCCESS_SEND_NOTIFICATION, notificationResponse);
         sendToClient(sseEmitterRepository.findByUserId(receiverUserId), receiverUserId, "notification", response);
     }
 
     @Transactional
-    private Notification saveAllNotification(List<Long> receiverUserIdList, long groupId, Content content) {
+    private Notification saveAllNotification(List<Long> receiverUserIdList, long groupId, String groupTitle, Content content) {
         List<Notification> notificationList = new ArrayList<>();
         receiverUserIdList.forEach(id ->
-                notificationList.add(Notification.toEntity(id, groupId, content))
+                notificationList.add(Notification.toEntity(id, groupId, groupTitle, content))
         );
         notificationRepository.saveAll(notificationList);
         return notificationList.get(0);
     }
 
     @Transactional
-    private Notification saveNotification(long receiverUserId, long groupId, Content content) {
-        Notification notification = Notification.toEntity(receiverUserId, groupId, content);
+    private Notification saveNotification(long receiverUserId, long groupId, String groupTitle, Content content) {
+        Notification notification = Notification.toEntity(receiverUserId, groupId, groupTitle, content);
         return notificationRepository.save(notification);
     }
 
@@ -95,25 +92,16 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public MyNotificationsResponse getMyNotifications(long userId, Pageable pageable) {
-        Slice<Notification> myNotifications = notificationRepository.findByUserIdAndCreateDateGreaterThan(userId, LocalDateTime.now().minusMonths(3), pageable);
+        Slice<Notification> myNotifications = notificationRepository.findMyNotifications(userId, LocalDateTime.now().minusMonths(3), pageable);
         List<NotificationResponse> notificationDtoList = toNotificationResponseList(myNotifications);
 
         return MyNotificationsResponse.toDto(notificationDtoList, myNotifications.hasNext());
     }
 
     private List<NotificationResponse> toNotificationResponseList(Slice<Notification> myNotifications) {
-        List<Long> groupIdList = myNotifications.stream()
-                .map(Notification::getGroupId).collect(Collectors.toList());
-        Map<Long, String> groupTitleMap = createGroupTitleMap(groupIdList);
         return myNotifications.stream()
-                .map(n -> NotificationResponse.toDto(n, groupTitleMap.get(n.getGroupId())))
+                .map(NotificationResponse::toDto)
                 .collect(Collectors.toList());
     }
 
-    private Map<Long, String> createGroupTitleMap(List<Long> groupIdList) {
-        Map<Long, String> groupTitleMap = new HashMap<>();
-        List<Group> groupList = groupRepository.findAllById(groupIdList);
-        groupList.forEach(g -> groupTitleMap.put(g.getId(), g.getTitle()));
-        return groupTitleMap;
-    }
 }

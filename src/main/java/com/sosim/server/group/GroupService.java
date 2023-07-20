@@ -9,6 +9,7 @@ import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupDto;
 import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.notification.dto.request.ModifyAdminNotificationRequest;
+import com.sosim.server.notification.util.NotificationUtil;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
@@ -34,6 +35,7 @@ public class GroupService {
     private final UserRepository userRepository;
     private final ParticipantRepository participantRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final NotificationUtil notificationUtil;
 
     @Transactional
     public GroupIdResponse createGroup(long userId, CreateGroupRequest createGroupRequest) {
@@ -119,4 +121,5 @@ public class GroupService {
         return groupRepository.findByIdWithParticipants(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
+
 }

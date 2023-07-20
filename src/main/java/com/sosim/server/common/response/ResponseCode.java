@@ -26,6 +26,9 @@ public enum ResponseCode {
     GET_MY_GROUPS(successCode(), HttpStatus.OK, "성공적으로 참가한 모임들이 조회되었습니다"),
     GET_NICKNAME(successCode(), HttpStatus.OK , "성공적으로 닉네임이 조회되었습니다."),
 
+    GET_GROUP_NOTIFICATION_SETTING(successCode(), HttpStatus.OK, "성공적으로 알림 설정을 조회했습니다."),
+    SET_GROUP_NOTIFICATION_SETTING(successCode(), HttpStatus.OK, "성공적으로 알림 설정을 저장했습니다."),
+
     CAN_WITHDRAW(successCode(), HttpStatus.OK, "회원 탈퇴가 가능한 상태입니다."),
     SUCCESS_WITHDRAW(successCode(), HttpStatus.OK, "회원 탈퇴가 성공적으로 이루어졌습니다."),
 
