@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static com.sosim.server.common.response.ResponseCode.NOT_FOUND_GROUP;
 import static com.sosim.server.common.response.ResponseCode.SUCCESS_SEND_NOTIFICATION;
+import static com.sosim.server.notification.Content.*;
 import static com.sosim.server.notification.Content.PAYMENT_DATE;
 import static com.sosim.server.notification.Content.create;
 
@@ -85,6 +86,18 @@ public class NotificationUtil {
     public void sendNotification(Notification notification) {
         Response<?> response = makeNotificationResponse(notification);
         sendToClient(notification, response);
+    }
+
+    @Async
+    @Transactional
+    public void sendModifyAdminNotification(Group group, String newAdminNickname) {
+        //TODO: 총무 변경 시 알림을 기존 총무, 새 총무한테도 보내야 하는지?
+        List<Notification> notifications = group.getParticipantList().stream()
+                .map(participant -> Notification
+                        .toEntity(participant.getUser().getId(), group, create(CHANGE_ADMIN, newAdminNickname)))
+                .collect(Collectors.toList());
+        notificationRepository.saveAll(notifications);
+        sendNotifications(notifications);
     }
 
     private Set<Long> makeGroupIdSet(List<Notification> reservedNotifications) {

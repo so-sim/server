@@ -36,6 +36,7 @@ public class PaymentNotificationService {
         checkAllStatusIsNonePayment(events);
 
         List<Notification> notifications = makeNotifications(events);
+        //TODO: save로직을 여기서 수행하는게 맞을 지?
         notificationRepository.saveAll(notifications);
 
         notificationUtil.sendNotifications(notifications);
