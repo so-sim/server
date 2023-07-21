@@ -11,20 +11,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.sosim.server.common.response.ResponseCode.CREATE_EVENT;
+import static com.sosim.server.common.response.ResponseCode.SEND_NONE_PAYMENT_NOTIFICATIONS;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/event")
+@RequestMapping("/api")
 public class PaymentNotificationController {
 
     private final PaymentNotificationService paymentNotificationService;
 
-    @PostMapping("/payment-notification")
+    @PostMapping("/notifications")
     public ResponseEntity<?> sendPaymentNotifications(@AuthUserId long userId, @Validated @RequestBody EventIdListRequest eventIdListRequest) {
         paymentNotificationService.sendPaymentNotification(userId, eventIdListRequest);
 
-        //TODO: Response 변경
-        return new ResponseEntity<>(Response.create(CREATE_EVENT, null), CREATE_EVENT.getHttpStatus());
+        return new ResponseEntity<>(Response.create(SEND_NONE_PAYMENT_NOTIFICATIONS, null), SEND_NONE_PAYMENT_NOTIFICATIONS.getHttpStatus());
     }
 }
