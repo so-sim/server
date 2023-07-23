@@ -20,7 +20,7 @@ public class PaymentNotificationController {
 
     private final PaymentNotificationService paymentNotificationService;
 
-    @PostMapping("/notifications")
+    @PostMapping("/pay-notifications")
     public ResponseEntity<?> sendPaymentNotifications(@AuthUserId long userId, @Validated @RequestBody EventIdListRequest eventIdListRequest) {
         paymentNotificationService.sendPaymentNotification(userId, eventIdListRequest);
 
