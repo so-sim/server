@@ -51,7 +51,7 @@ public class NotificationUtil {
     }
 
     @Transactional
-    @Scheduled(cron = "0 */30 * * * *") //30분 마다
+    @Scheduled(cron = "* */30 * * * *") //30분 마다
     public void sendRegularNotification() {
         List<Notification> reservedNotifications = notificationRepository.findReservedNotifications();
         reservedNotifications.forEach(this::sendReservedNotification);

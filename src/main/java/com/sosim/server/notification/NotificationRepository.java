@@ -21,14 +21,14 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             "WHERE n.userId = :userId")
     void updateViewByUserId(@Param("userId") long userId);
 
-    @Query(value = "SELECT * FROM Notification n " +
-            "WHERE n.userId = :userId " +
+    @Query(value = "SELECT * FROM Notifications n " +
+            "WHERE n.user_id = :userId " +
             "AND n.reserved = false " +
-            "AND n.sendDateTime >= :time", nativeQuery = true)
+            "AND n.send_dateTime >= :time", nativeQuery = true)
     Slice<Notification> findMyNotifications(@Param("userId") long userId, @Param("time") LocalDateTime time, Pageable pageable);
 
-    @Query(value = "SELECT * FROM Notification n " +
-            "WHERE n.sendDateTime <= CURRENT_TIMESTAMP AND n.reserved = true ", nativeQuery = true)
+    @Query(value = "SELECT * FROM Notifications n " +
+            "WHERE n.send_dateTime <= CURRENT_TIMESTAMP AND n.reserved = true ", nativeQuery = true)
     List<Notification> findReservedNotifications();
 
     @Query("DELETE FROM Notification n " +
