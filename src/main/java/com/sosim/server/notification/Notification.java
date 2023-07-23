@@ -26,7 +26,7 @@ public class Notification extends BaseTimeEntity {
     @Embedded
     private GroupInfo groupInfo;
 
-    @Enumerated(EnumType.STRING)
+    @Embedded
     private Content content;
 
     @Column(name = "VIEW")

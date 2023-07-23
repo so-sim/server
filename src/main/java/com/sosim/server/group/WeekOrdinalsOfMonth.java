@@ -1,8 +1,11 @@
 package com.sosim.server.group;
 
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Embeddable;
 import java.util.Arrays;
 
+@NoArgsConstructor
 @Embeddable
 public class WeekOrdinalsOfMonth {
     private static final String DELIMITER = ",";
