@@ -23,4 +23,12 @@ public enum Situation {
                 .findFirst()
                 .orElse(null);
     }
+
+    public boolean canModifyByParticipant() {
+        return CHECK.equals(this);
+    }
+
+    public boolean canModifyByAdmin() {
+        return FULL.equals(this) || NONE.equals(this);
+    }
 }

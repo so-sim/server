@@ -78,7 +78,7 @@ public class GroupService {
         Group group = findGroup(groupId);
         group.modifyAdmin(userId, newAdminNickname);
 
-        notificationUtil.sendModifyAdminNotification(group, newAdminNickname);
+        notificationUtil.sendModifyAdminNotification(group);
     }
 
     @Transactional(readOnly = true)

@@ -71,6 +71,8 @@ public enum ResponseCode {
 
     NOT_FOUND_EVENT(1300, HttpStatus.BAD_REQUEST, "해당 상세 내역을 찾을 수 없습니다."),
     ONLY_CAN_HAVE_NONE_PAYMENT(1301, HttpStatus.BAD_REQUEST, "납부 요청은 미납 상태의 내역만 가능합니다."),
+    NOT_CHECK_SITUATION(1302, HttpStatus.BAD_REQUEST, "확인 요청 상태로만 변경 가능합니다."),
+    NOT_FULL_OR_NON_SITUATION(1303, HttpStatus.BAD_REQUEST, "미납 또는 완납 상태로만 변경 가능합니다."),
 
     ;
 

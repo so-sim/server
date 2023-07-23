@@ -1,5 +1,6 @@
 package com.sosim.server.event;
 
+import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.group.Group;
@@ -12,6 +13,8 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 import static com.sosim.server.common.auditing.Status.ACTIVE;
+import static com.sosim.server.common.response.ResponseCode.NOT_CHECK_SITUATION;
+import static com.sosim.server.common.response.ResponseCode.NOT_FULL_OR_NON_SITUATION;
 
 @Entity
 @Getter
@@ -65,7 +68,7 @@ public class Event extends BaseTimeEntity {
         status = ACTIVE;
     }
 
-    public void modify(User user, ModifyEventRequest modifyEventRequest) {
+    public boolean modifyAndCheckChangedSituation(User user, ModifyEventRequest modifyEventRequest) {
         if (isDiffUser(modifyEventRequest.getNickname())) {
             this.nickname = modifyEventRequest.getNickname();
             this.user = user;
@@ -74,11 +77,28 @@ public class Event extends BaseTimeEntity {
         this.amount = modifyEventRequest.getAmount();
         this.ground = modifyEventRequest.getGround();
         this.memo = modifyEventRequest.getMemo();
+        Situation preSituation = this.situation;
         this.situation = modifyEventRequest.getSituation();
+        return !preSituation.equals(situation);
     }
 
     public boolean isNotNonePaymentSituation() {
         return !Situation.NONE.equals(situation);
+    }
+
+    public void modifySituation(Situation situation) {
+        validSituation(situation);
+        this.situation = situation;
+    }
+
+    private void validSituation(Situation situation) {
+        boolean isAdminUser = group.isAdminUser(user.getId());
+        if (!isAdminUser && !situation.canModifyByParticipant()) {
+            throw new CustomException(NOT_CHECK_SITUATION);
+        }
+        if (isAdminUser && !situation.canModifyByAdmin()) {
+            throw new CustomException(NOT_FULL_OR_NON_SITUATION);
+        }
     }
 
     private boolean isDiffUser(String nickname) {

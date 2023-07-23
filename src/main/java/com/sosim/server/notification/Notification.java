@@ -26,7 +26,7 @@ public class Notification extends BaseTimeEntity {
     @Embedded
     private GroupInfo groupInfo;
 
-    @Enumerated(EnumType.STRING)
+    @Embedded
     private Content content;
 
     @Column(name = "VIEW")
@@ -70,6 +70,22 @@ public class Notification extends BaseTimeEntity {
 
     public String getGroupTitle() {
         return groupInfo.getGroupTitle();
+    }
+
+    public String getCategory() {
+        return content.getContentType().getCategory();
+    }
+
+    public String getSummary() {
+        return content.getContentType().getCategory();
+    }
+
+    public String getType() {
+        return content.getContentType().getType();
+    }
+
+    public String getMessage() {
+        return content.getMessage(groupInfo.getGroupTitle());
     }
 
     private LocalDateTime setSendDateTime(LocalDateTime sendDateTime) {
