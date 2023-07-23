@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Getter
@@ -18,8 +19,10 @@ public class Content {
     public static String SITUATION_PAYMENT = "납부여부 변경";
     public static String CHANGE_ADMIN = "총무 변경";
 
+    @Column(name = "category")
     private String category;
 
+    @Column(name = "message")
     private String message;
 
     public static Content create(String type, String data) {
