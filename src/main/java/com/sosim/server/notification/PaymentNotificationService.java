@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 import static com.sosim.server.common.response.ResponseCode.NONE_ADMIN;
 import static com.sosim.server.common.response.ResponseCode.ONLY_CAN_HAVE_NONE_PAYMENT;
-import static com.sosim.server.notification.Content.NON_PAYMENT;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +51,7 @@ public class PaymentNotificationService {
 
     private Notification makeNotification(Group group, long userId, int totalAmount) {
         return Notification.toEntity(userId, group,
-                Content.create(NON_PAYMENT, String.valueOf(totalAmount)));
+                Content.create(ContentType.NONE_PAYMENT, String.valueOf(totalAmount)));
     }
 
     private Map<Long, Integer> makeUserTotalAmountMap(List<Event> events) {
