@@ -10,6 +10,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
+import static com.sosim.server.event.Situation.*;
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -33,4 +35,8 @@ public class ModifyEventRequest {
 
     @NotNull(message = "존재하지 않는 납부 여부 목록입니다.")
     private Situation situation;
+
+    public boolean isChangedFull() {
+        return FULL.equals(situation);
+    }
 }

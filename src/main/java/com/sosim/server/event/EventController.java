@@ -2,7 +2,6 @@ package com.sosim.server.event;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
-import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.event.dto.request.*;
 import com.sosim.server.event.dto.response.*;
 import lombok.RequiredArgsConstructor;
@@ -71,11 +70,4 @@ public class EventController {
         return new ResponseEntity<>(Response.create(GET_EVENTS, eventList), GET_EVENTS.getHttpStatus());
     }
 
-    @PostMapping("/notification")
-    public ResponseEntity<?> notifyEvents(@RequestBody EventIdListRequest eventIdListRequest) {
-        eventService.notifyEvents(eventIdListRequest);
-        ResponseCode eventsNotification = ResponseCode.EVENTS_NOTIFICATION;
-
-        return new ResponseEntity<>(Response.create(eventsNotification, null), eventsNotification.getHttpStatus());
-    }
 }

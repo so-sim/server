@@ -40,6 +40,7 @@ public enum ResponseCode {
     GET_EVENT_CALENDAR(successCode(), HttpStatus.OK, "상세 내역 캘린더가 성공적으로 조회되었습니다."),
     GET_EVENTS(successCode(), HttpStatus.OK, "상세 내역 리스트가 성공적으로 조회되었습니다."),
     EVENTS_NOTIFICATION(successCode(), HttpStatus.OK, "상세 내역 알림 발송이 성공적으로 완료되었습니다."),
+    SEND_NONE_PAYMENT_NOTIFICATIONS(successCode(), HttpStatus.OK, "미납 알림 발송이 성공적으로 완료되었습니다."),
 
     SUCCESS_SUBSCRIBE(successCode(), HttpStatus.OK, "알림 구독이 성공적으로 완료되었습니다."),
     SUCCESS_SEND_NOTIFICATION(successCode(), HttpStatus.OK, "알림이 성공적으로 전송되었습니다."),
@@ -69,6 +70,9 @@ public enum ResponseCode {
     NOT_FOUND_ADMIN(1008, HttpStatus.NOT_FOUND, "모임의 총무를 찾을 수 없습니다."),
 
     NOT_FOUND_EVENT(1300, HttpStatus.BAD_REQUEST, "해당 상세 내역을 찾을 수 없습니다."),
+    ONLY_CAN_HAVE_NONE_PAYMENT(1301, HttpStatus.BAD_REQUEST, "납부 요청은 미납 상태의 내역만 가능합니다."),
+    NOT_CHECK_SITUATION(1302, HttpStatus.BAD_REQUEST, "확인 요청 상태로만 변경 가능합니다."),
+    NOT_FULL_OR_NON_SITUATION(1303, HttpStatus.BAD_REQUEST, "미납 또는 완납 상태로만 변경 가능합니다."),
 
     ;
 

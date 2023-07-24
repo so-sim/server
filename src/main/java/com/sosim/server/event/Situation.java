@@ -9,7 +9,7 @@ import java.util.Arrays;
 @Getter
 @AllArgsConstructor
 public enum Situation {
-    NON("미납"),
+    NONE("미납"),
     FULL("완납"),
     CHECK("확인중"),
     ;
@@ -22,5 +22,13 @@ public enum Situation {
                 .filter(situation -> situation.getComment().equals(comment))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public boolean canModifyByParticipant() {
+        return CHECK.equals(this);
+    }
+
+    public boolean canModifyByAdmin() {
+        return FULL.equals(this) || NONE.equals(this);
     }
 }

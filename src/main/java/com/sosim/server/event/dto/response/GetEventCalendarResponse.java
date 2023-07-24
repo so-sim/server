@@ -38,7 +38,7 @@ public class GetEventCalendarResponse {
         private int check;
 
         private Payment increaseStatus(Situation situation) {
-            if (situation.equals(NON)) non++;
+            if (situation.equals(NONE)) non++;
             else if (situation.equals(FULL)) full++;
             else check++;
             return this;

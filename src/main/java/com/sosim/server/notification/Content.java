@@ -7,51 +7,34 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Getter
 @Builder
-@Embeddable
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Embeddable
 public class Content {
-    public static String PAYMENT_DATE = "납부일 안내";
-    public static String NON_PAYMENT = "미납 안내";
-    public static String SITUATION_PAYMENT = "납부여부 변경";
-    public static String CHANGE_ADMIN = "총무 변경";
+    @Enumerated(EnumType.STRING)
+    private ContentType contentType;
 
-    @Column(name = "category")
-    private String category;
+    private String data;
 
-    @Column(name = "message")
-    private String message;
+    public static Content create(ContentType contentType) {
+        return create(contentType, null);
+    }
 
-    public static Content create(String type, String data) {
+    public static Content create(ContentType contentType, String data) {
+        //TODO 납부 요청, 승인대기 Type은 data가 null이면 안됨!
         return Content.builder()
-                .category(type)
-                .message(createMessage(type,data))
+                .contentType(contentType)
+                .data(data)
                 .build();
     }
 
-    public static Content create(String type, String nickname, String situation) {
-        return Content.builder()
-                .category(type)
-                .message(String.format("%s님이 벌금내역을 %s으로 변경하였습니다.", nickname, situation))
-                .build();
+    public String getMessage(String groupTitle) {
+        return String.format(contentType.getMessageFormat(), groupTitle, data);
     }
 
-    private static String createMessage(String type, String data) {
-        String message = "";
-        if (type.equals(PAYMENT_DATE)) {
-            message = "오늘은 벌금 납부일입니다." + System.lineSeparator() + "미납 내역 확인 후, 벌금을 납부해주세요!";
-        }
-
-        if (type.equals(NON_PAYMENT)) {
-            message = String.format("벌금 납부를 잊으셨나요?" + System.lineSeparator() + "미납 내역 확인 후, %s원을 납부해주세요!", data);
-        }
-
-        if (type.equals(CHANGE_ADMIN)) {
-            message = String.format("총무가 %s님으로 변경되었습니다.", data);
-        }
-        return message;
-    }
 }
