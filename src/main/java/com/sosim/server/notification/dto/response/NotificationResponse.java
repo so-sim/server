@@ -22,19 +22,22 @@ public class NotificationResponse {
 
     private String message;
 
-    private String type;
-
-    //TODO 내부 데이터 추가
-
+    private InnerData innerData;
 
     public static NotificationResponse toDto(Notification notification) {
+        InnerData innerData = InnerData.builder()
+                .groupId(notification.getGroupId())
+                .dataType(notification.getType())
+                //TODO Notification에 eventId List 추가해서 적용
+                .build();
+
         return NotificationResponse.builder()
                 .date(notification.getSendDateTime().toLocalDate())
                 .groupTitle(notification.getGroupTitle())
                 .category(notification.getCategory())
                 .summary(notification.getSummary())
                 .message(notification.getMessage())
-                .type(notification.getType())
+                .innerData(innerData)
                 .build();
     }
 }
