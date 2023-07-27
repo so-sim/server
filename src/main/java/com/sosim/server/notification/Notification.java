@@ -55,15 +55,20 @@ public class Notification extends BaseTimeEntity {
     }
 
     public static Notification toEntity(long userId, Group group, Content content) {
-        return toEntity(userId, group.getId(), group.getTitle(), content);
+        return toEntity(userId, group.getId(), group.getTitle(), content, null);
     }
 
-    public static Notification toEntity(long userId, long groupId, String groupTitle, Content content) {
+    public static Notification toEntity(long userId, Group group, Content content, List<Long> eventIdList) {
+        return toEntity(userId, group.getId(), group.getTitle(), content, eventIdList);
+    }
+
+    public static Notification toEntity(long userId, long groupId, String groupTitle, Content content, List<Long> eventIdList) {
         return Notification.builder()
                 .userId(userId)
                 .groupId(groupId)
                 .groupTitle(groupTitle)
                 .content(content)
+                .eventIdList(eventIdList)
                 .build();
     }
 

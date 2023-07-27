@@ -28,9 +28,8 @@ public class NotificationResponse {
         InnerData innerData = InnerData.builder()
                 .groupId(notification.getGroupId())
                 .dataType(notification.getType())
-                //TODO Notification에 eventId List 추가해서 적용
+                .eventIdList(notification.getEventIdList())
                 .build();
-
         return NotificationResponse.builder()
                 .date(notification.getSendDateTime().toLocalDate())
                 .groupTitle(notification.getGroupTitle())
