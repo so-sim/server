@@ -3,6 +3,7 @@ package com.sosim.server.event;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.response.EventIdResponse;
+import com.sosim.server.event.dto.response.GetEventResponse;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.participant.Participant;
@@ -136,6 +137,40 @@ public class EventServiceTest {
         assertThat(e.getResponseCode()).isEqualTo(NONE_ADMIN);
 
         verify(eventRepository, times(0)).save(any(Event.class));
+    }
+
+    @DisplayName("상세 내역 단건 조회 / 성공")
+    @Test
+    void get_event() {
+        //given
+        Event event = Event.builder().build();
+        ReflectionTestUtils.setField(event, "id", eventId);
+        ReflectionTestUtils.setField(event, "situation", Situation.NONE);
+        ReflectionTestUtils.setField(event, "ground", Ground.ETC);
+
+        doReturn(Optional.of(event)).when(eventRepository).findByIdWithGroup(eventId);
+
+        //when
+        GetEventResponse response = eventService.getEvent(eventId);
+
+        //then
+        assertThat(response).isNotNull();
+        assertThat(response.getEventId()).isEqualTo(eventId);
+        assertThat(response.getGround()).isEqualTo(Ground.ETC.getComment());
+        assertThat(response.getSituation()).isEqualTo(Situation.NONE.getComment());
+    }
+
+    @DisplayName("상세 내역 단건 조회 / Event가 없을 경우")
+    @Test
+    void get_event_not_found_event() {
+        //given
+        doReturn(Optional.empty()).when(eventRepository).findByIdWithGroup(eventId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () -> eventService.getEvent(eventId));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_EVENT);
     }
 
     private CreateEventRequest makeCreateEventRequest(String nickname) {
