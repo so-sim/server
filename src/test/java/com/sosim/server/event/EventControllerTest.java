@@ -1,26 +1,43 @@
 package com.sosim.server.event;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.dto.request.CreateEventRequest;
+import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
-import com.sosim.server.event.dto.response.EventIdResponse;
-import com.sosim.server.event.dto.response.GetEventResponse;
+import com.sosim.server.event.dto.request.ModifySituationRequest;
+import com.sosim.server.event.dto.response.*;
+import com.sosim.server.group.Group;
+import com.sosim.server.group.dto.response.MyGroupDto;
+import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static com.sosim.server.common.response.ResponseCode.*;
 import static org.mockito.Mockito.*;
@@ -405,6 +422,181 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.content.field").value("situation"));
     }
 
+    @WithMockCustomUser
+    @DisplayName("상세 내역 삭제 / 성공")
+    @Test
+    void delete_event() throws Exception {
+        // given
+
+        // when
+        String url = URI_PREFIX.concat(String.format("/%d", eventId));
+        ResultActions resultActions = mvc.perform(delete(url));
+
+        // then
+        resultActions.andExpect(status().is(DELETE_EVENT.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(DELETE_EVENT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(DELETE_EVENT.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+
+        verify(eventService, times(1)).deleteEvent(userId, eventId);
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 삭제 / 상세 내역이 없는 경우")
+    @Test
+    void delete_event_not_found_event() throws Exception {
+        // given
+        CustomException e = new CustomException(NOT_FOUND_EVENT);
+        doThrow(e).when(eventService).deleteEvent(userId, eventId);
+
+        // when
+        String url = URI_PREFIX.concat(String.format("/%d", eventId));
+        ResultActions resultActions = mvc.perform(delete(url));
+
+        // then
+        resultActions.andExpect(status().is(NOT_FOUND_EVENT.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(NOT_FOUND_EVENT.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NOT_FOUND_EVENT.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 삭제 / 총무 권한이 없는 경우")
+    @Test
+    void delete_event_none_admin() throws Exception {
+        // given
+        CustomException e = new CustomException(NONE_ADMIN);
+        doThrow(e).when(eventService).deleteEvent(userId, eventId);
+
+        // when
+        String url = URI_PREFIX.concat(String.format("/%d", eventId));
+        ResultActions resultActions = mvc.perform(delete(url));
+
+        // then
+        resultActions.andExpect(status().is(NONE_ADMIN.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 납부여부 변경 / 성공")
+    @Test
+    void modify_event_situation() throws Exception {
+        // given
+        String situation = "확인중";
+        ModifySituationRequest request = makeModifySituationRequest(situation);
+        ModifySituationResponse response = makeModifySituationResponse(situation);
+        doReturn(response).when(eventService).modifyEventSituation(userId, request);
+
+        // when
+        ResultActions resultActions = mvc.perform(patch(URI_PREFIX)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertGroundAndSituation(request, null, request.getSituation())));
+
+        // then
+        resultActions.andExpect(status().is(MODIFY_EVENT_SITUATION.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(MODIFY_EVENT_SITUATION.getCode()))
+                .andExpect(jsonPath("$.status.message").value(MODIFY_EVENT_SITUATION.getMessage()))
+                .andExpect(jsonPath("$.content.situation").value(situation));
+
+        verify(eventService, times(1)).modifyEventSituation(userId, request);
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 납부여부 변경 / 완납 변경 시 총무 권한 없는 경우")
+    @Test
+    void modify_event_situation_none_admin() throws Exception {
+        // given
+        String situation = "완납";
+        ModifySituationRequest request = makeModifySituationRequest(situation);
+        CustomException e = new CustomException(NONE_ADMIN);
+        doThrow(e).when(eventService).modifyEventSituation(userId, request);
+
+        // when
+        ResultActions resultActions = mvc.perform(patch(URI_PREFIX)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertGroundAndSituation(request, null, request.getSituation())));
+
+        // then
+        resultActions.andExpect(status().is(NONE_ADMIN.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(NONE_ADMIN.getCode()))
+                .andExpect(jsonPath("$.status.message").value(NONE_ADMIN.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 납부여부 변경 / 확인중 변경 시 이미 완납인 경우")
+    @Test
+    void modify_event_situation_fail_to_check() throws Exception {
+        // given
+        String situation = "확인중";
+        ModifySituationRequest request = makeModifySituationRequest(situation);
+        CustomException e = new CustomException(FAIL_TO_CHECK);
+        doThrow(e).when(eventService).modifyEventSituation(userId, request);
+
+        // when
+        ResultActions resultActions = mvc.perform(patch(URI_PREFIX)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertGroundAndSituation(request, null, request.getSituation())));
+
+        // then
+        resultActions.andExpect(status().is(FAIL_TO_CHECK.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(FAIL_TO_CHECK.getCode()))
+                .andExpect(jsonPath("$.status.message").value(FAIL_TO_CHECK.getMessage()))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 캘린더 조회 / 성공")
+    @Test
+    void get_event_calendar() throws Exception {
+        // given
+        FilterEventRequest request = makeFilterEventRequest(LocalDate.now(), LocalDate.now());
+        GetEventCalendarResponse response = GetEventCalendarResponse.toDto(new ArrayList<>());
+
+        doReturn(response).when(eventService).getEventCalendar(request);
+
+        // when
+        String url = "/api/event/penalty/calendar";
+        ResultActions resultActions = mvc.perform(get(url)
+                .param("groupId", String.valueOf(groupId))
+                .param("startDate", "2023.01.01")
+                .param("endDate", "2023.01.01")
+        );
+
+        // then
+        resultActions.andExpect(status().is(GET_EVENT_CALENDAR.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(GET_EVENT_CALENDAR.getCode()))
+                .andExpect(jsonPath("$.status.message").value(GET_EVENT_CALENDAR.getMessage()));
+    }
+
+    @WithMockCustomUser
+    @DisplayName("상세 내역 필터링 / 성공")
+    @Test
+    void get_event_list_filter() throws Exception {
+        //given
+        FilterEventRequest request = makeFilterEventRequest(LocalDate.now(), LocalDate.now());
+        GetEventListResponse response = GetEventListResponse.toDto(new ArrayList<>(), 0);
+
+        doReturn(response).when(eventService).getEvents(request, PageRequest.of(0, 15));
+
+        //when
+        String url = "/api/event/penalties";
+        ResultActions resultActions = mvc.perform(get(url)
+                .param("page", "0")
+                .param("size", "15")
+                .param("groupId", String.valueOf(groupId))
+                .param("startDate", "2023.01.01")
+                .param("endDate", "2023.01.01")
+        );
+
+        //then
+        resultActions.andExpect(status().is(GET_EVENTS.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status.code").value(GET_EVENTS.getCode()))
+                .andExpect(jsonPath("$.status.message").value(GET_EVENTS.getMessage()));
+    }
+
     private CreateEventRequest makeCreateRequest(long groupId, String nickname, LocalDate date, int amount, String ground, String memo, String situation) {
         return CreateEventRequest.builder()
                 .groupId(groupId)
@@ -430,6 +622,26 @@ public class EventControllerTest {
                 .ground(Ground.getGround(ground))
                 .memo(memo)
                 .situation(Situation.getSituation(situation))
+                .build();
+    }
+
+    private ModifySituationRequest makeModifySituationRequest(String situation) {
+        return ModifySituationRequest.builder()
+                .situation(Situation.getSituation(situation))
+                .build();
+    }
+
+    private ModifySituationResponse makeModifySituationResponse(String situation) {
+        return ModifySituationResponse.builder()
+                .situation(situation)
+                .build();
+    }
+
+    private FilterEventRequest makeFilterEventRequest(LocalDate startDate, LocalDate endDate) {
+        return FilterEventRequest.builder()
+                .groupId(groupId)
+                .startDate(startDate)
+                .endDate(endDate)
                 .build();
     }
 

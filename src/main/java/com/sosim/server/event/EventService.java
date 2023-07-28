@@ -17,7 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 
 import static com.sosim.server.common.response.ResponseCode.*;
 
@@ -137,6 +137,22 @@ public class EventService {
         return participantRepository.findByNicknameAndGroupId(nickname, groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT))
                 .getUser();
+    }
+
+    private List<Long> getReceiverUserIdList(ModifySituationRequest modifySituationRequest) {
+        if (modifySituationRequest.getSituation().equals(Situation.CHECK)) {
+            List<Long> receiverUserIdList = new ArrayList<>();
+            long adminUserId = eventRepository.getAdminUserId(modifySituationRequest.getEventIdList().get(0));
+            receiverUserIdList.add(adminUserId);
+            return receiverUserIdList;
+        }
+        return eventRepository.getReceiverUserIdList(modifySituationRequest.getEventIdList());
+    }
+
+    private String getParticipantNickname(long userId, long groupId) {
+        return participantRepository.findByUserIdAndGroupId(userId, groupId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT))
+                .getNickname();
     }
 
 }
