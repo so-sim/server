@@ -26,6 +26,9 @@ public enum ResponseCode {
     GET_MY_GROUPS(successCode(), HttpStatus.OK, "성공적으로 참가한 모임들이 조회되었습니다"),
     GET_NICKNAME(successCode(), HttpStatus.OK , "성공적으로 닉네임이 조회되었습니다."),
 
+    GET_GROUP_NOTIFICATION_SETTING(successCode(), HttpStatus.OK, "성공적으로 알림 설정을 조회했습니다."),
+    SET_GROUP_NOTIFICATION_SETTING(successCode(), HttpStatus.OK, "성공적으로 알림 설정을 저장했습니다."),
+
     CAN_WITHDRAW(successCode(), HttpStatus.OK, "회원 탈퇴가 가능한 상태입니다."),
     SUCCESS_WITHDRAW(successCode(), HttpStatus.OK, "회원 탈퇴가 성공적으로 이루어졌습니다."),
 
@@ -37,6 +40,7 @@ public enum ResponseCode {
     GET_EVENT_CALENDAR(successCode(), HttpStatus.OK, "상세 내역 캘린더가 성공적으로 조회되었습니다."),
     GET_EVENTS(successCode(), HttpStatus.OK, "상세 내역 리스트가 성공적으로 조회되었습니다."),
     EVENTS_NOTIFICATION(successCode(), HttpStatus.OK, "상세 내역 알림 발송이 성공적으로 완료되었습니다."),
+    SEND_NONE_PAYMENT_NOTIFICATIONS(successCode(), HttpStatus.OK, "미납 알림 발송이 성공적으로 완료되었습니다."),
 
     SUCCESS_SUBSCRIBE(successCode(), HttpStatus.OK, "알림 구독이 성공적으로 완료되었습니다."),
     SUCCESS_SEND_NOTIFICATION(successCode(), HttpStatus.OK, "알림이 성공적으로 전송되었습니다."),
@@ -67,6 +71,9 @@ public enum ResponseCode {
 
     NOT_FOUND_EVENT(1300, HttpStatus.BAD_REQUEST, "해당 상세 내역을 찾을 수 없습니다."),
     FAIL_TO_CHECK(1301, HttpStatus.BAD_REQUEST, "완납인 상세 내역은 확인중으로 변경 불가능합니다."),
+    NOT_CHECK_SITUATION(1302, HttpStatus.BAD_REQUEST, "확인 요청 상태로만 변경 가능합니다."),
+    NOT_FULL_OR_NON_SITUATION(1303, HttpStatus.BAD_REQUEST, "미납 또는 완납 상태로만 변경 가능합니다."),
+    ONLY_CAN_HAVE_NONE_PAYMENT(1304, HttpStatus.BAD_REQUEST, "납부 요청은 미납 상태의 내역만 가능합니다."),
 
     ;
 

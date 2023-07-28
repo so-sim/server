@@ -14,18 +14,27 @@ public class NotificationResponse {
     @JsonFormat(pattern = "yyyy.MM.dd")
     private LocalDate date;
 
+    private String groupTitle;
+
     private String category;
 
-    private String groupTitle;
+    private String summary;
 
     private String message;
 
-    public static NotificationResponse toDto(Notification notification, String groupTitle) {
+    private String type;
+
+    //TODO 내부 데이터 추가
+
+
+    public static NotificationResponse toDto(Notification notification) {
         return NotificationResponse.builder()
-                .date(notification.getCreateDate().toLocalDate())
-                .category(notification.getContent().getCategory())
-                .groupTitle(groupTitle)
-                .message(notification.getContent().getMessage())
+                .date(notification.getSendDateTime().toLocalDate())
+                .groupTitle(notification.getGroupTitle())
+                .category(notification.getCategory())
+                .summary(notification.getSummary())
+                .message(notification.getMessage())
+                .type(notification.getType())
                 .build();
     }
 }
