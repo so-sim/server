@@ -29,7 +29,7 @@ public class NotificationResponse {
     public static NotificationResponse toDto(Notification notification) {
         InnerData innerData = InnerData.builder()
                 .groupId(notification.getGroupId())
-                .dataType(notification.getType())
+                .type(notification.getType())
                 .eventIdList(notification.getEventIdList())
                 .build();
         return NotificationResponse.builder()

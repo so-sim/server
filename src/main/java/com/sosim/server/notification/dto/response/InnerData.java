@@ -12,7 +12,7 @@ import java.util.List;
 public class InnerData {
     private long groupId;
 
-    private String dataType;
+    private String type;
 
     private List<Long> eventIdList;
 
