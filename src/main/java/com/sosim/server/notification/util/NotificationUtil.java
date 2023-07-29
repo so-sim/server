@@ -142,7 +142,7 @@ public class NotificationUtil {
     private Notification makeModifySituationNotification(Event event, Situation situation) {
         return Notification.toEntity(event.getUser().getId(),
                         event.getGroup(),
-                        Content.create(ContentType.getSituationType(situation)));
+                        Content.create(ContentType.getSituationType(situation), situation.getComment()));
     }
 
     private Set<Long> makeGroupIdSet(List<Notification> reservedNotifications) {
