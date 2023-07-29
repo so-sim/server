@@ -7,7 +7,6 @@ import com.sosim.server.event.Situation;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
 import com.sosim.server.notification.Content;
-import com.sosim.server.notification.ContentType;
 import com.sosim.server.notification.Notification;
 import com.sosim.server.notification.NotificationRepository;
 import com.sosim.server.notification.dto.response.NotificationCountResponse;
@@ -28,6 +27,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.sosim.server.common.response.ResponseCode.*;
+import static com.sosim.server.event.Situation.*;
+import static com.sosim.server.notification.ContentType.*;
 
 @RequiredArgsConstructor
 @Component
@@ -113,12 +114,17 @@ public class NotificationUtil {
 
     @Async
     @Transactional
-    public void sendCheckSituationNotifications(long receiverId, Group group, List<Event> events) {
-        List<Notification> notifications = events.stream()
-                .map(event -> makeCheckSituationNotification(receiverId, group, event.getNickname()))
+    public void sendCheckSituationNotification(Group group, List<Event> events) {
+        long adminId = group.getAdminParticipant().getUser().getId();
+        String senderNickname = events.get(0).getNickname();
+        Content content = Content.create(CHANGE_CHECK_SITUATION, senderNickname, CHECK.getComment());
+        List<Long> eventIdList = events.stream()
+                .map(Event::getId)
                 .collect(Collectors.toList());
-        notificationRepository.saveAll(notifications);
-        sendNotifications(notifications);
+
+        Notification notification = Notification.toEntity(adminId, group, content, eventIdList);
+        notificationRepository.save(notification);
+        sendNotification(notification);
     }
 
     @Async
@@ -132,17 +138,18 @@ public class NotificationUtil {
     }
 
     private Notification makeChangeAdminNotification(Group group, Participant participant) {
-        return Notification.toEntity(participant.getUser().getId(), group, Content.create(ContentType.CHANGE_ADMIN));
+        return Notification.toEntity(participant.getUser().getId(), group, Content.create(CHANGE_ADMIN));
     }
 
     private Notification makeCheckSituationNotification(long receiverId, Group group, String senderNickname) {
-        return Notification.toEntity(receiverId, group, Content.create(ContentType.CHANGE_CHECK_SITUATION, senderNickname));
+        return Notification.toEntity(receiverId, group, Content.create(CHANGE_CHECK_SITUATION, senderNickname));
     }
 
     private Notification makeModifySituationNotification(Event event, Situation situation) {
+        assert getSituationType(situation) != null;
         return Notification.toEntity(event.getUser().getId(),
                         event.getGroup(),
-                        Content.create(ContentType.getSituationType(situation), situation.getComment()));
+                        Content.create(getSituationType(situation), situation.getComment()));
     }
 
     private Set<Long> makeGroupIdSet(List<Notification> reservedNotifications) {
@@ -156,7 +163,7 @@ public class NotificationUtil {
                 .userId(p.getUser().getId())
                 .groupId(group.getId())
                 .groupTitle(group.getTitle())
-                .content(Content.create(ContentType.PAYMENT_DATE))
+                .content(Content.create(PAYMENT_DATE))
                 .reserved(true)
                 .sendDateTime(group.getNextNotifyDateTime())
                 .build();
