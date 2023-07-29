@@ -1,9 +1,6 @@
 package com.sosim.server.notification;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
@@ -18,14 +15,33 @@ public class Content {
     @Enumerated(EnumType.STRING)
     private ContentType contentType;
 
-    private String[] data;
+    @Getter(AccessLevel.NONE)
+    private String data1;
+
+    @Getter(AccessLevel.NONE)
+    private String data2;
 
     public static Content create(ContentType contentType, String... data) {
         contentType.checkDataCount(data);
-        return Content.builder()
+        Content content = Content.builder()
                 .contentType(contentType)
-                .data(data == null ? new String[0] : data)
                 .build();
+        content.setData(data);
+        return content;
+    }
+
+    public String[] getData() {
+        return new String[] {data1, data2};
+    }
+
+    private void setData(String[] data) {
+        if (data == null || data.length == 0) {
+            return;
+        }
+        data1 = data[0];
+        if (data.length > 1) {
+            data2 = data[1];
+        }
     }
 
 }

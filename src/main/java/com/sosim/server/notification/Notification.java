@@ -96,7 +96,7 @@ public class Notification extends BaseTimeEntity {
         return content.getContentType().getType();
     }
 
-    public String getMessageData() {
+    public String[] getMessageData() {
         return content.getData();
     }
 

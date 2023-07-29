@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Builder
@@ -14,31 +15,32 @@ public class NotificationResponse {
     @JsonFormat(pattern = "yyyy.MM.dd")
     private LocalDate date;
 
+    private String type;
+
+    private long groupId;
+
     private String groupTitle;
 
     private String category;
 
     private String summary;
 
-    private String messageData;
+    private String[] messageData;
+
+    private List<Long> eventIdList;
 
     private boolean view;
 
-    private InnerData innerData;
-
     public static NotificationResponse toDto(Notification notification) {
-        InnerData innerData = InnerData.builder()
-                .groupId(notification.getGroupId())
-                .type(notification.getType())
-                .eventIdList(notification.getEventIdList())
-                .build();
         return NotificationResponse.builder()
                 .date(notification.getSendDateTime().toLocalDate())
+                .type(notification.getType())
+                .groupId(notification.getGroupId())
                 .groupTitle(notification.getGroupTitle())
                 .category(notification.getCategory())
                 .summary(notification.getSummary())
                 .messageData(notification.getMessageData())
-                .innerData(innerData)
+                .eventIdList(notification.getEventIdList())
                 .view(notification.isView())
                 .build();
     }
