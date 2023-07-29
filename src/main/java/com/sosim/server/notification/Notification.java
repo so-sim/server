@@ -96,8 +96,8 @@ public class Notification extends BaseTimeEntity {
         return content.getContentType().getType();
     }
 
-    public String getMessage() {
-        return content.getMessage(groupInfo.getGroupTitle());
+    public String getMessageData() {
+        return content.getData();
     }
 
     private LocalDateTime setSendDateTime(LocalDateTime sendDateTime) {

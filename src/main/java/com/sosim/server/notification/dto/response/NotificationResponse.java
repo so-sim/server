@@ -20,7 +20,9 @@ public class NotificationResponse {
 
     private String summary;
 
-    private String message;
+    private String messageData;
+
+    private boolean view;
 
     private InnerData innerData;
 
@@ -35,8 +37,9 @@ public class NotificationResponse {
                 .groupTitle(notification.getGroupTitle())
                 .category(notification.getCategory())
                 .summary(notification.getSummary())
-                .message(notification.getMessage())
+                .messageData(notification.getMessageData())
                 .innerData(innerData)
+                .view(notification.isView())
                 .build();
     }
 }

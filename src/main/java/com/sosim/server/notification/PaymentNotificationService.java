@@ -67,7 +67,7 @@ public class PaymentNotificationService {
         List<Long> eventIdList = notificationDataDto.getEventIdList();
 
         return Notification.toEntity(userId, group,
-                Content.create(ContentType.NONE_PAYMENT, String.valueOf(totalAmount)), eventIdList);
+                Content.create(ContentType.REQUEST_PAYMENT, String.valueOf(totalAmount)), eventIdList);
     }
 
     private Map<Long, Integer> makeUserTotalAmountMap(List<Event> events) {

@@ -1,14 +1,18 @@
 package com.sosim.server.notification;
 
+import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.response.ResponseCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+
+import static com.sosim.server.notification.ContentType.CHANGE_ADMIN;
+import static com.sosim.server.notification.ContentType.PAYMENT_DATE;
 
 @Getter
 @Builder
@@ -26,15 +30,17 @@ public class Content {
     }
 
     public static Content create(ContentType contentType, String data) {
-        //TODO 납부 요청, 승인대기 Type은 data가 null이면 안됨!
+        checkDataByContentType(contentType, data);
         return Content.builder()
                 .contentType(contentType)
                 .data(data)
                 .build();
     }
 
-    public String getMessage(String groupTitle) {
-        return String.format(contentType.getMessageFormat(), groupTitle, data);
+    private static void checkDataByContentType(ContentType type, String data) {
+        if (!(PAYMENT_DATE.equals(type) || CHANGE_ADMIN.equals(type)) && data == null) {
+            throw new CustomException(ResponseCode.NOT_NULL_NOTIFICATION_DATA);
+        }
     }
 
 }
