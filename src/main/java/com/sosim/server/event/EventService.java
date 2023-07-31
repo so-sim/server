@@ -153,7 +153,7 @@ public class EventService {
 
     private List<String> getWithdrawNickname(List<Event> events, Group group) {
         List<String> nicknames = events.stream().map(Event::getNickname).collect(Collectors.toList());
-        return participantRepository.findAllByNicknameAndGroup(nicknames, group).stream()
+        return participantRepository.findAllByNicknameInAndGroup(nicknames, group).stream()
                 .map(Participant::getNickname)
                 .collect(Collectors.toList());
     }
