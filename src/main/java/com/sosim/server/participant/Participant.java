@@ -97,4 +97,7 @@ public class Participant extends BaseTimeEntity {
         this.isAdmin = true;
     }
 
+    public boolean isWithdrawGroup() {
+        return this.status.equals(Status.DELETED);
+    }
 }

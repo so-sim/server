@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,4 +45,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     @Query("SELECT p.user.id FROM Participant p " +
             "WHERE p.status = 'ACTIVE' AND p.group.id = :groupId")
     List<Long> getReceiverUserIdList(@Param("groupId") long groupId);
+
+    List<Participant> findAllByNicknameAndGroup(List<String> nicknames, Group group);
 }
