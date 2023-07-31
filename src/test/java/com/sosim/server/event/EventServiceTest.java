@@ -4,10 +4,13 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
 import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
+import com.sosim.server.event.dto.request.ModifySituationRequest;
 import com.sosim.server.event.dto.response.EventIdResponse;
 import com.sosim.server.event.dto.response.GetEventResponse;
+import com.sosim.server.event.dto.response.ModifySituationResponse;
 import com.sosim.server.group.Group;
 import com.sosim.server.group.GroupRepository;
+import com.sosim.server.notification.util.NotificationUtil;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.user.User;
@@ -19,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.sosim.server.common.response.ResponseCode.*;
@@ -45,6 +49,9 @@ public class EventServiceTest {
 
     @Mock
     ParticipantRepository participantRepository;
+
+    @Mock
+    NotificationUtil notificationUtil;
 
     @DisplayName("상세 내역 생성 / 성공")
     @Test
@@ -328,6 +335,81 @@ public class EventServiceTest {
         assertThat(e.getResponseCode()).isEqualTo(NONE_ADMIN);
     }
 
+    @DisplayName("상세 내역 납부 여부 N개 변경 / 성공")
+    @Test
+    void modify_event_situation() {
+        // given
+        ModifySituationRequest request = makeModifySituationRequest(Situation.NONE);
+
+        Event event = Event.builder().build();
+        Group group = Group.builder().build();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(event, "group", group);
+        ReflectionTestUtils.setField(group, "id", groupId);
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        group.createParticipant(user, "닉네임", true);
+
+        doReturn(List.of(event)).when(eventRepository).findAllById(request.getEventIdList());
+        doNothing().when(eventRepository).updateSituationAll(request.getEventIdList(), request.getSituation());
+
+        // when
+        ModifySituationResponse response = eventService.modifyEventSituation(userId, request);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getSituation()).isEqualTo(request.getSituation().getComment());
+        assertThat(response.getEventIdList()).isEqualTo(request.getEventIdList());
+    }
+
+    @DisplayName("상세 내역 납부 여부 N개 변경 / 총무가 확인 중으로 변경할 경우")
+    @Test
+    void modify_event_situation_admin_to_check() {
+        // given
+        ModifySituationRequest request = makeModifySituationRequest(Situation.CHECK);
+
+        Event event = Event.builder().build();
+        Group group = Group.builder().build();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(event, "group", group);
+        ReflectionTestUtils.setField(group, "id", groupId);
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        group.createParticipant(user, "닉네임", true);
+
+        doReturn(List.of(event)).when(eventRepository).findAllById(request.getEventIdList());
+
+        // when
+        CustomException e = assertThrows(CustomException.class, () -> eventService.modifyEventSituation(userId, request));
+
+        // then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FULL_OR_NON_SITUATION);
+    }
+
+    @DisplayName("상세 내역 납부 여부 N개 변경 / 팀원이 미납 or 완납 으로 변경할 경우")
+    @Test
+    void modify_event_situation_none_admin() {
+        // given
+        ModifySituationRequest request = makeModifySituationRequest(Situation.FULL);
+
+        Event event = Event.builder().build();
+        Group group = Group.builder().build();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(event, "group", group);
+        ReflectionTestUtils.setField(group, "id", groupId);
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        group.createParticipant(user, "닉네임", true);
+
+        doReturn(List.of(event)).when(eventRepository).findAllById(request.getEventIdList());
+
+        // when
+        CustomException e = assertThrows(CustomException.class, () -> eventService.modifyEventSituation(userId + 1, request));
+
+        // then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_CHECK_SITUATION);
+    }
+
     private CreateEventRequest makeCreateEventRequest(String nickname) {
         return CreateEventRequest.builder()
                 .groupId(groupId)
@@ -340,6 +422,13 @@ public class EventServiceTest {
                 .nickname(nickname)
                 .ground(Ground.ETC)
                 .situation(Situation.NONE)
+                .build();
+    }
+
+    private ModifySituationRequest makeModifySituationRequest(Situation situation) {
+        return ModifySituationRequest.builder()
+                .eventIdList(List.of(eventId))
+                .situation(situation)
                 .build();
     }
 }
