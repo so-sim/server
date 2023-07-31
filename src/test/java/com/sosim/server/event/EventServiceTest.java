@@ -1,6 +1,7 @@
 package com.sosim.server.event;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.response.EventIdResponse;
@@ -268,6 +269,63 @@ public class EventServiceTest {
 
         //then
         assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_PARTICIPANT);
+    }
+
+    @DisplayName("상세 내역 삭제 / 성공")
+    @Test
+    void delete_event() {
+        // given
+        Event event = Event.builder().build();
+        Group group = Group.builder().build();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(event, "id", eventId);
+        ReflectionTestUtils.setField(event, "group", group);
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        group.createParticipant(user, "닉네임", true);
+
+        doReturn(Optional.of(event)).when(eventRepository).findByIdWithGroup(eventId);
+
+        // when
+        eventService.deleteEvent(userId, eventId);
+
+        // then
+        assertThat(event.getStatus()).isEqualTo(Status.DELETED);
+    }
+
+    @DisplayName("상세 내역 삭제 / Event가 없는 경우")
+    @Test
+    void delete_event_not_found_event() {
+        // given
+        doReturn(Optional.empty()).when(eventRepository).findByIdWithGroup(eventId);
+
+        // when
+        CustomException e = assertThrows(CustomException.class, () -> eventService.deleteEvent(userId, eventId));
+
+        // then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_EVENT);
+    }
+
+    @DisplayName("상세 내역 삭제 / 총무가 아닌 경우")
+    @Test
+    void delete_event_none_admin() {
+        // given
+        Event event = Event.builder().build();
+        Group group = Group.builder().build();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(event, "id", eventId);
+        ReflectionTestUtils.setField(event, "group", group);
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        group.createParticipant(user, "닉네임", true);
+
+        doReturn(Optional.of(event)).when(eventRepository).findByIdWithGroup(eventId);
+
+        // when
+        CustomException e = assertThrows(CustomException.class, () -> eventService.deleteEvent(userId + 1, eventId));
+
+        // then
+        assertThat(e.getResponseCode()).isEqualTo(NONE_ADMIN);
     }
 
     private CreateEventRequest makeCreateEventRequest(String nickname) {
