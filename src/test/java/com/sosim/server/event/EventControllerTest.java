@@ -1,6 +1,5 @@
 package com.sosim.server.event;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.dto.request.CreateEventRequest;
@@ -8,36 +7,23 @@ import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.request.ModifySituationRequest;
 import com.sosim.server.event.dto.response.*;
-import com.sosim.server.group.Group;
-import com.sosim.server.group.dto.response.MyGroupDto;
-import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import static com.sosim.server.common.response.ResponseCode.*;
 import static org.mockito.Mockito.*;
@@ -484,7 +470,7 @@ public class EventControllerTest {
     @Test
     void modify_event_situation() throws Exception {
         // given
-        String situation = "확인중";
+        String situation = "승인대기";
         ModifySituationRequest request = makeModifySituationRequest(situation);
         ModifySituationResponse response = makeModifySituationResponse(situation);
         doReturn(response).when(eventService).modifyEventSituation(userId, request);
@@ -508,7 +494,7 @@ public class EventControllerTest {
     @Test
     void modify_event_situation_none_admin() throws Exception {
         // given
-        String situation = "완납";
+        String situation = "납부완료";
         ModifySituationRequest request = makeModifySituationRequest(situation);
         CustomException e = new CustomException(NONE_ADMIN);
         doThrow(e).when(eventService).modifyEventSituation(userId, request);
@@ -530,7 +516,7 @@ public class EventControllerTest {
     @Test
     void modify_event_situation_fail_to_check() throws Exception {
         // given
-        String situation = "확인중";
+        String situation = "승인대기";
         ModifySituationRequest request = makeModifySituationRequest(situation);
         CustomException e = new CustomException(FAIL_TO_CHECK);
         doThrow(e).when(eventService).modifyEventSituation(userId, request);
