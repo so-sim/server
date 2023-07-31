@@ -2,6 +2,7 @@ package com.sosim.server.event;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.dto.request.CreateEventRequest;
+import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.response.EventIdResponse;
 import com.sosim.server.event.dto.response.GetEventResponse;
 import com.sosim.server.group.Group;
@@ -21,7 +22,6 @@ import java.util.Optional;
 
 import static com.sosim.server.common.response.ResponseCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -173,10 +173,115 @@ public class EventServiceTest {
         assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_EVENT);
     }
 
+    @DisplayName("상세 내역 단건 수정 / 성공")
+    @Test
+    void modify_event() {
+        //given
+        String nickname = "닉네임";
+        ModifyEventRequest request = makeModifyEventRequest(nickname);
+
+        Event event = Event.builder().build();
+        Group group = Group.builder().build();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(event, "id", eventId);
+        ReflectionTestUtils.setField(event, "group", group);
+        ReflectionTestUtils.setField(event, "nickname", nickname);
+        ReflectionTestUtils.setField(event, "situation", Situation.NONE);
+        ReflectionTestUtils.setField(group, "id", groupId);
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        Participant participant = group.createParticipant(user, nickname, true);
+
+        doReturn(Optional.of(event)).when(eventRepository).findByIdWithGroup(eventId);
+        doReturn(Optional.of(participant)).when(participantRepository).findByNicknameAndGroupId(nickname, groupId);
+
+        //when
+        GetEventResponse response = eventService.modifyEvent(userId, eventId, request);
+
+        //then
+        assertThat(response).isNotNull();
+        assertThat(response.getEventId()).isEqualTo(eventId);
+        assertThat(response.getGround()).isEqualTo(Ground.ETC.getComment());
+        assertThat(response.getSituation()).isEqualTo(Situation.NONE.getComment());
+    }
+
+    @DisplayName("상세 내역 단건 수정 / Event가 없을 경우")
+    @Test
+    void modify_event_not_found_event() {
+        //given
+        ModifyEventRequest request = ModifyEventRequest.builder().build();
+        doReturn(Optional.empty()).when(eventRepository).findByIdWithGroup(eventId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () -> eventService.modifyEvent(userId, eventId, request));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_EVENT);
+    }
+
+    @DisplayName("상세 내역 단건 수정 / 총무가 아닐 경우")
+    @Test
+    void modify_event_none_admin() {
+        //given
+        String nickname = "닉네임";
+        ModifyEventRequest request = makeModifyEventRequest(nickname);
+
+        Event event = Event.builder().build();
+        Group group = Group.builder().build();
+        ReflectionTestUtils.setField(event, "group", group);
+        ReflectionTestUtils.setField(group, "id", groupId);
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        group.createParticipant(user, nickname, true);
+
+        doReturn(Optional.of(event)).when(eventRepository).findByIdWithGroup(eventId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () -> eventService.modifyEvent(userId + 1, eventId, request));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NONE_ADMIN);
+    }
+
+    @DisplayName("상세 내역 단건 수정 / 변경할 팀원이 없는 경우")
+    @Test
+    void modify_event_not_found_participant() {
+        //given
+        String nickname = "닉네임";
+        ModifyEventRequest request = makeModifyEventRequest(nickname + "2");
+
+        Event event = Event.builder().build();
+        Group group = Group.builder().build();
+        ReflectionTestUtils.setField(event, "group", group);
+        ReflectionTestUtils.setField(group, "id", groupId);
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        group.createParticipant(user, nickname, true);
+
+        doReturn(Optional.of(event)).when(eventRepository).findByIdWithGroup(eventId);
+        doReturn(Optional.empty()).when(participantRepository).findByNicknameAndGroupId(nickname + "2", groupId);
+
+        //when
+        CustomException e = assertThrows(CustomException.class, () -> eventService.modifyEvent(userId, eventId, request));
+
+        //then
+        assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_PARTICIPANT);
+    }
+
     private CreateEventRequest makeCreateEventRequest(String nickname) {
         return CreateEventRequest.builder()
                 .groupId(groupId)
                 .nickname(nickname)
+                .build();
+    }
+
+    private ModifyEventRequest makeModifyEventRequest(String nickname) {
+        return ModifyEventRequest.builder()
+                .nickname(nickname)
+                .ground(Ground.ETC)
+                .situation(Situation.NONE)
                 .build();
     }
 }
