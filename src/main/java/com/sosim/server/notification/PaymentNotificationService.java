@@ -5,6 +5,7 @@ import com.sosim.server.event.Event;
 import com.sosim.server.event.EventRepository;
 import com.sosim.server.event.dto.request.EventIdListRequest;
 import com.sosim.server.group.Group;
+import com.sosim.server.notification.dto.NotificationDataDto;
 import com.sosim.server.notification.util.NotificationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,23 +36,38 @@ public class PaymentNotificationService {
         checkAllStatusIsNonePayment(events);
 
         List<Notification> notifications = makeNotifications(events);
-        //TODO: save로직을 여기서 수행하는게 맞을 지?
         notificationRepository.saveAll(notifications);
 
         notificationUtil.sendNotifications(notifications);
     }
 
     private List<Notification> makeNotifications(List<Event> events) {
-        Map<Long, Integer> map = makeUserTotalAmountMap(events);
+        Map<Long, NotificationDataDto> map = makeUserNotificationDataMap(events);
         Group group = events.get(0).getGroup();
+
         return map.entrySet().stream()
                 .map(entry -> makeNotification(group, entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 
-    private Notification makeNotification(Group group, long userId, int totalAmount) {
+    private Map<Long, NotificationDataDto> makeUserNotificationDataMap(List<Event> events) {
+        Map<Long, NotificationDataDto> map = new HashMap<>();
+        for (Event event : events) {
+
+            Long userId = event.getUser().getId();
+            NotificationDataDto dataDto = map.compute(userId, (k, v) -> v == null ? new NotificationDataDto() : v);
+            dataDto.addAmount(event.getAmount());
+            dataDto.addEventId(event.getId());
+        }
+        return map;
+    }
+
+    private Notification makeNotification(Group group, long userId, NotificationDataDto notificationDataDto) {
+        int totalAmount = notificationDataDto.getTotalAmount();
+        List<Long> eventIdList = notificationDataDto.getEventIdList();
+
         return Notification.toEntity(userId, group,
-                Content.create(ContentType.NONE_PAYMENT, String.valueOf(totalAmount)));
+                Content.create(ContentType.REQUEST_PAYMENT, String.valueOf(totalAmount)), eventIdList);
     }
 
     private Map<Long, Integer> makeUserTotalAmountMap(List<Event> events) {

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -38,25 +39,36 @@ public class Notification extends BaseTimeEntity {
     @Column(name = "RESERVED")
     private boolean reserved;
 
+    @ElementCollection
+    @CollectionTable(name = "event_ids", joinColumns = @JoinColumn(name = "notification_id"))
+    @OrderColumn(name = "line_idx")
+    private List<Long> eventIdList;
+
     @Builder
-    public Notification(long userId, long groupId, String groupTitle, Content content, LocalDateTime sendDateTime, boolean reserved) {
+    public Notification(long userId, long groupId, String groupTitle, Content content, LocalDateTime sendDateTime, boolean reserved, List<Long> eventIdList) {
         this.userId = userId;
         this.groupInfo = setGroupInfo(groupId, groupTitle);
         this.content = content;
         this.sendDateTime = setSendDateTime(sendDateTime);
         this.reserved = reserved;
+        this.eventIdList = eventIdList;
     }
 
     public static Notification toEntity(long userId, Group group, Content content) {
-        return toEntity(userId, group.getId(), group.getTitle(), content);
+        return toEntity(userId, group.getId(), group.getTitle(), content, null);
     }
 
-    public static Notification toEntity(long userId, long groupId, String groupTitle, Content content) {
+    public static Notification toEntity(long userId, Group group, Content content, List<Long> eventIdList) {
+        return toEntity(userId, group.getId(), group.getTitle(), content, eventIdList);
+    }
+
+    public static Notification toEntity(long userId, long groupId, String groupTitle, Content content, List<Long> eventIdList) {
         return Notification.builder()
                 .userId(userId)
                 .groupId(groupId)
                 .groupTitle(groupTitle)
                 .content(content)
+                .eventIdList(eventIdList)
                 .build();
     }
 
@@ -84,8 +96,8 @@ public class Notification extends BaseTimeEntity {
         return content.getContentType().getType();
     }
 
-    public String getMessage() {
-        return content.getMessage(groupInfo.getGroupTitle());
+    public String[] getMessageData() {
+        return content.getData();
     }
 
     private LocalDateTime setSendDateTime(LocalDateTime sendDateTime) {

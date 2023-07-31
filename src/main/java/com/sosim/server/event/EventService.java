@@ -80,12 +80,12 @@ public class EventService {
 
         validSituation(userId, group, situation);
         eventRepository.updateSituationAll(modifySituationRequest.getEventIdList(), modifySituationRequest.getSituation());
-//        events.forEach(event -> event.modifySituation(situation)); update 쿼리가 여러개 나가는 문제 발생
 
         if (group.isAdminUser(userId)) {
             notificationUtil.sendModifySituationNotifications(events, situation);
         } else {
-            notificationUtil.sendCheckSituationNotifications(userId, group, events);
+            //TODO: events에 여러 사용자가 섞이는 경우 체크해야 하는지?
+            notificationUtil.sendCheckSituationNotification(group, events);
         }
 
         return ModifySituationResponse.toDto(modifySituationRequest.getSituation(), modifySituationRequest.getEventIdList());

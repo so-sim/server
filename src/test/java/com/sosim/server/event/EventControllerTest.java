@@ -1,6 +1,5 @@
 package com.sosim.server.event;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.dto.request.CreateEventRequest;
@@ -8,36 +7,23 @@ import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.request.ModifySituationRequest;
 import com.sosim.server.event.dto.response.*;
-import com.sosim.server.group.Group;
-import com.sosim.server.group.dto.response.MyGroupDto;
-import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import static com.sosim.server.common.response.ResponseCode.*;
 import static org.mockito.Mockito.*;
@@ -74,7 +60,7 @@ public class EventControllerTest {
     @Test
     void create_event() throws Exception {
         // given
-        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "미납");
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "납부 전");
         EventIdResponse response = EventIdResponse.builder().eventId(eventId).build();
 
         doReturn(response).when(eventService).createEvent(userId, request);
@@ -98,7 +84,7 @@ public class EventControllerTest {
     @Test
     void create_event_not_found_group() throws Exception {
         // given
-        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "미납");
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "납부 전");
         CustomException e = new CustomException(NOT_FOUND_GROUP);
 
         doThrow(e).when(eventService).createEvent(userId, request);
@@ -120,7 +106,7 @@ public class EventControllerTest {
     @Test
     void create_event_not_found_participant() throws Exception {
         // given
-        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "미납");
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "납부 전");
         CustomException e = new CustomException(NOT_FOUND_PARTICIPANT);
 
         doThrow(e).when(eventService).createEvent(userId, request);
@@ -142,7 +128,7 @@ public class EventControllerTest {
     @Test
     void create_event_none_admin() throws Exception {
         // given
-        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "미납");
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, "기타", "메모", "납부 전");
         CustomException e = new CustomException(NONE_ADMIN);
 
         doThrow(e).when(eventService).createEvent(userId, request);
@@ -164,8 +150,8 @@ public class EventControllerTest {
     @Test
     void create_event_valid_amount() throws Exception {
         // given
-        CreateEventRequest overAmount = makeCreateRequest(groupId, "닉네임", LocalDate.now(), -1, "기타", "메모", "미납");
-        CreateEventRequest underAmount = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1_000_001, "기타", "메모", "미납");
+        CreateEventRequest overAmount = makeCreateRequest(groupId, "닉네임", LocalDate.now(), -1, "기타", "메모", "납부 전");
+        CreateEventRequest underAmount = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1_000_001, "기타", "메모", "납부 전");
 
         // when
         ResultActions overResult = mvc.perform(post(URI_PREFIX)
@@ -191,7 +177,7 @@ public class EventControllerTest {
     @Test
     void create_event_valid_ground() throws Exception {
         // given
-        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, null, "메모", "미납");
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, null, "메모", "납부 전");
 
         // when
         ResultActions resultActions = mvc.perform(post(URI_PREFIX)
@@ -269,7 +255,7 @@ public class EventControllerTest {
     @Test
     void modify_event() throws Exception {
         // given
-        ModifyEventRequest request = makeModifyRequest("닉네임", 1000, "기타", "메모", "미납");
+        ModifyEventRequest request = makeModifyRequest("닉네임", 1000, "기타", "메모", "납부 전");
         GetEventResponse response = makeGetEventResponse();
         doReturn(response).when(eventService).modifyEvent(userId, eventId, request);
 
@@ -293,7 +279,7 @@ public class EventControllerTest {
     @Test
     void modify_event_not_found_event() throws Exception {
         // given
-        ModifyEventRequest request = makeModifyRequest("닉네임", 1000, "기타", "메모", "미납");
+        ModifyEventRequest request = makeModifyRequest("닉네임", 1000, "기타", "메모", "납부 전");
         CustomException e = new CustomException(NOT_FOUND_EVENT);
         doThrow(e).when(eventService).modifyEvent(userId, eventId, request);
 
@@ -315,7 +301,7 @@ public class EventControllerTest {
     @Test
     void modify_event_none_admin() throws Exception {
         // given
-        ModifyEventRequest request = makeModifyRequest("닉네임", 1000, "기타", "메모", "미납");
+        ModifyEventRequest request = makeModifyRequest("닉네임", 1000, "기타", "메모", "납부 전");
         CustomException e = new CustomException(NONE_ADMIN);
         doThrow(e).when(eventService).modifyEvent(userId, eventId, request);
 
@@ -337,7 +323,7 @@ public class EventControllerTest {
     @Test
     void modify_event_not_found_participant() throws Exception {
         // given
-        ModifyEventRequest request = makeModifyRequest("닉네임", 1000, "기타", "메모", "미납");
+        ModifyEventRequest request = makeModifyRequest("닉네임", 1000, "기타", "메모", "납부 전");
         CustomException e = new CustomException(NOT_FOUND_PARTICIPANT);
         doThrow(e).when(eventService).modifyEvent(userId, eventId, request);
 
@@ -359,8 +345,8 @@ public class EventControllerTest {
     @Test
     void modify_event_valid_amount() throws Exception {
         // given
-        CreateEventRequest overAmount = makeCreateRequest(groupId, "닉네임", LocalDate.now(), -1, "기타", "메모", "미납");
-        CreateEventRequest underAmount = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1_000_001, "기타", "메모", "미납");
+        CreateEventRequest overAmount = makeCreateRequest(groupId, "닉네임", LocalDate.now(), -1, "기타", "메모", "납부 전");
+        CreateEventRequest underAmount = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1_000_001, "기타", "메모", "납부 전");
 
         // when
         String url = URI_PREFIX.concat(String.format("/%d", eventId));
@@ -387,7 +373,7 @@ public class EventControllerTest {
     @Test
     void modify_event_valid_ground() throws Exception {
         // given
-        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, null, "메모", "미납");
+        CreateEventRequest request = makeCreateRequest(groupId, "닉네임", LocalDate.now(), 1000, null, "메모", "납부 전");
 
         // when
         String url = URI_PREFIX.concat(String.format("/%d", eventId));
@@ -484,7 +470,7 @@ public class EventControllerTest {
     @Test
     void modify_event_situation() throws Exception {
         // given
-        String situation = "확인중";
+        String situation = "승인대기";
         ModifySituationRequest request = makeModifySituationRequest(situation);
         ModifySituationResponse response = makeModifySituationResponse(situation);
         doReturn(response).when(eventService).modifyEventSituation(userId, request);
@@ -508,7 +494,7 @@ public class EventControllerTest {
     @Test
     void modify_event_situation_none_admin() throws Exception {
         // given
-        String situation = "완납";
+        String situation = "납부완료";
         ModifySituationRequest request = makeModifySituationRequest(situation);
         CustomException e = new CustomException(NONE_ADMIN);
         doThrow(e).when(eventService).modifyEventSituation(userId, request);
@@ -530,7 +516,7 @@ public class EventControllerTest {
     @Test
     void modify_event_situation_fail_to_check() throws Exception {
         // given
-        String situation = "확인중";
+        String situation = "승인대기";
         ModifySituationRequest request = makeModifySituationRequest(situation);
         CustomException e = new CustomException(FAIL_TO_CHECK);
         doThrow(e).when(eventService).modifyEventSituation(userId, request);

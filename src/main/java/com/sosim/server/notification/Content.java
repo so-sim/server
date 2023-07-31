@@ -1,11 +1,7 @@
 package com.sosim.server.notification;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -19,22 +15,33 @@ public class Content {
     @Enumerated(EnumType.STRING)
     private ContentType contentType;
 
-    private String data;
+    @Getter(AccessLevel.NONE)
+    private String data1;
 
-    public static Content create(ContentType contentType) {
-        return create(contentType, null);
-    }
+    @Getter(AccessLevel.NONE)
+    private String data2;
 
-    public static Content create(ContentType contentType, String data) {
-        //TODO 납부 요청, 승인대기 Type은 data가 null이면 안됨!
-        return Content.builder()
+    public static Content create(ContentType contentType, String... data) {
+        contentType.checkDataCount(data);
+        Content content = Content.builder()
                 .contentType(contentType)
-                .data(data)
                 .build();
+        content.setData(data);
+        return content;
     }
 
-    public String getMessage(String groupTitle) {
-        return String.format(contentType.getMessageFormat(), groupTitle, data);
+    public String[] getData() {
+        return new String[] {data1, data2};
+    }
+
+    private void setData(String[] data) {
+        if (data == null || data.length == 0) {
+            return;
+        }
+        data1 = data[0];
+        if (data.length > 1) {
+            data2 = data[1];
+        }
     }
 
 }
