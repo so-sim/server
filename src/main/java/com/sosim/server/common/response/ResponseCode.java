@@ -73,6 +73,7 @@ public enum ResponseCode {
     ONLY_CAN_HAVE_NONE_PAYMENT(1301, HttpStatus.BAD_REQUEST, "납부 요청은 미납 상태의 내역만 가능합니다."),
     NOT_CHECK_SITUATION(1302, HttpStatus.BAD_REQUEST, "확인 요청 상태로만 변경 가능합니다."),
     NOT_FULL_OR_NON_SITUATION(1303, HttpStatus.BAD_REQUEST, "미납 또는 완납 상태로만 변경 가능합니다."),
+    NOT_FULL_TO_CHECK(1304, HttpStatus.BAD_REQUEST, "미납인 내역만 확인 중으로 변경 가능합니다."),
 
     ;
 
