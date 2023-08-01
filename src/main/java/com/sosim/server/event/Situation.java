@@ -9,9 +9,9 @@ import java.util.Arrays;
 @Getter
 @AllArgsConstructor
 public enum Situation {
-    NONE("납부 전"),
-    FULL("납부완료"),
-    CHECK("승인대기"),
+    NONE("미납"),
+    FULL("완납"),
+    CHECK("확인중"),
     ;
 
     private String comment;

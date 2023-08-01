@@ -44,4 +44,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     @Query("SELECT p.user.id FROM Participant p " +
             "WHERE p.status = 'ACTIVE' AND p.group.id = :groupId")
     List<Long> getReceiverUserIdList(@Param("groupId") long groupId);
+
+    List<Participant> findAllByNicknameInAndGroup(List<String> nicknames, Group group);
 }
