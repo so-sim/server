@@ -1,4 +1,4 @@
-package com.sosim.server.group;
+package com.sosim.server.group.domain.entity;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sosim.server.group.MonthSettingType.SIMPLE_DATE;
+import static com.sosim.server.group.domain.entity.MonthSettingType.SIMPLE_DATE;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

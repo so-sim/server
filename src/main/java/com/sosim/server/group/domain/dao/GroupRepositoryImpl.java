@@ -1,6 +1,7 @@
-package com.sosim.server.group;
+package com.sosim.server.group.domain.dao;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.participant.QParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

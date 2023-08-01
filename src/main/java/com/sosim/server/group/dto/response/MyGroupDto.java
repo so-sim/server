@@ -1,7 +1,7 @@
 package com.sosim.server.group.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sosim.server.group.Group;
+import com.sosim.server.group.domain.entity.Group;
 import lombok.Builder;
 import lombok.Getter;
 

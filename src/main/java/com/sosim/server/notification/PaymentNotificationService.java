@@ -4,7 +4,7 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.Event;
 import com.sosim.server.event.EventRepository;
 import com.sosim.server.event.dto.request.EventIdListRequest;
-import com.sosim.server.group.Group;
+import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.notification.dto.NotificationDataDto;
 import com.sosim.server.notification.util.NotificationUtil;
 import lombok.RequiredArgsConstructor;

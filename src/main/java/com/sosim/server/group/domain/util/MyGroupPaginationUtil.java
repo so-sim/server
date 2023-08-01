@@ -1,4 +1,4 @@
-package com.sosim.server.group;
+package com.sosim.server.group.domain.util;
 
 import com.sosim.server.group.dto.MyGroupPageDto;
 

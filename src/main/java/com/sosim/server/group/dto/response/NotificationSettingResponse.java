@@ -1,9 +1,10 @@
 package com.sosim.server.group.dto.response;
 
-import com.sosim.server.group.DayNotificationSettingInfo;
-import com.sosim.server.group.MonthNotificationSettingInfo;
-import com.sosim.server.group.NotificationSettingInfo;
-import com.sosim.server.group.WeekNotificationSettingInfo;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.sosim.server.group.domain.entity.DayNotificationSettingInfo;
+import com.sosim.server.group.domain.entity.MonthNotificationSettingInfo;
+import com.sosim.server.group.domain.entity.NotificationSettingInfo;
+import com.sosim.server.group.domain.entity.WeekNotificationSettingInfo;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,10 +18,12 @@ public class NotificationSettingResponse {
 
     private String settingType;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YY.MM.dd", timezone = "Asia/Seoul")
     private LocalDate startDate;
 
     private int repeatCycle;
 
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime sendTime;
 
     private String monthSettingType;

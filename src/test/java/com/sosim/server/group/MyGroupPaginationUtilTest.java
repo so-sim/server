@@ -1,11 +1,10 @@
 package com.sosim.server.group;
 
+import com.sosim.server.group.domain.util.MyGroupPaginationUtil;
 import com.sosim.server.group.dto.MyGroupPageDto;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 
 class MyGroupPaginationUtilTest {

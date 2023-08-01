@@ -1,4 +1,4 @@
-package com.sosim.server.group;
+package com.sosim.server.group.domain.entity;
 
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
