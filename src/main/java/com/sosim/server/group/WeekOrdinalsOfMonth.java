@@ -1,6 +1,7 @@
 package com.sosim.server.group;
 
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.Embeddable;
 import java.util.Arrays;
@@ -21,6 +22,9 @@ public class WeekOrdinalsOfMonth {
     }
 
     public int[] getOrdinalNumbers() {
+        if (!StringUtils.hasText(ordinalNumbers)) {
+            return new int[0];
+        }
         return Arrays.stream(ordinalNumbers.split(DELIMITER))
                 .mapToInt(Integer::parseInt)
                 .toArray();

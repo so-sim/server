@@ -13,7 +13,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,8 @@ import static com.sosim.server.common.response.ResponseCode.*;
 @NoArgsConstructor
 @Table(name = "`GROUPS`")
 public class Group extends BaseTimeEntity {
+    public static final int DEFAULT_REPEAT_CYCLE = 1;
+    public static final LocalTime DEFAULT_SEND_TIME = LocalTime.of(12, 0);
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "GROUP_ID")
@@ -53,6 +57,7 @@ public class Group extends BaseTimeEntity {
         this.title = title;
         this.coverColor = coverColor;
         this.groupType = groupType;
+        this.notificationSettingInfo = initNotificationSettingInfo();
         status = ACTIVE;
     }
 
@@ -159,6 +164,18 @@ public class Group extends BaseTimeEntity {
             return;
         }
         notificationSettingInfo.changeSettingInfo(settingInfo);
+    }
+
+    private NotificationSettingInfo initNotificationSettingInfo() {
+        return MonthNotificationSettingInfo.builder()
+                .startDate(LocalDate.now())
+                .repeatCycle(DEFAULT_REPEAT_CYCLE)
+                .sendTime(DEFAULT_SEND_TIME)
+                .monthSettingType(null)
+                .sendDay(LocalDate.now().getDayOfMonth())
+                .weekOrdinalsOfMonth(new WeekOrdinalsOfMonth())
+                .daysOfWeek(new DaysOfWeek())
+                .build();
     }
 
     private boolean isSameSettingType(NotificationSettingInfo newSettingInfo) {
