@@ -432,7 +432,7 @@ class ParticipantControllerTest {
         String keyword = "닉네임";
         request.setKeyword(keyword);
 
-        List<NicknameDto> list = List.of(new NicknameDto("닉네임1"), new NicknameDto("닉네임2"));
+        List<NicknameDto> list = List.of(new NicknameDto("닉네임1", false), new NicknameDto("닉네임2", false));
         NicknameSearchResponse response = new NicknameSearchResponse(list);
 
         doReturn(response).when(participantService).searchParticipants(groupId, request);
@@ -448,7 +448,9 @@ class ParticipantControllerTest {
                 .andExpect(jsonPath("$.status.message").value(SEARCH_PARTICIPANTS.getMessage()))
                 .andExpect(jsonPath("$.content.nicknameList").isArray())
                 .andExpect(jsonPath("$.content.nicknameList[0].nickname").value("닉네임1"))
-                .andExpect(jsonPath("$.content.nicknameList[1].nickname").value("닉네임2"));
+                .andExpect(jsonPath("$.content.nicknameList[0].withdraw").value(false))
+                .andExpect(jsonPath("$.content.nicknameList[1].nickname").value("닉네임2"))
+                .andExpect(jsonPath("$.content.nicknameList[1].withdraw").value(false));
     }
 
     private static GetParticipantListResponse makeGetParticipantsResponse(String adminNickname) {
