@@ -1,4 +1,4 @@
-package com.sosim.server.group.domain.dao;
+package com.sosim.server.group.domain.repository;
 
 import com.sosim.server.group.domain.entity.Group;
 import org.springframework.data.domain.Slice;

@@ -11,6 +11,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.sosim.server.group.domain.entity.MonthSettingType.*;
 import static com.sosim.server.group.domain.entity.MonthSettingType.SIMPLE_DATE;
 
 @Getter
@@ -50,8 +51,10 @@ public class MonthNotificationSettingInfo extends NotificationSettingInfo {
     public LocalDateTime calculateNextSendDateTime() {
         if (SIMPLE_DATE.equals(monthSettingType)) {
             return calcNextSimpleDateTime();
+        } else if (WEEK.equals(monthSettingType)) {
+            return calcNextWeekDateTime();
         }
-        return calcNextWeekDateTime();
+        return LocalDateTime.now();
     }
 
     @Override
