@@ -3,9 +3,11 @@ package com.sosim.server.event;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
 import com.sosim.server.event.dto.request.CreateEventRequest;
+import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.event.dto.request.ModifySituationRequest;
 import com.sosim.server.event.dto.response.EventIdResponse;
+import com.sosim.server.event.dto.response.GetEventCalendarResponse;
 import com.sosim.server.event.dto.response.GetEventResponse;
 import com.sosim.server.event.dto.response.ModifySituationResponse;
 import com.sosim.server.group.Group;
@@ -20,8 +22,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -410,6 +415,49 @@ public class EventServiceTest {
         assertThat(e.getResponseCode()).isEqualTo(NOT_CHECK_SITUATION);
     }
 
+    @DisplayName("상세 내역 캘린더 조회 / 성공")
+    @Test
+    void get_event_calendar() {
+        // given
+        FilterEventRequest request = makeFilterEventRequest(null, null);
+
+        Event event = Event.builder().build();
+        ReflectionTestUtils.setField(event, "id", eventId);
+        ReflectionTestUtils.setField(event, "date", LocalDate.now());
+        ReflectionTestUtils.setField(event, "situation", Situation.NONE);
+
+        doReturn(List.of(event)).when(eventRepository).searchAll(request);
+
+        // when
+        GetEventCalendarResponse response = eventService.getEventCalendar(request);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusOfDay()).isNotEmpty();
+    }
+
+    @DisplayName("상세 내역 리스트 조회 / 성공")
+    @Test
+    void get_event_list() {
+        // given
+        FilterEventRequest request = makeFilterEventRequest("닉네임", Situation.NONE);
+        Pageable pageable = PageRequest.of(0, 15);
+
+        Event event = Event.builder().build();
+        ReflectionTestUtils.setField(event, "id", eventId);
+        ReflectionTestUtils.setField(event, "date", LocalDate.now());
+        ReflectionTestUtils.setField(event, "situation", Situation.NONE);
+
+        doReturn(List.of(event)).when(eventRepository).searchAll(request);
+
+        // when
+        GetEventCalendarResponse response = eventService.getEventCalendar(request);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusOfDay()).isNotEmpty();
+    }
+
     private CreateEventRequest makeCreateEventRequest(String nickname) {
         return CreateEventRequest.builder()
                 .groupId(groupId)
@@ -430,5 +478,15 @@ public class EventServiceTest {
                 .eventIdList(List.of(eventId))
                 .situation(situation)
                 .build();
+    }
+
+    private FilterEventRequest makeFilterEventRequest(String nickname, Situation situation) {
+        FilterEventRequest request = new FilterEventRequest();
+        request.setGroupId(groupId);
+        request.setStartDate(LocalDate.now());
+        request.setEndDate(LocalDate.now());
+        request.setNickname(nickname);
+        request.setSituation(situation);
+        return request;
     }
 }
