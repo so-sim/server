@@ -68,7 +68,7 @@ public class Event extends BaseTimeEntity {
         status = ACTIVE;
     }
 
-    public boolean modifyAndCheckChangedSituation(User user, ModifyEventRequest modifyEventRequest) {
+    public void modify(User user, ModifyEventRequest modifyEventRequest) {
         if (isDiffUser(modifyEventRequest.getNickname())) {
             this.nickname = modifyEventRequest.getNickname();
             this.user = user;
@@ -77,9 +77,7 @@ public class Event extends BaseTimeEntity {
         this.amount = modifyEventRequest.getAmount();
         this.ground = modifyEventRequest.getGround();
         this.memo = modifyEventRequest.getMemo();
-        Situation preSituation = this.situation;
         this.situation = modifyEventRequest.getSituation();
-        return !preSituation.equals(situation);
     }
 
     public boolean isNotNonePaymentSituation() {

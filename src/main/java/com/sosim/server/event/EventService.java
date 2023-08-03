@@ -57,20 +57,21 @@ public class EventService {
     @Transactional
     public GetEventResponse modifyEvent(long userId, long eventId, ModifyEventRequest modifyEventRequest) {
         Event event = findEventWithGroup(eventId);
+
         Group group = event.getGroup();
         checkIsAdmin(group, userId);
 
         Participant participant = findParticipant(group.getId(), modifyEventRequest.getNickname());
+        Situation preSituation = event.getSituation();
+
+        event.modify(participant.getUser(), modifyEventRequest);
+
         boolean participantIsWithdraw = participant.isWithdrawGroup();
-        boolean changedSituation = event.modifyAndCheckChangedSituation(participant.getUser(), modifyEventRequest);
-        GetEventResponse getEventResponse = GetEventResponse.toDto(event);
-
-        if (participantIsWithdraw || !changedSituation) {
-            return getEventResponse;
+        Situation newSituation = modifyEventRequest.getSituation();
+        if (!participantIsWithdraw && preSituation != newSituation) {
+            notificationUtil.sendModifySituationNotifications(List.of(event), preSituation, newSituation);
         }
-
-        notificationUtil.sendModifySituationNotifications(List.of(event), modifyEventRequest.getSituation());
-        return getEventResponse;
+        return GetEventResponse.toDto(event);
     }
 
     @Transactional
@@ -96,7 +97,7 @@ public class EventService {
         if (group.isAdminUser(userId)) {
             List<String> withdrawNicknames = getWithdrawNickname(events, group);
             events = events.stream().filter(e -> !withdrawNicknames.contains(e.getNickname())).collect(Collectors.toList());
-            notificationUtil.sendModifySituationNotifications(events, newSituation);
+            notificationUtil.sendModifySituationNotifications(events, preSituation, newSituation);
         } else {
             //TODO: events에 여러 사용자가 섞이는 경우 체크해야 하는지?
             notificationUtil.sendCheckSituationNotification(group, events);

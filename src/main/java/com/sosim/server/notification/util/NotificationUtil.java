@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.sosim.server.common.response.ResponseCode.*;
-import static com.sosim.server.event.Situation.*;
+import static com.sosim.server.event.Situation.CHECK;
 import static com.sosim.server.notification.ContentType.*;
 
 @RequiredArgsConstructor
@@ -129,9 +129,9 @@ public class NotificationUtil {
 
     @Async
     @Transactional
-    public void sendModifySituationNotifications(List<Event> events, Situation situation) {
+    public void sendModifySituationNotifications(List<Event> events, Situation preSituation, Situation newSituation) {
         List<Notification> notifications = events.stream()
-                .map(event -> makeModifySituationNotification(event, situation))
+                .map(event -> makeModifySituationNotification(event, preSituation, newSituation))
                 .collect(Collectors.toList());
         notificationRepository.saveAll(notifications);
         sendNotifications(notifications);
@@ -141,15 +141,10 @@ public class NotificationUtil {
         return Notification.toEntity(participant.getUser().getId(), group, Content.create(CHANGE_ADMIN));
     }
 
-    private Notification makeCheckSituationNotification(long receiverId, Group group, String senderNickname) {
-        return Notification.toEntity(receiverId, group, Content.create(CHANGE_CHECK_SITUATION, senderNickname));
-    }
-
-    private Notification makeModifySituationNotification(Event event, Situation situation) {
-        assert getSituationType(situation) != null;
+    private Notification makeModifySituationNotification(Event event, Situation preSituation, Situation newSituation) {
         return Notification.toEntity(event.getUser().getId(),
                         event.getGroup(),
-                        Content.create(getSituationType(situation), situation.getComment()));
+                        Content.create(getSituationType(newSituation), preSituation.getComment(), newSituation.getComment()));
     }
 
     private Set<Long> makeGroupIdSet(List<Notification> reservedNotifications) {
