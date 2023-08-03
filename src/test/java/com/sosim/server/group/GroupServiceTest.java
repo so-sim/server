@@ -2,12 +2,16 @@ package com.sosim.server.group;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
+import com.sosim.server.group.domain.entity.Group;
+import com.sosim.server.group.domain.repository.GroupRepository;
+import com.sosim.server.group.domain.util.MyGroupPaginationUtil;
 import com.sosim.server.group.dto.MyGroupPageDto;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupsResponse;
+import com.sosim.server.group.service.GroupService;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
 import com.sosim.server.user.User;

@@ -3,7 +3,7 @@ package com.sosim.server.event;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
-import com.sosim.server.group.Group;
+import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.user.User;
 import lombok.Builder;
 import lombok.Getter;

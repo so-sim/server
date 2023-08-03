@@ -1,12 +1,11 @@
-package com.sosim.server.group;
+package com.sosim.server.group.domain.entity;
 
-import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 import java.time.DayOfWeek;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Embeddable
 public class DaysOfWeek {
     public static final String DELIMITER = ",";
