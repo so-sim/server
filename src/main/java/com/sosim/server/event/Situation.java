@@ -33,6 +33,7 @@ public enum Situation {
     }
 
     public boolean canModifyToCheck(Situation newSituation) {
-        return !(this.equals(FULL) && newSituation.equals(CHECK));
+        if (!newSituation.equals(CHECK)) return false;
+        return !this.equals(NONE);
     }
 }

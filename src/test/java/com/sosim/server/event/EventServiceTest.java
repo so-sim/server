@@ -350,6 +350,7 @@ public class EventServiceTest {
         Group group = Group.builder().build();
         User user = User.builder().build();
         ReflectionTestUtils.setField(event, "group", group);
+        ReflectionTestUtils.setField(event, "situation", Situation.CHECK);
         ReflectionTestUtils.setField(group, "id", groupId);
         ReflectionTestUtils.setField(user, "id", userId);
 
@@ -377,6 +378,7 @@ public class EventServiceTest {
         Group group = Group.builder().build();
         User user = User.builder().build();
         ReflectionTestUtils.setField(event, "group", group);
+        ReflectionTestUtils.setField(event, "situation", Situation.NONE);
         ReflectionTestUtils.setField(group, "id", groupId);
         ReflectionTestUtils.setField(user, "id", userId);
 
@@ -401,6 +403,7 @@ public class EventServiceTest {
         Group group = Group.builder().build();
         User user = User.builder().build();
         ReflectionTestUtils.setField(event, "group", group);
+        ReflectionTestUtils.setField(event, "situation", Situation.NONE);
         ReflectionTestUtils.setField(group, "id", groupId);
         ReflectionTestUtils.setField(user, "id", userId);
 
