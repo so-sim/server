@@ -1,6 +1,6 @@
 package com.sosim.server.notification.dto.request;
 
-import com.sosim.server.group.Group;
+import com.sosim.server.group.domain.entity.Group;
 import lombok.Builder;
 import lombok.Getter;
 

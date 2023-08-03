@@ -1,6 +1,7 @@
 package com.sosim.server.group.dto.request;
 
-import com.sosim.server.group.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.sosim.server.group.domain.entity.*;
 import lombok.Data;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DirectFieldBindingResult;
@@ -10,7 +11,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import static com.sosim.server.group.MonthSettingType.SIMPLE_DATE;
+import static com.sosim.server.group.domain.entity.MonthSettingType.SIMPLE_DATE;
 
 @Data
 public class NotificationSettingRequest {
@@ -21,10 +22,12 @@ public class NotificationSettingRequest {
 
     private String settingType;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YY.MM.dd", timezone = "Asia/Seoul")
     private LocalDate startDate;
 
     private int repeatCycle;
 
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime sendTime;
 
     private MonthSettingType monthSettingType;

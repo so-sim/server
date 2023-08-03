@@ -70,12 +70,13 @@ public enum ResponseCode {
     NOT_FOUND_ADMIN(1008, HttpStatus.NOT_FOUND, "모임의 총무를 찾을 수 없습니다."),
 
     NOT_FOUND_EVENT(1300, HttpStatus.BAD_REQUEST, "해당 상세 내역을 찾을 수 없습니다."),
-    ONLY_CAN_HAVE_NONE_PAYMENT(1301, HttpStatus.BAD_REQUEST, "납부 요청은 미납 상태의 내역만 가능합니다."),
+    FAIL_TO_CHECK(1301, HttpStatus.BAD_REQUEST, "완납인 상세 내역은 확인중으로 변경 불가능합니다."),
     NOT_CHECK_SITUATION(1302, HttpStatus.BAD_REQUEST, "확인 요청 상태로만 변경 가능합니다."),
     NOT_FULL_OR_NON_SITUATION(1303, HttpStatus.BAD_REQUEST, "미납 또는 완납 상태로만 변경 가능합니다."),
-    NOT_FULL_TO_CHECK(1304, HttpStatus.BAD_REQUEST, "미납인 내역만 확인 중으로 변경 가능합니다."),
+    ONLY_CAN_HAVE_NONE_PAYMENT(1304, HttpStatus.BAD_REQUEST, "납부 요청은 미납 상태의 내역만 가능합니다."),
+    NOT_FULL_TO_CHECK(1305, HttpStatus.BAD_REQUEST, "미납인 내역만 확인 중으로 변경 가능합니다."),
 
-    ;
+    MUST_NEED_NOTIFICATION_MESSAGE_DATA(1305, HttpStatus.BAD_REQUEST, "알림 메시지 데이터가 반드시 필요합니다.");
 
     private int code;
     private HttpStatus httpStatus;

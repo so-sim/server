@@ -3,7 +3,7 @@ package com.sosim.server.participant;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.common.auditing.Status;
-import com.sosim.server.group.Group;
+import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.user.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -97,4 +97,7 @@ public class Participant extends BaseTimeEntity {
         this.isAdmin = true;
     }
 
+    public boolean isWithdrawGroup() {
+        return this.status.equals(Status.DELETED);
+    }
 }

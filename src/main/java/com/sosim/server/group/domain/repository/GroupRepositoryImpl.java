@@ -1,6 +1,7 @@
-package com.sosim.server.group;
+package com.sosim.server.group.domain.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.participant.QParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -10,7 +11,7 @@ import org.springframework.data.domain.SliceImpl;
 import java.util.List;
 
 import static com.sosim.server.common.auditing.Status.ACTIVE;
-import static com.sosim.server.group.QGroup.group;
+import static com.sosim.server.group.domain.entity.QGroup.*;
 import static com.sosim.server.participant.QParticipant.participant;
 
 @RequiredArgsConstructor

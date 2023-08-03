@@ -1,6 +1,9 @@
 package com.sosim.server.group;
 
 import com.sosim.server.config.TestConfig;
+import com.sosim.server.group.domain.entity.Group;
+import com.sosim.server.group.domain.repository.GroupRepository;
+import com.sosim.server.group.domain.util.MyGroupPaginationUtil;
 import com.sosim.server.group.dto.MyGroupPageDto;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;

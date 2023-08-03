@@ -1,7 +1,8 @@
-package com.sosim.server.group;
+package com.sosim.server.group.controller;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
+import com.sosim.server.group.service.GroupNotificationSettingService;
 import com.sosim.server.group.dto.request.NotificationSettingRequest;
 import com.sosim.server.group.dto.response.NotificationSettingResponse;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,8 @@
 package com.sosim.server.participant;
 
 import com.sosim.server.config.QueryDslConfig;
-import com.sosim.server.group.Group;
-import com.sosim.server.group.GroupRepository;
+import com.sosim.server.group.domain.entity.Group;
+import com.sosim.server.group.domain.repository.GroupRepository;
 import com.sosim.server.user.User;
 import com.sosim.server.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;

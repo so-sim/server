@@ -15,6 +15,11 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
             "WHERE e.id IN (:eventIdList)")
     void updateSituationAll(@Param("eventIdList") List<Long> eventIdList, @Param("situation") Situation situation);
 
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Event e SET e.nickname = :newNickname " +
+            "WHERE e.nickname IN (:nickname)")
+    void updateNicknameAll(@Param("newNickname") String newNickname, @Param("nickname") String nickname);
+
     @Query("SELECT e FROM Event e JOIN FETCH e.group " +
             "WHERE e.id = :eventId AND e.status = 'ACTIVE'")
     Optional<Event> findByIdWithGroup(@Param("eventId") long eventId);

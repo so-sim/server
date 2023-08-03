@@ -1,6 +1,9 @@
-package com.sosim.server.group;
+package com.sosim.server.group.service;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.group.domain.entity.Group;
+import com.sosim.server.group.domain.repository.GroupRepository;
+import com.sosim.server.group.domain.entity.NotificationSettingInfo;
 import com.sosim.server.group.dto.request.NotificationSettingRequest;
 import com.sosim.server.group.dto.response.NotificationSettingResponse;
 import com.sosim.server.notification.util.NotificationUtil;

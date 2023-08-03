@@ -7,4 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class NicknameDto {
     private String nickname;
+    private boolean withdraw;
 }

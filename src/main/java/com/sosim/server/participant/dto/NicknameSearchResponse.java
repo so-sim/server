@@ -18,7 +18,7 @@ public class NicknameSearchResponse {
 
     private static List<NicknameDto> mapNicknameDtoList(List<Participant> participantList) {
         return participantList.stream()
-                .map(p -> new NicknameDto(p.getNickname()))
+                .map(p -> new NicknameDto(p.getNickname(), p.isWithdrawGroup()))
                 .collect(Collectors.toList());
     }
 }

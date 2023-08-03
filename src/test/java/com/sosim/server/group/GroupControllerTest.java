@@ -2,12 +2,15 @@ package com.sosim.server.group;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.group.controller.GroupController;
+import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupDto;
 import com.sosim.server.group.dto.response.MyGroupsResponse;
+import com.sosim.server.group.service.GroupService;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.security.WithMockCustomUser;
