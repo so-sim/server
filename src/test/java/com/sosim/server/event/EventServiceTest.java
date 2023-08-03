@@ -10,8 +10,8 @@ import com.sosim.server.event.dto.response.EventIdResponse;
 import com.sosim.server.event.dto.response.GetEventCalendarResponse;
 import com.sosim.server.event.dto.response.GetEventResponse;
 import com.sosim.server.event.dto.response.ModifySituationResponse;
-import com.sosim.server.group.Group;
-import com.sosim.server.group.GroupRepository;
+import com.sosim.server.group.domain.entity.Group;
+import com.sosim.server.group.domain.repository.GroupRepository;
 import com.sosim.server.notification.util.NotificationUtil;
 import com.sosim.server.participant.Participant;
 import com.sosim.server.participant.ParticipantRepository;
@@ -484,7 +484,7 @@ public class EventServiceTest {
     }
 
     private FilterEventRequest makeFilterEventRequest(String nickname, Situation situation) {
-        FilterEventRequest request = new FilterEventRequest();
+        FilterEventRequest request = FilterEventRequest.builder().build();
         request.setGroupId(groupId);
         request.setStartDate(LocalDate.now());
         request.setEndDate(LocalDate.now());
