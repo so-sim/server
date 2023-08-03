@@ -87,15 +87,16 @@ public class EventService {
     public ModifySituationResponse modifyEventSituation(long userId, ModifySituationRequest modifySituationRequest) {
         List<Event> events = eventRepository.findAllById(modifySituationRequest.getEventIdList());
         Group group = events.get(0).getGroup();
-        Situation situation = modifySituationRequest.getSituation();
+        Situation preSituation = events.get(0).getSituation();
+        Situation newSituation = modifySituationRequest.getSituation();
 
-        validSituation(userId, group, situation);
+        validSituation(userId, group, preSituation, newSituation);
         eventRepository.updateSituationAll(modifySituationRequest.getEventIdList(), modifySituationRequest.getSituation());
 
         if (group.isAdminUser(userId)) {
             List<String> withdrawNicknames = getWithdrawNickname(events, group);
             events = events.stream().filter(e -> !withdrawNicknames.contains(e.getNickname())).collect(Collectors.toList());
-            notificationUtil.sendModifySituationNotifications(events, situation);
+            notificationUtil.sendModifySituationNotifications(events, newSituation);
         } else {
             //TODO: events에 여러 사용자가 섞이는 경우 체크해야 하는지?
             notificationUtil.sendCheckSituationNotification(group, events);
@@ -116,12 +117,16 @@ public class EventService {
         return GetEventListResponse.toDto(events.getContent(), events.getTotalElements());
     }
 
-    private void validSituation(long userId, Group group, Situation situation) {
+    private void validSituation(long userId, Group group, Situation preSituation, Situation newSituation) {
+        if (preSituation.canModifyToCheck(newSituation)) {
+            throw new CustomException(NOT_FULL_TO_CHECK);
+        }
+
         boolean isAdminUser = group.isAdminUser(userId);
-        if (!isAdminUser && !situation.canModifyByParticipant()) {
+        if (!isAdminUser && !newSituation.canModifyByParticipant()) {
             throw new CustomException(NOT_CHECK_SITUATION);
         }
-        if (isAdminUser && !situation.canModifyByAdmin()) {
+        if (isAdminUser && !newSituation.canModifyByAdmin()) {
             throw new CustomException(NOT_FULL_OR_NON_SITUATION);
         }
     }

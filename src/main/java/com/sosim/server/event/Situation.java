@@ -31,4 +31,9 @@ public enum Situation {
     public boolean canModifyByAdmin() {
         return FULL.equals(this) || NONE.equals(this);
     }
+
+    public boolean canModifyToCheck(Situation newSituation) {
+        if (!newSituation.equals(CHECK)) return false;
+        return !this.equals(NONE);
+    }
 }
