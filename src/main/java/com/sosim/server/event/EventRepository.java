@@ -1,5 +1,7 @@
 package com.sosim.server.event;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -38,4 +40,24 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
             "WHERE e.id IN (:eventIdList)")
     @EntityGraph(attributePaths = {"user", "group"})
     List<Event> findAllById(@Param("eventIdList") List<Long> eventIdList);
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.id IN (:eventIdList)")
+    @EntityGraph(attributePaths = {"user", "group"})
+    Page<Event> findAllById(@Param("eventIdList") List<Long> eventIdList, Pageable pageable);
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.group.id = :groupId " +
+            "AND e.id IN (:eventIdList) ")
+    @EntityGraph(attributePaths = {"user", "group"})
+    Page<Event> findAllByEventIdList(@Param("groupId") long groupId, List<Long> eventIdList,
+                                     Pageable pageable);
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.group.id = :groupId " +
+            "AND e.userId = :userId " +
+            "AND e.id IN (:eventIdList) ")
+    @EntityGraph(attributePaths = {"user", "group"})
+    Page<Event> findAllByEventIdList(@Param("userId") long userId, @Param("groupId") long groupId,
+                                     List<Long> eventIdList, Pageable pageable);
 }
