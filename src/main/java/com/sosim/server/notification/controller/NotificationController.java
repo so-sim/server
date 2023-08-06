@@ -28,10 +28,17 @@ public class NotificationController {
     }
 
     @PatchMapping("/notification")
-    public ResponseEntity<?> viewAllNotification(@AuthUserId long userId) {
-        notificationService.viewAllNotification(userId);
+    public ResponseEntity<?> viewAllNotifications(@AuthUserId long userId) {
+        notificationService.viewAllNotifications(userId);
 
-        return new ResponseEntity<>(Response.create(VIEW_ALL_NOTIFICATION, null), VIEW_ALL_NOTIFICATION.getHttpStatus());
+        return new ResponseEntity<>(Response.create(VIEW_ALL_NOTIFICATIONS, null), VIEW_ALL_NOTIFICATIONS.getHttpStatus());
+    }
+
+    @PatchMapping("/notification/{notificationId}")
+    public ResponseEntity<?> viewNotification(@AuthUserId long userId, @PathVariable long notificationId) {
+        notificationService.viewNotification(userId, notificationId);
+
+        return new ResponseEntity<>(Response.create(VIEW_NOTIFICATION, null), VIEW_NOTIFICATION.getHttpStatus());
     }
 
     @GetMapping("/notification")

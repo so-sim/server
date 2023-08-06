@@ -44,7 +44,8 @@ public enum ResponseCode {
 
     SUCCESS_SUBSCRIBE(successCode(), HttpStatus.OK, "알림 구독이 성공적으로 완료되었습니다."),
     SUCCESS_SEND_NOTIFICATION(successCode(), HttpStatus.OK, "알림이 성공적으로 전송되었습니다."),
-    VIEW_ALL_NOTIFICATION(successCode(), HttpStatus.OK, "모든 알림이 성공적으로 읽음 처리되었습니다."),
+    VIEW_ALL_NOTIFICATIONS(successCode(), HttpStatus.OK, "모든 알림이 성공적으로 읽음 처리되었습니다."),
+    VIEW_NOTIFICATION(successCode(), HttpStatus.OK, "해당 알림이 성공적으로 읽음 처리되었습니다."),
     GET_MY_NOTIFICATIONS(successCode(), HttpStatus.OK, "성공적으로 알림 목록이 조회되었습니다."),
 
     BINDING_ERROR(2000, HttpStatus.BAD_REQUEST, "입력값 중 검증에 실패한 값이 있습니다"),
@@ -76,8 +77,10 @@ public enum ResponseCode {
     ONLY_CAN_HAVE_NONE_PAYMENT(1304, HttpStatus.BAD_REQUEST, "납부 요청은 미납 상태의 내역만 가능합니다."),
     NOT_FULL_TO_CHECK(1305, HttpStatus.BAD_REQUEST, "미납인 내역만 확인 중으로 변경 가능합니다."),
 
-    MUST_NEED_NOTIFICATION_MESSAGE_DATA(1305, HttpStatus.BAD_REQUEST, "알림 메시지 데이터가 반드시 필요합니다.");
-
+    MUST_NEED_NOTIFICATION_MESSAGE_DATA(1306, HttpStatus.BAD_REQUEST, "알림 메시지 데이터가 반드시 필요합니다."),
+    NOT_FOUND_NOTIFICATION(1307, HttpStatus.NOT_FOUND, "해당 알림을 찾을 수 없습니다."),
+    IS_NOT_NOTIFICATION_RECEIVER(1308, HttpStatus.FORBIDDEN, "알림 수신자가 아닙니다.")
+    ;
     private int code;
     private HttpStatus httpStatus;
     private String message;

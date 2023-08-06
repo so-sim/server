@@ -1,5 +1,6 @@
 package com.sosim.server.notification.service;
 
+import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.notification.domain.entity.Notification;
 import com.sosim.server.notification.domain.repository.NotificationRepository;
 import com.sosim.server.notification.dto.response.MyNotificationsResponse;
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.sosim.server.common.response.ResponseCode.NOT_FOUND_NOTIFICATION;
+
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
@@ -30,8 +33,15 @@ public class NotificationService {
     }
 
     @Transactional
-    public void viewAllNotification(long userId) {
+    public void viewAllNotifications(long userId) {
         notificationRepository.updateViewByUserId(userId);
+    }
+
+    @Transactional
+    public void viewNotification(long userId, long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_NOTIFICATION));
+        notification.read(userId);
     }
 
     @Transactional(readOnly = true)
@@ -47,4 +57,5 @@ public class NotificationService {
                 .map(NotificationResponse::toDto)
                 .collect(Collectors.toList());
     }
+
 }
