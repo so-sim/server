@@ -25,7 +25,7 @@ public class NotificationResponse {
 
     private String summary;
 
-    private String[] messageData;
+    private MessageDataDto messageData;
 
     private List<Long> eventIdList;
 
@@ -44,4 +44,5 @@ public class NotificationResponse {
                 .view(notification.isView())
                 .build();
     }
+
 }

@@ -3,6 +3,7 @@ package com.sosim.server.notification.domain.entity;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.group.domain.entity.Group;
+import com.sosim.server.notification.dto.response.MessageDataDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -104,7 +105,7 @@ public class Notification extends BaseTimeEntity {
         return content.getContentType().getType();
     }
 
-    public String[] getMessageData() {
+    public MessageDataDto getMessageData() {
         return content.getData();
     }
 
