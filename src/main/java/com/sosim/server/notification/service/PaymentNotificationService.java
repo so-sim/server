@@ -1,10 +1,14 @@
-package com.sosim.server.notification;
+package com.sosim.server.notification.service;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.Event;
 import com.sosim.server.event.EventRepository;
 import com.sosim.server.event.dto.request.EventIdListRequest;
 import com.sosim.server.group.domain.entity.Group;
+import com.sosim.server.notification.domain.entity.Content;
+import com.sosim.server.notification.domain.entity.ContentType;
+import com.sosim.server.notification.domain.entity.Notification;
+import com.sosim.server.notification.domain.repository.NotificationRepository;
 import com.sosim.server.notification.dto.NotificationDataDto;
 import com.sosim.server.notification.util.NotificationUtil;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.sosim.server.notification;
+package com.sosim.server.notification.domain.entity;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.Situation;

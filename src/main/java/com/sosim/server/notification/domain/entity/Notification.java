@@ -1,5 +1,6 @@
-package com.sosim.server.notification;
+package com.sosim.server.notification.domain.entity;
 
+import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.group.domain.entity.Group;
 import lombok.Builder;
@@ -9,6 +10,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.sosim.server.common.response.ResponseCode.IS_NOT_NOTIFICATION_RECEIVER;
 
 @Entity
 @Getter
@@ -76,6 +79,11 @@ public class Notification extends BaseTimeEntity {
         reserved = false;
     }
 
+    public void read(long userId) {
+        checkUserIsReceiver(userId);
+        view = true;
+    }
+
     public long getGroupId() {
         return groupInfo.getGroupId();
     }
@@ -98,6 +106,12 @@ public class Notification extends BaseTimeEntity {
 
     public String[] getMessageData() {
         return content.getData();
+    }
+
+    private void checkUserIsReceiver(long userId) {
+        if (this.userId != userId) {
+            throw new CustomException(IS_NOT_NOTIFICATION_RECEIVER);
+        }
     }
 
     private LocalDateTime setSendDateTime(LocalDateTime sendDateTime) {
