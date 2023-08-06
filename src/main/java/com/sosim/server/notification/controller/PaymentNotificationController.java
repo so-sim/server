@@ -1,8 +1,9 @@
-package com.sosim.server.notification;
+package com.sosim.server.notification.controller;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.event.dto.request.EventIdListRequest;
+import com.sosim.server.notification.service.PaymentNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

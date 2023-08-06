@@ -1,5 +1,7 @@
-package com.sosim.server.notification;
+package com.sosim.server.notification.service;
 
+import com.sosim.server.notification.domain.entity.Notification;
+import com.sosim.server.notification.domain.repository.NotificationRepository;
 import com.sosim.server.notification.dto.response.MyNotificationsResponse;
 import com.sosim.server.notification.dto.response.NotificationResponse;
 import com.sosim.server.notification.util.NotificationUtil;

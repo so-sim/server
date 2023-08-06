@@ -1,5 +1,6 @@
-package com.sosim.server.notification;
+package com.sosim.server.notification.domain.repository;
 
+import com.sosim.server.notification.domain.entity.Notification;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;

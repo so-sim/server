@@ -1,4 +1,4 @@
-package com.sosim.server.notification;
+package com.sosim.server.notification.domain.entity;
 
 import lombok.AccessLevel;
 import lombok.Builder;

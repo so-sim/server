@@ -1,7 +1,8 @@
-package com.sosim.server.notification;
+package com.sosim.server.notification.controller;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
+import com.sosim.server.notification.service.NotificationService;
 import com.sosim.server.notification.dto.response.MyNotificationsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
