@@ -117,18 +117,17 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public GetEventListResponse getEventsByEventIdList(long userId, GetEventIdListRequest getEventIdListRequest, Pageable pageable) {
+    public GetEventIdListResponse getEventsByEventIdList(long userId, GetEventIdListRequest getEventIdListRequest) {
         long groupId = getEventIdListRequest.getGroupId();
         Group group = findGroupWithParticipants(groupId);
 
-        Page<Event> events = null;
+        List<Event> events = null;
         if (group.isAdminUser(userId)) {
-            events = eventRepository.findAllByEventIdList(groupId, getEventIdListRequest.getEventIdList(), pageable);
+            events = eventRepository.findAllByEventIdList(groupId, getEventIdListRequest.getEventIdList());
         } else {
-            events = eventRepository.findAllByEventIdList(userId, groupId, getEventIdListRequest.getEventIdList(), pageable);
+            events = eventRepository.findAllByEventIdList(userId, groupId, getEventIdListRequest.getEventIdList());
         }
-        //TODO: 논의 후 페이지네이션 정보 변경하기
-        return GetEventListResponse.toDto(events.getContent(), events.getTotalElements());
+        return GetEventIdListResponse.toDto(events);
     }
 
     private void validSituation(long userId, Group group, Situation preSituation, Situation newSituation) {

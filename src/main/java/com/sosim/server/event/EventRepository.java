@@ -50,14 +50,12 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
             "WHERE e.group.id = :groupId " +
             "AND e.id IN (:eventIdList) ")
     @EntityGraph(attributePaths = {"user", "group"})
-    Page<Event> findAllByEventIdList(@Param("groupId") long groupId, List<Long> eventIdList,
-                                     Pageable pageable);
+    List<Event> findAllByEventIdList(@Param("groupId") long groupId, List<Long> eventIdList);
 
     @Query("SELECT e FROM Event e " +
             "WHERE e.group.id = :groupId " +
             "AND e.userId = :userId " +
             "AND e.id IN (:eventIdList) ")
     @EntityGraph(attributePaths = {"user", "group"})
-    Page<Event> findAllByEventIdList(@Param("userId") long userId, @Param("groupId") long groupId,
-                                     List<Long> eventIdList, Pageable pageable);
+    List<Event> findAllByEventIdList(@Param("userId") long userId, @Param("groupId") long groupId, List<Long> eventIdList);
 }
