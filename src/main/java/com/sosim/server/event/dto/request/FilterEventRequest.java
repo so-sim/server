@@ -1,6 +1,6 @@
 package com.sosim.server.event.dto.request;
 
-import com.sosim.server.event.Situation;
+import com.sosim.server.event.domain.entity.Situation;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

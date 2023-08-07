@@ -1,6 +1,6 @@
 package com.sosim.server.participant.dto.response;
 
-import com.sosim.server.participant.Participant;
+import com.sosim.server.participant.domain.entity.Participant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

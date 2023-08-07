@@ -1,8 +1,8 @@
 package com.sosim.server.event.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sosim.server.event.Ground;
-import com.sosim.server.event.Situation;
+import com.sosim.server.event.domain.entity.Ground;
+import com.sosim.server.event.domain.entity.Situation;
 import lombok.*;
 
 import javax.validation.constraints.Max;
@@ -10,7 +10,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-import static com.sosim.server.event.Situation.*;
+import static com.sosim.server.event.domain.entity.Situation.*;
 
 @Getter
 @Builder
