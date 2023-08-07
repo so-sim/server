@@ -15,7 +15,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.sosim.server.event.QEvent.event;
+import static com.sosim.server.event.domain.entity.QEvent.event;
 
 
 @RequiredArgsConstructor
