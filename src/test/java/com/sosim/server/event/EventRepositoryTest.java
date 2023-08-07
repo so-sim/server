@@ -1,6 +1,7 @@
 package com.sosim.server.event;
 
 import com.sosim.server.config.QueryDslConfig;
+import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -89,6 +91,21 @@ public class EventRepositoryTest {
         assertThat(event.getGroup()).isNotNull();
     }
 
+    @DisplayName("Event 캘린더 조회용 Query DSL")
+    @Test
+    void get_event_calendar() {
+        // given
+        FilterEventRequest request = makeFilterEventRequest(null, null);
+        saveEventEntity();
+
+        // when
+        System.out.println("=============================");
+        List<Event> events = eventRepository.searchAll(request);
+
+        // then
+        assertThat(events).isNotNull();
+    }
+
     private void saveEventEntity() {
         List<Event> events = new ArrayList<>();
 
@@ -110,8 +127,18 @@ public class EventRepositoryTest {
         groupRepository.save(group);
         return Event.builder()
                 .situation(situation)
+                .date(LocalDate.of(2023, 8, 1))
                 .group(group)
                 .nickname(nickname)
+                .build();
+    }
+
+    private FilterEventRequest makeFilterEventRequest(String nickname, Situation situation) {
+        return FilterEventRequest.builder()
+                .startDate(LocalDate.of(2023, 8, 1))
+                .endDate(LocalDate.of(2023, 8, 31))
+                .nickname(nickname)
+                .situation(situation)
                 .build();
     }
 }
