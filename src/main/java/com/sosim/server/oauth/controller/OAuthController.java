@@ -1,8 +1,9 @@
-package com.sosim.server.oauth;
+package com.sosim.server.oauth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.common.util.CookieUtil;
+import com.sosim.server.oauth.service.OAuthService;
 import com.sosim.server.oauth.dto.response.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

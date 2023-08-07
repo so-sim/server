@@ -1,6 +1,6 @@
 package com.sosim.server.user;
 
-import com.sosim.server.oauth.Social;
+import com.sosim.server.oauth.domain.domain.Social;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

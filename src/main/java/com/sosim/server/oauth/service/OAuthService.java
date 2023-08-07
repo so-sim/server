@@ -1,4 +1,4 @@
-package com.sosim.server.oauth;
+package com.sosim.server.oauth.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.jwt.service.JwtService;
+import com.sosim.server.oauth.domain.util.OAuthUserFactory;
 import com.sosim.server.oauth.dto.request.OAuthTokenRequest;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import com.sosim.server.oauth.dto.response.LoginResponse;

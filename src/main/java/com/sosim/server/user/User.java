@@ -2,7 +2,7 @@ package com.sosim.server.user;
 
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.common.auditing.Status;
-import com.sosim.server.oauth.Social;
+import com.sosim.server.oauth.domain.domain.Social;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import lombok.Builder;
 import lombok.Getter;

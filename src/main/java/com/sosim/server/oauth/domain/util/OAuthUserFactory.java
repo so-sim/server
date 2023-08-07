@@ -1,4 +1,4 @@
-package com.sosim.server.oauth;
+package com.sosim.server.oauth.domain.util;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.ResponseCode;
