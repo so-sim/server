@@ -1,10 +1,14 @@
 package com.sosim.server.notification.domain.entity;
 
+import com.sosim.server.event.Situation;
+import com.sosim.server.notification.dto.response.MessageDataDto;
 import lombok.*;
 
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+
+import static com.sosim.server.notification.domain.entity.ContentType.*;
 
 @Getter
 @Builder
@@ -30,8 +34,18 @@ public class Content {
         return content;
     }
 
-    public String[] getData() {
-        return new String[] {data1, data2};
+    public MessageDataDto getData() {
+        MessageDataDto messageDataDto = new MessageDataDto();
+        if (REQUEST_PAYMENT.equals(contentType)) {
+            messageDataDto.setAmount(Integer.valueOf(data1));
+        } else if (CHANGE_CHECK_SITUATION.equals(contentType)) {
+            messageDataDto.setNickname(data1);
+            messageDataDto.setAfterSituation(Situation.getSituation(data2));
+        } else if (CHANGE_FULL_SITUATION.equals(contentType) || CHANGE_NONE_SITUATION.equals(contentType)) {
+            messageDataDto.setBeforeSituation(Situation.getSituation(data1));
+            messageDataDto.setAfterSituation(Situation.getSituation(data2));
+        }
+        return messageDataDto;
     }
 
     private void setData(String[] data) {
