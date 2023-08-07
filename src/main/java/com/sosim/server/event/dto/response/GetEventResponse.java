@@ -1,7 +1,7 @@
 package com.sosim.server.event.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sosim.server.event.Event;
+import com.sosim.server.event.domain.entity.Event;
 import lombok.Builder;
 import lombok.Getter;
 
