@@ -1,4 +1,4 @@
-package com.sosim.server.jwt.util;
+package com.sosim.server.jwt.domain.util;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import io.jsonwebtoken.*;

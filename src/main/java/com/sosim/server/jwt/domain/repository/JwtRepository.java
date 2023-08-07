@@ -1,5 +1,6 @@
-package com.sosim.server.jwt;
+package com.sosim.server.jwt.domain.repository;
 
+import com.sosim.server.jwt.domain.entity.RefreshToken;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.sosim.server.jwt;
+package com.sosim.server.jwt.domain.entity;
 
 import lombok.AccessLevel;
 import lombok.Builder;

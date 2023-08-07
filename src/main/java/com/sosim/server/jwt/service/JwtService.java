@@ -1,10 +1,12 @@
-package com.sosim.server.jwt;
+package com.sosim.server.jwt.service;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.ResponseCode;
+import com.sosim.server.jwt.domain.entity.RefreshToken;
+import com.sosim.server.jwt.domain.repository.JwtRepository;
 import com.sosim.server.jwt.dto.response.JwtResponse;
-import com.sosim.server.jwt.util.JwtFactory;
-import com.sosim.server.jwt.util.JwtProvider;
+import com.sosim.server.jwt.domain.util.JwtFactory;
+import com.sosim.server.jwt.domain.util.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

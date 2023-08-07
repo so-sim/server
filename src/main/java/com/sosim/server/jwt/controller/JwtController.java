@@ -1,8 +1,9 @@
-package com.sosim.server.jwt;
+package com.sosim.server.jwt.controller;
 
 import com.sosim.server.common.response.Response;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.common.util.CookieUtil;
+import com.sosim.server.jwt.service.JwtService;
 import com.sosim.server.jwt.dto.response.JwtResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
