@@ -1,6 +1,9 @@
 package com.sosim.server.event;
 
 import com.sosim.server.config.QueryDslConfig;
+import com.sosim.server.event.domain.entity.Event;
+import com.sosim.server.event.domain.entity.Situation;
+import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
