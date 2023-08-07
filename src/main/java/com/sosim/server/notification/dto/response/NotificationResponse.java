@@ -1,7 +1,7 @@
 package com.sosim.server.notification.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sosim.server.notification.Notification;
+import com.sosim.server.notification.domain.entity.Notification;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -25,7 +25,7 @@ public class NotificationResponse {
 
     private String summary;
 
-    private String[] messageData;
+    private MessageDataDto messageData;
 
     private List<Long> eventIdList;
 
@@ -44,4 +44,5 @@ public class NotificationResponse {
                 .view(notification.isView())
                 .build();
     }
+
 }

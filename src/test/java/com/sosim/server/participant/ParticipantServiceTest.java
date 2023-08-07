@@ -1,16 +1,19 @@
 package com.sosim.server.participant;
 
 import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.event.EventRepository;
+import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
+import com.sosim.server.participant.domain.entity.Participant;
+import com.sosim.server.participant.domain.repository.ParticipantRepository;
 import com.sosim.server.participant.dto.NicknameDto;
 import com.sosim.server.participant.dto.NicknameSearchRequest;
 import com.sosim.server.participant.dto.NicknameSearchResponse;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
-import com.sosim.server.user.User;
-import com.sosim.server.user.UserRepository;
+import com.sosim.server.participant.service.ParticipantService;
+import com.sosim.server.user.domain.entity.User;
+import com.sosim.server.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

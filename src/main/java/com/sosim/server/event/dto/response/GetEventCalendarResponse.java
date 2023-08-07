@@ -1,14 +1,14 @@
 package com.sosim.server.event.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sosim.server.event.Event;
-import com.sosim.server.event.Situation;
+import com.sosim.server.event.domain.entity.Event;
+import com.sosim.server.event.domain.entity.Situation;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.*;
 
-import static com.sosim.server.event.Situation.*;
+import static com.sosim.server.event.domain.entity.Situation.*;
 
 @Getter
 @NoArgsConstructor

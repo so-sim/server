@@ -2,16 +2,16 @@ package com.sosim.server.notification.util;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.Response;
-import com.sosim.server.event.Event;
-import com.sosim.server.event.Situation;
+import com.sosim.server.event.domain.entity.Event;
+import com.sosim.server.event.domain.entity.Situation;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
-import com.sosim.server.notification.Content;
-import com.sosim.server.notification.Notification;
-import com.sosim.server.notification.NotificationRepository;
+import com.sosim.server.notification.domain.entity.Content;
+import com.sosim.server.notification.domain.entity.Notification;
+import com.sosim.server.notification.domain.repository.NotificationRepository;
 import com.sosim.server.notification.dto.response.NotificationCountResponse;
 import com.sosim.server.notification.dto.response.NotificationResponse;
-import com.sosim.server.participant.Participant;
+import com.sosim.server.participant.domain.entity.Participant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,8 +27,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.sosim.server.common.response.ResponseCode.*;
-import static com.sosim.server.event.Situation.*;
-import static com.sosim.server.notification.ContentType.*;
+import static com.sosim.server.event.domain.entity.Situation.CHECK;
+import static com.sosim.server.notification.domain.entity.ContentType.*;
 
 @RequiredArgsConstructor
 @Component
@@ -129,9 +129,9 @@ public class NotificationUtil {
 
     @Async
     @Transactional
-    public void sendModifySituationNotifications(List<Event> events, Situation situation) {
+    public void sendModifySituationNotifications(List<Event> events, Situation preSituation, Situation newSituation) {
         List<Notification> notifications = events.stream()
-                .map(event -> makeModifySituationNotification(event, situation))
+                .map(event -> makeModifySituationNotification(event, preSituation, newSituation))
                 .collect(Collectors.toList());
         notificationRepository.saveAll(notifications);
         sendNotifications(notifications);
@@ -141,15 +141,10 @@ public class NotificationUtil {
         return Notification.toEntity(participant.getUser().getId(), group, Content.create(CHANGE_ADMIN));
     }
 
-    private Notification makeCheckSituationNotification(long receiverId, Group group, String senderNickname) {
-        return Notification.toEntity(receiverId, group, Content.create(CHANGE_CHECK_SITUATION, senderNickname));
-    }
-
-    private Notification makeModifySituationNotification(Event event, Situation situation) {
-        assert getSituationType(situation) != null;
+    private Notification makeModifySituationNotification(Event event, Situation preSituation, Situation newSituation) {
         return Notification.toEntity(event.getUser().getId(),
                         event.getGroup(),
-                        Content.create(getSituationType(situation), situation.getComment()));
+                        Content.create(getSituationType(newSituation), preSituation.getComment(), newSituation.getComment()));
     }
 
     private Set<Long> makeGroupIdSet(List<Notification> reservedNotifications) {

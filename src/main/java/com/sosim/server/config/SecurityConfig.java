@@ -1,6 +1,6 @@
 package com.sosim.server.config;
 
-import com.sosim.server.jwt.util.JwtProvider;
+import com.sosim.server.jwt.domain.util.JwtProvider;
 import com.sosim.server.security.filter.AuthenticationFilter;
 import com.sosim.server.security.filter.JwtFailureFilter;
 import lombok.RequiredArgsConstructor;

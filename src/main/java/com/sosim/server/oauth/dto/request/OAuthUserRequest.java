@@ -1,6 +1,6 @@
 package com.sosim.server.oauth.dto.request;
 
-import com.sosim.server.oauth.Social;
+import com.sosim.server.oauth.domain.domain.Social;
 
 import java.util.Map;
 
