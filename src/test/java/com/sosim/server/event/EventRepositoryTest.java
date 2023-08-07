@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
@@ -104,6 +106,28 @@ public class EventRepositoryTest {
 
         // then
         assertThat(events).isNotNull();
+    }
+
+    @DisplayName("Event Filter Query DSL")
+    @Test
+    void get_event_list() {
+        // given
+        FilterEventRequest nicknameRequest = makeFilterEventRequest("닉네임1", null);
+        FilterEventRequest situationRequest = makeFilterEventRequest(null, Situation.FULL);
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        saveEventEntity();
+
+        // when
+        List<Event> nicknameList = eventRepository.searchAll(nicknameRequest, pageRequest).getContent();
+        List<Event> situationList = eventRepository.searchAll(situationRequest, pageRequest).getContent();
+
+        // then
+        for (Event event : nicknameList) {
+            assertThat(event.getNickname()).isEqualTo("닉네임1");
+        }
+        for (Event event : situationList) {
+            assertThat(event.getSituation()).isEqualTo(Situation.FULL);
+        }
     }
 
     private void saveEventEntity() {
