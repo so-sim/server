@@ -1,4 +1,4 @@
-package com.sosim.server.event;
+package com.sosim.server.event.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;

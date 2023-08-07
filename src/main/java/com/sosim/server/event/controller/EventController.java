@@ -1,7 +1,8 @@
-package com.sosim.server.event;
+package com.sosim.server.event.controller;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
+import com.sosim.server.event.service.EventService;
 import com.sosim.server.event.dto.request.*;
 import com.sosim.server.event.dto.response.*;
 import lombok.RequiredArgsConstructor;

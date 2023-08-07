@@ -1,5 +1,7 @@
-package com.sosim.server.event;
+package com.sosim.server.event.domain.repository;
 
+import com.sosim.server.event.domain.entity.Situation;
+import com.sosim.server.event.domain.entity.Event;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

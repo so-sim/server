@@ -1,7 +1,7 @@
 package com.sosim.server.participant;
 
 import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.event.EventRepository;
+import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
 import com.sosim.server.participant.dto.NicknameSearchRequest;

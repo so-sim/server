@@ -1,9 +1,9 @@
 package com.sosim.server.event.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sosim.server.event.Event;
-import com.sosim.server.event.Ground;
-import com.sosim.server.event.Situation;
+import com.sosim.server.event.domain.entity.Event;
+import com.sosim.server.event.domain.entity.Ground;
+import com.sosim.server.event.domain.entity.Situation;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.user.User;
 import lombok.*;

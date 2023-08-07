@@ -1,6 +1,6 @@
 package com.sosim.server.notification.domain.entity;
 
-import com.sosim.server.event.Situation;
+import com.sosim.server.event.domain.entity.Situation;
 import com.sosim.server.notification.dto.response.MessageDataDto;
 import lombok.*;
 

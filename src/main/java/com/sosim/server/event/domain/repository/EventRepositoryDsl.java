@@ -1,5 +1,6 @@
-package com.sosim.server.event;
+package com.sosim.server.event.domain.repository;
 
+import com.sosim.server.event.domain.entity.Event;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

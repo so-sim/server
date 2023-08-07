@@ -2,6 +2,10 @@ package com.sosim.server.event;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
+import com.sosim.server.event.domain.entity.Event;
+import com.sosim.server.event.domain.entity.Ground;
+import com.sosim.server.event.domain.entity.Situation;
+import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
@@ -10,6 +14,7 @@ import com.sosim.server.event.dto.response.EventIdResponse;
 import com.sosim.server.event.dto.response.GetEventCalendarResponse;
 import com.sosim.server.event.dto.response.GetEventResponse;
 import com.sosim.server.event.dto.response.ModifySituationResponse;
+import com.sosim.server.event.service.EventService;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
 import com.sosim.server.notification.util.NotificationUtil;

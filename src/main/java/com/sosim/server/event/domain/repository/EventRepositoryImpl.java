@@ -1,9 +1,11 @@
-package com.sosim.server.event;
+package com.sosim.server.event.domain.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sosim.server.common.auditing.Status;
+import com.sosim.server.event.domain.entity.Situation;
+import com.sosim.server.event.domain.entity.Event;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

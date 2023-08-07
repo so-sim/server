@@ -1,6 +1,6 @@
 package com.sosim.server.event.dto.response;
 
-import com.sosim.server.event.Situation;
+import com.sosim.server.event.domain.entity.Situation;
 import lombok.Builder;
 import lombok.Getter;
 

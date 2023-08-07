@@ -2,8 +2,8 @@ package com.sosim.server.notification.util;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.Response;
-import com.sosim.server.event.Event;
-import com.sosim.server.event.Situation;
+import com.sosim.server.event.domain.entity.Event;
+import com.sosim.server.event.domain.entity.Situation;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
 import com.sosim.server.notification.domain.entity.Content;
@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.sosim.server.common.response.ResponseCode.*;
-import static com.sosim.server.event.Situation.CHECK;
+import static com.sosim.server.event.domain.entity.Situation.CHECK;
 import static com.sosim.server.notification.domain.entity.ContentType.*;
 
 @RequiredArgsConstructor

@@ -1,6 +1,9 @@
-package com.sosim.server.event;
+package com.sosim.server.event.service;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.event.domain.entity.Event;
+import com.sosim.server.event.domain.entity.Situation;
+import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.event.dto.request.CreateEventRequest;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
