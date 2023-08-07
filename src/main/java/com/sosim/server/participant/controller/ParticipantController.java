@@ -1,7 +1,8 @@
-package com.sosim.server.participant;
+package com.sosim.server.participant.controller;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
+import com.sosim.server.participant.service.ParticipantService;
 import com.sosim.server.participant.dto.NicknameSearchRequest;
 import com.sosim.server.participant.dto.NicknameSearchResponse;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;

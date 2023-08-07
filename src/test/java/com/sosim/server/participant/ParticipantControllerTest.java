@@ -2,12 +2,14 @@ package com.sosim.server.participant;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.participant.controller.ParticipantController;
 import com.sosim.server.participant.dto.NicknameDto;
 import com.sosim.server.participant.dto.NicknameSearchRequest;
 import com.sosim.server.participant.dto.NicknameSearchResponse;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
+import com.sosim.server.participant.service.ParticipantService;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import org.junit.jupiter.api.BeforeEach;

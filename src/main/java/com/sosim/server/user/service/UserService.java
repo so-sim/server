@@ -2,8 +2,8 @@ package com.sosim.server.user.service;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
-import com.sosim.server.participant.Participant;
-import com.sosim.server.participant.ParticipantRepository;
+import com.sosim.server.participant.domain.entity.Participant;
+import com.sosim.server.participant.domain.repository.ParticipantRepository;
 import com.sosim.server.user.domain.entity.User;
 import com.sosim.server.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

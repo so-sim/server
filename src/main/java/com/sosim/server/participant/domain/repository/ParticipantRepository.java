@@ -1,6 +1,7 @@
-package com.sosim.server.participant;
+package com.sosim.server.participant.domain.repository;
 
 import com.sosim.server.group.domain.entity.Group;
+import com.sosim.server.participant.domain.entity.Participant;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,4 +1,4 @@
-package com.sosim.server.participant;
+package com.sosim.server.participant.domain.entity;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;

@@ -11,7 +11,7 @@ import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupDto;
 import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.group.service.GroupService;
-import com.sosim.server.participant.Participant;
+import com.sosim.server.participant.domain.entity.Participant;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;

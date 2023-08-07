@@ -11,7 +11,7 @@ import com.sosim.server.notification.domain.entity.Notification;
 import com.sosim.server.notification.domain.repository.NotificationRepository;
 import com.sosim.server.notification.dto.response.NotificationCountResponse;
 import com.sosim.server.notification.dto.response.NotificationResponse;
-import com.sosim.server.participant.Participant;
+import com.sosim.server.participant.domain.entity.Participant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
