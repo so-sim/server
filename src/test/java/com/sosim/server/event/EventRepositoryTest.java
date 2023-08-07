@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.EntityManager;
@@ -22,6 +21,10 @@ import static org.assertj.core.api.Assertions.*;
 @DataJpaTest
 @Import(QueryDslConfig.class)
 public class EventRepositoryTest {
+
+    private long eventId;
+
+    private List<Long> eventIdList;
 
     @Autowired
     EventRepository eventRepository;
@@ -35,6 +38,7 @@ public class EventRepositoryTest {
     @BeforeEach
     void setUp() {
         eventRepository.deleteAll();
+        eventIdList = new ArrayList<>();
         em.flush();
         em.clear();
     }
@@ -44,7 +48,6 @@ public class EventRepositoryTest {
     void update_situation_all() {
         // given
         saveEventEntity();
-        List<Long> eventIdList = new ArrayList<>(Arrays.asList(1L, 2L, 3L));
         Situation situation = Situation.CHECK;
 
         // when
@@ -53,9 +56,9 @@ public class EventRepositoryTest {
         List<Event> events = eventRepository.findAllById(eventIdList);
 
         // then
-        assertThat(events.get(0).getSituation()).isEqualTo(situation);
-        assertThat(events.get(1).getSituation()).isEqualTo(situation);
-        assertThat(events.get(2).getSituation()).isEqualTo(situation);
+        for (Event event : events) {
+            assertThat(event.getSituation()).isEqualTo(situation);
+        }
     }
 
     @DisplayName("닉네임 일괄 변경")
@@ -63,9 +66,8 @@ public class EventRepositoryTest {
     void update_nickname_all() {
         // given
         saveEventEntity();
-        String preNickname = "닉네임2";
+        String preNickname = "닉네임1";
         String newNickname = "새 닉네임";
-        List<Long> eventIdList = new ArrayList<>(Arrays.asList(4L, 5L, 6L));
 
         // when
         System.out.println("=============================");
@@ -73,17 +75,16 @@ public class EventRepositoryTest {
         List<Event> events = eventRepository.findAllById(eventIdList);
 
         // then
-        assertThat(events.get(0).getNickname()).isEqualTo(newNickname);
-        assertThat(events.get(1).getNickname()).isEqualTo(newNickname);
-        assertThat(events.get(2).getNickname()).isEqualTo(newNickname);
+        for (Event event : events) {
+            assertThat(event.getNickname()).isEqualTo(newNickname);
+        }
     }
 
     @DisplayName("Event 조회 / Group n + 1")
     @Test
     void find_by_id_with_group() {
         // given
-        saveEventEntity();
-        long eventId = 1L;
+        saveEventEntityOne();
 
         // when
         System.out.println("=============================");
@@ -138,12 +139,16 @@ public class EventRepositoryTest {
             events.add(makeEvent(Situation.NONE, "닉네임1"));
         }
 
-        size = 3;
-        while (size-- > 0) {
-            events.add(makeEvent(Situation.FULL, "닉네임2"));
-        }
+        List<Event> eventList = eventRepository.saveAll(events);
 
-        eventRepository.saveAll(events);
+        for (Event event : eventList) {
+            eventIdList.add(event.getId());
+        }
+    }
+
+    private void saveEventEntityOne() {
+        Event event = eventRepository.save(makeEvent(null, null));
+        eventId = event.getId();
     }
 
     private Event makeEvent(Situation situation, String nickname) {
