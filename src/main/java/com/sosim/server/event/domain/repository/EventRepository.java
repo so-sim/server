@@ -26,16 +26,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
             "WHERE e.id = :eventId AND e.status = 'ACTIVE'")
     Optional<Event> findByIdWithGroup(@Param("eventId") long eventId);
 
-    @Query("SELECT DISTINCT e.user.id FROM Event e " +
-            "WHERE e.id IN (:eventIdList)")
-    List<Long> getReceiverUserIdList(@Param("eventIdList") List<Long> eventIdList);
-
-    @Query("SELECT p.user.id FROM Event e " +
-            "JOIN e.group g " +
-            "JOIN g.participantList p " +
-            "WHERE e.id = :eventId AND p.isAdmin = 'TRUE'")
-    long getAdminUserId(@Param("eventId") long eventId);
-
     @Query("SELECT e FROM Event e " +
             "WHERE e.id IN (:eventIdList)")
     @EntityGraph(attributePaths = {"user", "group"})
