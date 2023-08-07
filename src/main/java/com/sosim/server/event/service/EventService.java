@@ -4,10 +4,7 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.domain.entity.Event;
 import com.sosim.server.event.domain.entity.Situation;
 import com.sosim.server.event.domain.repository.EventRepository;
-import com.sosim.server.event.dto.request.CreateEventRequest;
-import com.sosim.server.event.dto.request.FilterEventRequest;
-import com.sosim.server.event.dto.request.ModifyEventRequest;
-import com.sosim.server.event.dto.request.ModifySituationRequest;
+import com.sosim.server.event.dto.request.*;
 import com.sosim.server.event.dto.response.*;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
@@ -20,7 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.sosim.server.common.response.ResponseCode.*;
@@ -118,7 +115,22 @@ public class EventService {
     @Transactional(readOnly = true)
     public GetEventListResponse getEvents(FilterEventRequest filterEventRequest, Pageable pageable) {
         Page<Event> events = eventRepository.searchAll(filterEventRequest, pageable);
+        //TODO: 논의 후 페이지네이션 정보 변경하기
         return GetEventListResponse.toDto(events.getContent(), events.getTotalElements());
+    }
+
+    @Transactional(readOnly = true)
+    public GetEventIdListResponse getEventsByEventIdList(long userId, GetEventIdListRequest getEventIdListRequest) {
+        long groupId = getEventIdListRequest.getGroupId();
+        Group group = findGroupWithParticipants(groupId);
+
+        List<Event> events = null;
+        if (group.isAdminUser(userId)) {
+            events = eventRepository.findAllByEventIdList(groupId, getEventIdListRequest.getEventIdList());
+        } else {
+            events = eventRepository.findAllByEventIdList(userId, groupId, getEventIdListRequest.getEventIdList());
+        }
+        return GetEventIdListResponse.toDto(events);
     }
 
     private void validSituation(long userId, Group group, Situation preSituation, Situation newSituation) {
@@ -166,4 +178,5 @@ public class EventService {
                 .map(Participant::getNickname)
                 .collect(Collectors.toList());
     }
+
 }
