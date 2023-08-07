@@ -4,7 +4,7 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.domain.entity.Group;
-import com.sosim.server.user.User;
+import com.sosim.server.user.domain.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

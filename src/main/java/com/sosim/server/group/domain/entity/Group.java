@@ -5,7 +5,7 @@ import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.common.response.ResponseCode;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.participant.Participant;
-import com.sosim.server.user.User;
+import com.sosim.server.user.domain.entity.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

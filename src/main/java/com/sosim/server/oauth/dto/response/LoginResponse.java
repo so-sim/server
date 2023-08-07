@@ -2,7 +2,7 @@ package com.sosim.server.oauth.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sosim.server.jwt.dto.response.JwtResponse;
-import com.sosim.server.user.User;
+import com.sosim.server.user.domain.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 

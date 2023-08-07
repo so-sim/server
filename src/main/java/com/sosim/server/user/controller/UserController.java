@@ -1,8 +1,9 @@
-package com.sosim.server.user;
+package com.sosim.server.user.controller;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.common.util.CookieUtil;
+import com.sosim.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

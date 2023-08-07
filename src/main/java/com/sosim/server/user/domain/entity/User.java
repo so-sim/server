@@ -1,4 +1,4 @@
-package com.sosim.server.user;
+package com.sosim.server.user.domain.entity;
 
 import com.sosim.server.common.auditing.BaseTimeEntity;
 import com.sosim.server.common.auditing.Status;

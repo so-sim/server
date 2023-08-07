@@ -5,7 +5,7 @@ import com.sosim.server.event.domain.entity.Event;
 import com.sosim.server.event.domain.entity.Ground;
 import com.sosim.server.event.domain.entity.Situation;
 import com.sosim.server.group.domain.entity.Group;
-import com.sosim.server.user.User;
+import com.sosim.server.user.domain.entity.User;
 import lombok.*;
 
 import javax.validation.constraints.*;
