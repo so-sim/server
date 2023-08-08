@@ -63,6 +63,10 @@ public class WeekNotificationSettingInfo extends NotificationSettingInfo {
     }
 
     private boolean isSendCondition(DayOfWeek currentWeek, int diffCycle, LocalDateTime sendDateTime) {
+        //TODO: 기존 daysOfWeek가 null / Day로직도 동일
+        if (daysOfWeek == null) {
+            return false;
+        }
         return diffCycle % repeatCycle == 0 && daysOfWeek.contain(currentWeek)
                 && isAfterOrEqualsNow(sendDateTime);
     }

@@ -36,6 +36,9 @@ public class WeekOrdinalsOfMonth {
     }
 
     private String makeOrdinalNumberString(int[] ordinalNo) {
+        if (ordinalNo == null) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         for (int no : ordinalNo) {
             sb.append(no).append(DELIMITER);

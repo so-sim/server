@@ -36,6 +36,9 @@ public class DaysOfWeek {
     }
 
     private String makeString(String[] dayOfWeeks) {
+        if (dayOfWeeks == null) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         for (String week : dayOfWeeks) {
             sb.append(week).append(DELIMITER);
