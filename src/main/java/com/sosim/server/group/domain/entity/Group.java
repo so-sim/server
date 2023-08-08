@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -57,7 +56,6 @@ public class Group extends BaseTimeEntity {
         this.title = title;
         this.coverColor = coverColor;
         this.groupType = groupType;
-        this.notificationSettingInfo = initNotificationSettingInfo();
         status = ACTIVE;
     }
 
@@ -158,6 +156,9 @@ public class Group extends BaseTimeEntity {
 
     public void changeNotificationSettingInfo(long userId, NotificationSettingInfo settingInfo) {
         checkIsAdmin(userId);
+        if (notSettingInfo()) {
+            return;
+        }
         //TODO: 타입이 다른 경우 아예 갈아끼워야 하는데, 정상 작동 여부 테스트 필요
         if (!isSameSettingType(settingInfo)) {
             notificationSettingInfo = settingInfo;
@@ -166,16 +167,8 @@ public class Group extends BaseTimeEntity {
         notificationSettingInfo.changeSettingInfo(settingInfo);
     }
 
-    private NotificationSettingInfo initNotificationSettingInfo() {
-        return MonthNotificationSettingInfo.builder()
-                .startDate(LocalDate.now())
-                .repeatCycle(DEFAULT_REPEAT_CYCLE)
-                .sendTime(DEFAULT_SEND_TIME)
-                .monthSettingType(null)
-                .sendDay(LocalDate.now().getDayOfMonth())
-                .weekOrdinalsOfMonth(new WeekOrdinalsOfMonth())
-                .daysOfWeek(new DaysOfWeek())
-                .build();
+    private boolean notSettingInfo() {
+        return notificationSettingInfo == null;
     }
 
     private boolean isSameSettingType(NotificationSettingInfo newSettingInfo) {
