@@ -46,7 +46,7 @@ public class DayNotificationSettingInfo extends NotificationSettingInfo {
 
     @Override
     public String getSettingType() {
-        return "W";
+        return "D";
     }
 
     @Override

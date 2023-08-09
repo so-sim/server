@@ -43,7 +43,7 @@ public class Notification extends BaseTimeEntity {
     @Column(name = "RESERVED")
     private boolean reserved;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "event_ids", joinColumns = @JoinColumn(name = "notification_id"))
     @OrderColumn(name = "line_idx")
     private List<Long> eventIdList;
