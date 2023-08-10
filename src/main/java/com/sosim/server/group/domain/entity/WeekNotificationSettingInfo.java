@@ -26,7 +26,14 @@ public class WeekNotificationSettingInfo extends NotificationSettingInfo {
     public WeekNotificationSettingInfo(boolean enableNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime, DaysOfWeek daysOfWeek) {
         super(enableNotification, startDate, repeatCycle, sendTime);
         setNextSendDate();
-        this.daysOfWeek = daysOfWeek;
+        this.daysOfWeek = setDaysOfWeek(daysOfWeek);
+    }
+
+    private DaysOfWeek setDaysOfWeek(DaysOfWeek daysOfWeek) {
+        if (daysOfWeek == null) {
+            return new DaysOfWeek(null);
+        }
+        return daysOfWeek;
     }
 
     private void setNextSendDate() {
@@ -63,12 +70,15 @@ public class WeekNotificationSettingInfo extends NotificationSettingInfo {
     }
 
     private boolean isSendCondition(DayOfWeek currentWeek, int diffCycle, LocalDateTime sendDateTime) {
-        //TODO: 기존 daysOfWeek가 null / Day로직도 동일
-        if (daysOfWeek == null) {
-            return false;
-        }
-        return diffCycle % repeatCycle == 0 && daysOfWeek.contain(currentWeek)
-                && isAfterOrEqualsNow(sendDateTime);
+        return isValidCycle(diffCycle) && isContain(currentWeek) && isAfterOrEqualsNow(sendDateTime);
+    }
+
+    private boolean isContain(DayOfWeek currentWeek) {
+        return daysOfWeek.contain(currentWeek);
+    }
+
+    private boolean isValidCycle(int diffCycle) {
+        return diffCycle % repeatCycle == 0;
     }
 
     private boolean isAfterOrEqualsNow(LocalDateTime sendDateTime) {

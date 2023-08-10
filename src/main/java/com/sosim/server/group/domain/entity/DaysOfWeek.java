@@ -12,11 +12,10 @@ public class DaysOfWeek {
 
     private String daysOfWeek;
 
-    public DaysOfWeek(String daysOfWeek) {
-        this.daysOfWeek = daysOfWeek;
-    }
-
     public DaysOfWeek(String[] dayOfWeeks) {
+        if (dayOfWeeks == null || dayOfWeeks.length == 0) {
+            this.daysOfWeek = "";
+        }
         this.daysOfWeek = makeString(dayOfWeeks);
     }
 
@@ -36,9 +35,6 @@ public class DaysOfWeek {
     }
 
     private String makeString(String[] dayOfWeeks) {
-        if (dayOfWeeks == null) {
-            return "";
-        }
         StringBuilder sb = new StringBuilder();
         for (String week : dayOfWeeks) {
             sb.append(week).append(DELIMITER);
