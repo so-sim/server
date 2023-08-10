@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,16 +23,18 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             "WHERE n.userId = :userId")
     void updateViewByUserId(@Param("userId") long userId);
 
-    @Query(value = "SELECT * FROM notifications n " +
-            "WHERE n.user_id = :userId " +
+    @Query("SELECT n FROM Notification n " +
+            "WHERE n.userId = :userId " +
             "AND n.reserved = false " +
-            "AND n.send_dateTime >= :time", nativeQuery = true)
+            "AND n.sendDateTime >= :time")
     Slice<Notification> findMyNotifications(@Param("userId") long userId, @Param("time") LocalDateTime time, Pageable pageable);
 
     @Query(value = "SELECT * FROM notifications n " +
             "WHERE n.send_dateTime <= CURRENT_TIMESTAMP AND n.reserved = true ", nativeQuery = true)
     List<Notification> findReservedNotifications();
 
+    @Modifying
+    @Transactional
     @Query("DELETE FROM Notification n " +
             "WHERE n.groupInfo.groupId = :groupId AND n.reserved = true")
     void deleteReservedNotifications(@Param("groupId") long groupId);

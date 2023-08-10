@@ -65,12 +65,10 @@ public class MonthNotificationSettingInfo extends NotificationSettingInfo {
     @Override
     public void changeSettingInfoDetail(NotificationSettingInfo newSettingInfo) {
         MonthNotificationSettingInfo monthSettingInfo = (MonthNotificationSettingInfo) newSettingInfo;
-        if (SIMPLE_DATE.equals(monthSettingInfo.getMonthSettingType())) {
-            sendDay = monthSettingInfo.getSendDay();
-        } else {
-            weekOrdinalsOfMonth = monthSettingInfo.getWeekOrdinalsOfMonth();
-            daysOfWeek = monthSettingInfo.getDaysOfWeek();
-        }
+        monthSettingType = monthSettingInfo.getMonthSettingType();
+        sendDay = monthSettingInfo.getSendDay();
+        weekOrdinalsOfMonth = monthSettingInfo.getWeekOrdinalsOfMonth();
+        daysOfWeek = monthSettingInfo.getDaysOfWeek();
         setNextSendTime();
     }
 
