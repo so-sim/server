@@ -43,6 +43,10 @@ public class Event extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Situation situation;
 
+    @Column(name = "SITUATION")
+    @Enumerated(EnumType.STRING)
+    private Situation preSituation;
+
     @Column(name = "NICKNAME")
     private String nickname;
 
