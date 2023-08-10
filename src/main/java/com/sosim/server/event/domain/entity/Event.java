@@ -43,7 +43,7 @@ public class Event extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Situation situation;
 
-    @Column(name = "SITUATION")
+    @Column(name = "PRE_SITUATION")
     @Enumerated(EnumType.STRING)
     private Situation preSituation;
 
@@ -81,6 +81,10 @@ public class Event extends BaseTimeEntity {
         this.amount = modifyEventRequest.getAmount();
         this.ground = modifyEventRequest.getGround();
         this.memo = modifyEventRequest.getMemo();
+
+        if (modifyEventRequest.getSituation().equals(Situation.FULL)) {
+            preSituation = situation;
+        }
         this.situation = modifyEventRequest.getSituation();
     }
 
