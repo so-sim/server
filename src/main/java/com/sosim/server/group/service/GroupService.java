@@ -60,8 +60,10 @@ public class GroupService {
     @Transactional
     public GroupIdResponse updateGroup(long userId, long groupId, ModifyGroupRequest modifyGroupRequest) {
         Group group = findGroup(groupId);
+        String preTitle = group.getTitle();
         group.update(userId, modifyGroupRequest);
 
+//        checkModifyNotificationGroupTitle(preTitle, modifyGroupRequest.getTitle(), groupId);
         changeAdminNickname(group, modifyGroupRequest.getNickname());
 
         return GroupIdResponse.toDto(group.getId());
@@ -91,6 +93,12 @@ public class GroupService {
 
         List<MyGroupDto> myGroupDtoList = toMyGroupDtoList(userId, myGroups);
         return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroupDtoList);
+    }
+
+    private void checkModifyNotificationGroupTitle(String preTitle, String newTitle, long groupId) {
+        if (!preTitle.equals(newTitle)) {
+            notificationUtil.modifyGroupTitle(groupId, newTitle);
+        }
     }
 
     private void changeAdminNickname(Group group, String newNickname) {

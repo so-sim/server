@@ -38,4 +38,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query("DELETE FROM Notification n " +
             "WHERE n.groupInfo.groupId = :groupId AND n.reserved = true")
     void deleteReservedNotifications(@Param("groupId") long groupId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Notification n SET n.groupInfo.groupTitle = :title " +
+            "WHERE n.groupInfo.groupId = :groupId")
+    void updateAllGroupTitleByGroupId(@Param("groupId") long groupId, @Param("title") String title);
 }
