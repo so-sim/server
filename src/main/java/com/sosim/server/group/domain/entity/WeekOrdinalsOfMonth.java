@@ -16,6 +16,7 @@ public class WeekOrdinalsOfMonth {
     public WeekOrdinalsOfMonth(int[] ordinalNo) {
         if (ordinalNo == null || ordinalNo.length == 0) {
             this.ordinalNumbers = "";
+            return;
         }
         this.ordinalNumbers = makeOrdinalNumberString(ordinalNo);
     }

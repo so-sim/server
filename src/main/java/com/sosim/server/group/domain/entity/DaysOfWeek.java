@@ -15,6 +15,7 @@ public class DaysOfWeek {
     public DaysOfWeek(String[] dayOfWeeks) {
         if (dayOfWeeks == null || dayOfWeeks.length == 0) {
             this.daysOfWeek = "";
+            return;
         }
         this.daysOfWeek = makeString(dayOfWeeks);
     }
