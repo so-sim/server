@@ -138,7 +138,7 @@ public class NotificationUtil {
     }
 
     private Notification makeChangeAdminNotification(Group group, Participant participant) {
-        return Notification.toEntity(participant.getUser().getId(), group, Content.create(CHANGE_ADMIN));
+        return Notification.toEntity(participant.getUser().getId(), group, Content.create(CHANGE_ADMIN, group.getAdminParticipant().getNickname()));
     }
 
     private Notification makeModifySituationNotification(Event event, Situation preSituation, Situation newSituation) {
