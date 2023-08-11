@@ -25,8 +25,8 @@ public class WeekNotificationSettingInfo extends NotificationSettingInfo {
     @Builder
     public WeekNotificationSettingInfo(boolean enableNotification, LocalDate startDate, int repeatCycle, LocalTime sendTime, DaysOfWeek daysOfWeek) {
         super(enableNotification, startDate, repeatCycle, sendTime);
-        setNextSendDate();
         this.daysOfWeek = setDaysOfWeek(daysOfWeek);
+        setNextSendDate();
     }
 
     private DaysOfWeek setDaysOfWeek(DaysOfWeek daysOfWeek) {
