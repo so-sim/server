@@ -192,7 +192,6 @@ class GroupServiceTest {
         addParticipantInGroup(group, userId, true);
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
-        doNothing().when(notificationUtil).modifyGroupTitle(groupId, title);
 
         //when
         GroupIdResponse response = groupService.updateGroup(userId, groupId, request);
