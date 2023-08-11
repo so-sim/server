@@ -12,6 +12,7 @@ import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.group.service.GroupService;
+import com.sosim.server.notification.util.NotificationUtil;
 import com.sosim.server.participant.domain.entity.Participant;
 import com.sosim.server.participant.domain.repository.ParticipantRepository;
 import com.sosim.server.user.domain.entity.User;
@@ -51,6 +52,8 @@ class GroupServiceTest {
     UserRepository userRepository;
     @Mock
     ParticipantRepository participantRepository;
+    @Mock
+    NotificationUtil notificationUtil;
 
     @DisplayName("그룹 생성 / 성공")
     @Test
@@ -189,6 +192,7 @@ class GroupServiceTest {
         addParticipantInGroup(group, userId, true);
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doNothing().when(notificationUtil).modifyGroupTitle(groupId, title);
 
         //when
         GroupIdResponse response = groupService.updateGroup(userId, groupId, request);
