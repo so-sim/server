@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -135,6 +136,12 @@ public class NotificationUtil {
                 .collect(Collectors.toList());
         notificationRepository.saveAll(notifications);
         sendNotifications(notifications);
+    }
+
+    @Async
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void modifyNickname(long groupId, String preNickname, String newNickname) {
+        notificationRepository.updateAllNicknameByGroupIdAndNickname(groupId, preNickname, newNickname);
     }
 
     private Notification makeChangeAdminNotification(Group group, Participant participant) {

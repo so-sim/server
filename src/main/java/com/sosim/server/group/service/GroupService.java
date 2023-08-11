@@ -100,6 +100,7 @@ public class GroupService {
         String preNickname = admin.getNickname();
         admin.modifyNickname(group, newNickname);
         eventRepository.updateNicknameAll(newNickname, preNickname);
+        notificationUtil.modifyNickname(group.getId(), preNickname, newNickname);
     }
 
     private List<MyGroupDto> toMyGroupDtoList(long userId, Slice<Group> myGroups) {

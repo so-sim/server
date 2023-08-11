@@ -4,6 +4,7 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
+import com.sosim.server.notification.util.NotificationUtil;
 import com.sosim.server.participant.domain.entity.Participant;
 import com.sosim.server.participant.domain.repository.ParticipantRepository;
 import com.sosim.server.participant.dto.NicknameSearchRequest;
@@ -31,6 +32,7 @@ public class ParticipantService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final NotificationUtil notificationUtil;
 
     @Transactional
     public void createParticipant(long userId, long groupId, String nickname) {
@@ -70,6 +72,7 @@ public class ParticipantService {
         participant.modifyNickname(group, newNickname);
 
         eventRepository.updateNicknameAll(newNickname, preNickname);
+        notificationUtil.modifyNickname(groupId, preNickname, newNickname);
     }
 
     @Transactional(readOnly = true)
