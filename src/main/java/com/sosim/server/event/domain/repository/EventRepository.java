@@ -15,7 +15,9 @@ import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long>, EventRepositoryDsl {
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE Event e SET e.situation = :situation " +
+    @Query("UPDATE Event e SET " +
+            "e.preSituation = CASE :situation WHEN 'FULL' THEN e.situation ELSE e.preSituation END, " +
+            "e.situation = :situation " +
             "WHERE e.id IN (:eventIdList)")
     void updateSituationAll(@Param("eventIdList") List<Long> eventIdList, @Param("situation") Situation situation);
 
