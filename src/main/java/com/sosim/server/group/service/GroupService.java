@@ -64,6 +64,7 @@ public class GroupService {
         Group group = findGroup(groupId);
         group.update(userId, modifyGroupRequest);
 
+        notificationUtil.modifyGroupTitle(groupId, group.getTitle());
         changeAdminNickname(group, modifyGroupRequest.getNickname());
 
         return GroupIdResponse.toDto(group.getId());

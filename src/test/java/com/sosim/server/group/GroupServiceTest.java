@@ -13,6 +13,7 @@ import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupsResponse;
 import com.sosim.server.group.service.GroupService;
+import com.sosim.server.notification.util.NotificationUtil;
 import com.sosim.server.participant.domain.entity.Participant;
 import com.sosim.server.participant.domain.repository.ParticipantRepository;
 import com.sosim.server.user.domain.entity.User;
@@ -54,6 +55,9 @@ class GroupServiceTest {
     ParticipantRepository participantRepository;
     @Mock
     EventRepository eventRepository;
+    @
+    NotificationUtil notificationUtil;
+
 
     @DisplayName("그룹 생성 / 성공")
     @Test

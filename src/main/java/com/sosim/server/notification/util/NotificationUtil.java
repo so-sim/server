@@ -143,6 +143,12 @@ public class NotificationUtil {
     public void modifyNickname(long groupId, String preNickname, String newNickname) {
         notificationRepository.updateAllNicknameByGroupIdAndNickname(groupId, preNickname, newNickname);
     }
+  
+    @Async
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void modifyGroupTitle(long groupId, String newTitle) {
+        notificationRepository.updateAllGroupTitleByGroupId(groupId, newTitle);
+    }
 
     private Notification makeChangeAdminNotification(Group group, Participant participant) {
         return Notification.toEntity(participant.getUser().getId(), group, Content.create(CHANGE_ADMIN, group.getAdminParticipant().getNickname()));

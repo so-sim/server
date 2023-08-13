@@ -36,10 +36,24 @@ public class MonthNotificationSettingInfo extends NotificationSettingInfo {
                                         MonthSettingType monthSettingType, WeekOrdinalsOfMonth weekOrdinalsOfMonth, DaysOfWeek daysOfWeek, int sendDay) {
         super(enableNotification, startDate, repeatCycle, sendTime);
         this.monthSettingType = monthSettingType;
-        this.weekOrdinalsOfMonth = weekOrdinalsOfMonth;
-        this.daysOfWeek = daysOfWeek;
+        this.weekOrdinalsOfMonth = setWeekOrdinalsOfMonth(weekOrdinalsOfMonth);
+        this.daysOfWeek = setDaysOfWeek(daysOfWeek);
         this.sendDay = sendDay;
         setNextSendTime();
+    }
+
+    private WeekOrdinalsOfMonth setWeekOrdinalsOfMonth(WeekOrdinalsOfMonth weekOrdinalsOfMonth) {
+        if (weekOrdinalsOfMonth == null) {
+            return new WeekOrdinalsOfMonth(null);
+        }
+        return weekOrdinalsOfMonth;
+    }
+
+    private DaysOfWeek setDaysOfWeek(DaysOfWeek daysOfWeek) {
+        if (daysOfWeek == null) {
+            return new DaysOfWeek(null);
+        }
+        return daysOfWeek;
     }
 
     private void setNextSendTime() {

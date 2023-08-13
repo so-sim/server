@@ -13,11 +13,11 @@ public class WeekOrdinalsOfMonth {
 
     private String ordinalNumbers;
 
-    public WeekOrdinalsOfMonth(String ordinalNumbers) {
-        this.ordinalNumbers = ordinalNumbers;
-    }
-
     public WeekOrdinalsOfMonth(int[] ordinalNo) {
+        if (ordinalNo == null || ordinalNo.length == 0) {
+            this.ordinalNumbers = "";
+            return;
+        }
         this.ordinalNumbers = makeOrdinalNumberString(ordinalNo);
     }
 
@@ -36,9 +36,6 @@ public class WeekOrdinalsOfMonth {
     }
 
     private String makeOrdinalNumberString(int[] ordinalNo) {
-        if (ordinalNo == null) {
-            return "";
-        }
         StringBuilder sb = new StringBuilder();
         for (int no : ordinalNo) {
             sb.append(no).append(DELIMITER);
