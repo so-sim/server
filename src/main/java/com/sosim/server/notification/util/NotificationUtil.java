@@ -139,13 +139,13 @@ public class NotificationUtil {
     }
 
     @Async
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional
     public void modifyNickname(long groupId, String preNickname, String newNickname) {
         notificationRepository.updateAllNicknameByGroupIdAndNickname(groupId, preNickname, newNickname);
     }
   
     @Async
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional
     public void modifyGroupTitle(long groupId, String newTitle) {
         notificationRepository.updateAllGroupTitleByGroupId(groupId, newTitle);
     }
