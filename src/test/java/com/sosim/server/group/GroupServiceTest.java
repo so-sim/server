@@ -55,7 +55,7 @@ class GroupServiceTest {
     ParticipantRepository participantRepository;
     @Mock
     EventRepository eventRepository;
-    @
+    @Mock
     NotificationUtil notificationUtil;
 
 
