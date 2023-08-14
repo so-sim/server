@@ -168,8 +168,6 @@ public class EventRepositoryTest {
     private Event makeEvent(Situation situation, String nickname) {
         User user = User.builder().build();
         userRepository.save(user);
-        Group group = Group.builder().build();
-        groupRepository.save(group);
         return Event.builder()
                 .situation(situation)
                 .date(LocalDate.of(2023, 8, 1))
