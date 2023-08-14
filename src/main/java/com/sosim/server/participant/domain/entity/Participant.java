@@ -19,7 +19,6 @@ import static com.sosim.server.common.response.ResponseCode.CANNOT_WITHDRAWAL_BY
 @Getter
 @NoArgsConstructor
 @Table(name = "PARTICIPANTS")
-@DynamicUpdate
 public class Participant extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

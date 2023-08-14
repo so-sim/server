@@ -26,7 +26,6 @@ import static com.sosim.server.common.response.ResponseCode.*;
 @Getter()
 @NoArgsConstructor
 @Table(name = "`GROUPS`")
-@DynamicUpdate
 public class Group extends BaseTimeEntity {
     public static final int DEFAULT_REPEAT_CYCLE = 1;
     public static final LocalTime DEFAULT_SEND_TIME = LocalTime.of(12, 0);

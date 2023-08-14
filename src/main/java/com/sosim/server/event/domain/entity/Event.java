@@ -21,7 +21,6 @@ import static com.sosim.server.common.response.ResponseCode.NOT_FULL_OR_NON_SITU
 @Getter
 @NoArgsConstructor
 @Table(name = "EVENTS")
-@DynamicUpdate
 public class Event extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

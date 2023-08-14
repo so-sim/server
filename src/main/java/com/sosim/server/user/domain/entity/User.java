@@ -15,7 +15,6 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @Table(name = "USERS")
-@DynamicUpdate
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
