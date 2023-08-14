@@ -74,7 +74,7 @@ public class EventServiceTest {
         ReflectionTestUtils.setField(group, "id", groupId);
         User user = User.builder().build();
         ReflectionTestUtils.setField(user, "id", userId);
-        Event event = Event.builder().build();
+        Event event = Event.builder().user(user).build();
         ReflectionTestUtils.setField(event, "id", eventId);
 
         Participant participant = group.createParticipant(user, nickname, true);
@@ -161,7 +161,9 @@ public class EventServiceTest {
     @Test
     void get_event() {
         //given
-        Event event = Event.builder().build();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        Event event = Event.builder().user(user).build();
         ReflectionTestUtils.setField(event, "id", eventId);
         ReflectionTestUtils.setField(event, "situation", Situation.NONE);
         ReflectionTestUtils.setField(event, "ground", Ground.ETC);
@@ -198,15 +200,15 @@ public class EventServiceTest {
         String nickname = "닉네임";
         ModifyEventRequest request = makeModifyEventRequest(nickname);
 
-        Event event = Event.builder().build();
-        Group group = Group.builder().build();
         User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        Event event = Event.builder().user(user).build();
+        Group group = Group.builder().build();
         ReflectionTestUtils.setField(event, "id", eventId);
         ReflectionTestUtils.setField(event, "group", group);
         ReflectionTestUtils.setField(event, "nickname", nickname);
         ReflectionTestUtils.setField(event, "situation", Situation.NONE);
         ReflectionTestUtils.setField(group, "id", groupId);
-        ReflectionTestUtils.setField(user, "id", userId);
 
         Participant participant = group.createParticipant(user, nickname, true);
 
@@ -244,12 +246,12 @@ public class EventServiceTest {
         String nickname = "닉네임";
         ModifyEventRequest request = makeModifyEventRequest(nickname);
 
-        Event event = Event.builder().build();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        Event event = Event.builder().user(user).build();
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(event, "group", group);
         ReflectionTestUtils.setField(group, "id", groupId);
-        User user = User.builder().build();
-        ReflectionTestUtils.setField(user, "id", userId);
 
         group.createParticipant(user, nickname, true);
 
@@ -269,12 +271,12 @@ public class EventServiceTest {
         String nickname = "닉네임";
         ModifyEventRequest request = makeModifyEventRequest(nickname + "2");
 
-        Event event = Event.builder().build();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        Event event = Event.builder().user(user).build();
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(event, "group", group);
         ReflectionTestUtils.setField(group, "id", groupId);
-        User user = User.builder().build();
-        ReflectionTestUtils.setField(user, "id", userId);
 
         group.createParticipant(user, nickname, true);
 
@@ -292,12 +294,12 @@ public class EventServiceTest {
     @Test
     void delete_event() {
         // given
-        Event event = Event.builder().build();
-        Group group = Group.builder().build();
         User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        Event event = Event.builder().user(user).build();
+        Group group = Group.builder().build();
         ReflectionTestUtils.setField(event, "id", eventId);
         ReflectionTestUtils.setField(event, "group", group);
-        ReflectionTestUtils.setField(user, "id", userId);
 
         group.createParticipant(user, "닉네임", true);
 
@@ -327,12 +329,12 @@ public class EventServiceTest {
     @Test
     void delete_event_none_admin() {
         // given
-        Event event = Event.builder().build();
-        Group group = Group.builder().build();
         User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        Event event = Event.builder().user(user).build();
+        Group group = Group.builder().build();
         ReflectionTestUtils.setField(event, "id", eventId);
         ReflectionTestUtils.setField(event, "group", group);
-        ReflectionTestUtils.setField(user, "id", userId);
 
         group.createParticipant(user, "닉네임", true);
 
@@ -351,13 +353,13 @@ public class EventServiceTest {
         // given
         ModifySituationRequest request = makeModifySituationRequest(Situation.NONE);
 
-        Event event = Event.builder().build();
-        Group group = Group.builder().build();
         User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        Event event = Event.builder().user(user).build();
+        Group group = Group.builder().build();
         ReflectionTestUtils.setField(event, "group", group);
         ReflectionTestUtils.setField(event, "situation", Situation.CHECK);
         ReflectionTestUtils.setField(group, "id", groupId);
-        ReflectionTestUtils.setField(user, "id", userId);
 
         group.createParticipant(user, "닉네임", true);
 
@@ -379,13 +381,13 @@ public class EventServiceTest {
         // given
         ModifySituationRequest request = makeModifySituationRequest(Situation.CHECK);
 
-        Event event = Event.builder().build();
-        Group group = Group.builder().build();
         User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        Event event = Event.builder().user(user).build();
+        Group group = Group.builder().build();
         ReflectionTestUtils.setField(event, "group", group);
         ReflectionTestUtils.setField(event, "situation", Situation.NONE);
         ReflectionTestUtils.setField(group, "id", groupId);
-        ReflectionTestUtils.setField(user, "id", userId);
 
         group.createParticipant(user, "닉네임", true);
 
@@ -404,13 +406,13 @@ public class EventServiceTest {
         // given
         ModifySituationRequest request = makeModifySituationRequest(Situation.FULL);
 
-        Event event = Event.builder().build();
-        Group group = Group.builder().build();
         User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        Event event = Event.builder().user(user).build();
+        Group group = Group.builder().build();
         ReflectionTestUtils.setField(event, "group", group);
         ReflectionTestUtils.setField(event, "situation", Situation.NONE);
         ReflectionTestUtils.setField(group, "id", groupId);
-        ReflectionTestUtils.setField(user, "id", userId);
 
         group.createParticipant(user, "닉네임", true);
 
@@ -429,7 +431,9 @@ public class EventServiceTest {
         // given
         FilterEventRequest request = makeFilterEventRequest(null, null);
 
-        Event event = Event.builder().build();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        Event event = Event.builder().user(user).build();
         ReflectionTestUtils.setField(event, "id", eventId);
         ReflectionTestUtils.setField(event, "date", LocalDate.now());
         ReflectionTestUtils.setField(event, "situation", Situation.NONE);
@@ -451,7 +455,9 @@ public class EventServiceTest {
         FilterEventRequest request = makeFilterEventRequest("닉네임", Situation.NONE);
         Pageable pageable = PageRequest.of(0, 15);
 
-        Event event = Event.builder().build();
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+        Event event = Event.builder().user(user).build();
         ReflectionTestUtils.setField(event, "id", eventId);
         ReflectionTestUtils.setField(event, "date", LocalDate.now());
         ReflectionTestUtils.setField(event, "situation", Situation.NONE);
