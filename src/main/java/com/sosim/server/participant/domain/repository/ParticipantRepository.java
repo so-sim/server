@@ -1,5 +1,6 @@
 package com.sosim.server.participant.domain.repository;
 
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.participant.domain.entity.Participant;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -46,5 +47,5 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
             "WHERE p.status = 'ACTIVE' AND p.group.id = :groupId")
     List<Long> getReceiverUserIdList(@Param("groupId") long groupId);
 
-    List<Participant> findAllByNicknameInAndGroup(List<String> nicknames, Group group);
+    List<Participant> findAllByNicknameInAndGroupAndStatus(List<String> nicknames, Group group, Status status);
 }
