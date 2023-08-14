@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -53,7 +52,7 @@ public class NotificationUtil {
     }
 
     @Transactional
-    @Scheduled(cron = "* */30 * * * *") //30분 마다
+    @Scheduled(cron = "0 */30 * * * *") //30분 마다
     public void sendRegularNotification() {
         List<Notification> reservedNotifications = notificationRepository.findReservedNotifications();
         reservedNotifications.forEach(this::sendReservedNotification);
