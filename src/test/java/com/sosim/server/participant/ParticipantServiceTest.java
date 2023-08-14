@@ -332,7 +332,7 @@ class ParticipantServiceTest {
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
         doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
-        doNothing().when(eventRepository).updateNicknameAll(any(), any(), any());
+        doNothing().when(eventRepository).updateNicknameAll(newNickname, participant.getNickname(), groupId);
 
         //when
         participantService.modifyNickname(userId, groupId, newNickname);
