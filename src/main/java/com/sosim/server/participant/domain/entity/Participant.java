@@ -8,6 +8,7 @@ import com.sosim.server.user.domain.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
@@ -18,6 +19,7 @@ import static com.sosim.server.common.response.ResponseCode.CANNOT_WITHDRAWAL_BY
 @Getter
 @NoArgsConstructor
 @Table(name = "PARTICIPANTS")
+@DynamicUpdate
 public class Participant extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

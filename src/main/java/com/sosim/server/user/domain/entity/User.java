@@ -7,6 +7,7 @@ import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
@@ -14,6 +15,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @Table(name = "USERS")
+@DynamicUpdate
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -8,6 +8,7 @@ import com.sosim.server.user.domain.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import static com.sosim.server.common.response.ResponseCode.NOT_FULL_OR_NON_SITU
 @Getter
 @NoArgsConstructor
 @Table(name = "EVENTS")
+@DynamicUpdate
 public class Event extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
