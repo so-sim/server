@@ -165,12 +165,14 @@ public class Group extends BaseTimeEntity {
         notificationSettingInfo.changeSettingInfo(settingInfo);
     }
 
-    private boolean notSettingInfo() {
+    private boolean noSettingInfo() {
         return notificationSettingInfo == null;
     }
 
     private boolean isSameSettingType(NotificationSettingInfo newSettingInfo) {
-        if (notSettingInfo()) return false;
+        if (noSettingInfo()) {
+            return false;
+        }
         return notificationSettingInfo.getSettingType().equals(newSettingInfo.getSettingType());
     }
 

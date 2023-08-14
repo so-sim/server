@@ -11,8 +11,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sosim.server.group.domain.entity.MonthSettingType.*;
 import static com.sosim.server.group.domain.entity.MonthSettingType.SIMPLE_DATE;
+import static com.sosim.server.group.domain.entity.MonthSettingType.WEEK;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -120,7 +120,7 @@ public class MonthNotificationSettingInfo extends NotificationSettingInfo {
     private LocalDateTime findSendDateTime(List<LocalDate> availableDates) {
         LocalDate sendDate = availableDates.get(0);
         for (LocalDate availableDate : availableDates) {
-            if (canSendDate(availableDate)) {
+            if (canNotSend(availableDate)) {
                 sendDate = availableDate;
                 break;
             }
@@ -145,9 +145,12 @@ public class MonthNotificationSettingInfo extends NotificationSettingInfo {
 
     private LocalDate calcNextSendMonth() {
         LocalDate nextMonthDate = nextSendDateTime.toLocalDate();
+        int cycle = 0;
+
         LocalDate lastDateInMonth = getAvailableLastDateInMonth(nextMonthDate);
-        while (canSendDate(lastDateInMonth)) {
-            nextMonthDate.plusMonths(1);
+        while (canNotSend(lastDateInMonth) || cycle % repeatCycle != 0) {
+            nextMonthDate = nextMonthDate.plusMonths(1);
+            cycle++;
             lastDateInMonth = getAvailableLastDateInMonth(nextMonthDate);
         }
         return nextMonthDate;
@@ -160,9 +163,9 @@ public class MonthNotificationSettingInfo extends NotificationSettingInfo {
         return localDate.with(TemporalAdjusters.dayOfWeekInMonth(lastOrdinal, lastWeek));
     }
 
-    private boolean canSendDate(LocalDate localDate) {
-        return localDate.isBefore(startDate) ||
-                LocalDateTime.of(localDate, sendTime).isBefore(LocalDateTime.now());
+    private boolean canNotSend(LocalDate sendDate) {
+        return sendDate.isBefore(startDate) ||
+                LocalDateTime.of(sendDate, sendTime).isBefore(LocalDateTime.now());
     }
 }
 
