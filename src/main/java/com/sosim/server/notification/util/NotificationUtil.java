@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -53,7 +52,7 @@ public class NotificationUtil {
     }
 
     @Transactional
-    @Scheduled(cron = "* */30 * * * *") //30분 마다
+    @Scheduled(cron = "0 */30 * * * *") //30분 마다
     public void sendRegularNotification() {
         List<Notification> reservedNotifications = notificationRepository.findReservedNotifications();
         reservedNotifications.forEach(this::sendReservedNotification);
@@ -139,13 +138,19 @@ public class NotificationUtil {
     }
 
     @Async
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional
+    public void modifyNickname(long groupId, String preNickname, String newNickname) {
+        notificationRepository.updateAllNicknameByGroupIdAndNickname(groupId, preNickname, newNickname);
+    }
+  
+    @Async
+    @Transactional
     public void modifyGroupTitle(long groupId, String newTitle) {
         notificationRepository.updateAllGroupTitleByGroupId(groupId, newTitle);
     }
 
     private Notification makeChangeAdminNotification(Group group, Participant participant) {
-        return Notification.toEntity(participant.getUser().getId(), group, Content.create(CHANGE_ADMIN));
+        return Notification.toEntity(participant.getUser().getId(), group, Content.create(CHANGE_ADMIN, group.getAdminParticipant().getNickname()));
     }
 
     private Notification makeModifySituationNotification(Event event, Situation preSituation, Situation newSituation) {

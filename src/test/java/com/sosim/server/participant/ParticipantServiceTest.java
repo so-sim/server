@@ -4,6 +4,7 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
+import com.sosim.server.notification.util.NotificationUtil;
 import com.sosim.server.participant.domain.entity.Participant;
 import com.sosim.server.participant.domain.repository.ParticipantRepository;
 import com.sosim.server.participant.dto.NicknameDto;
@@ -52,6 +53,9 @@ class ParticipantServiceTest {
 
     @Mock
     EventRepository eventRepository;
+
+    @Mock
+    NotificationUtil notificationUtil;
 
     @DisplayName("참가자 가입 / 정상")
     @Test
@@ -328,7 +332,7 @@ class ParticipantServiceTest {
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
         doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
-        doNothing().when(eventRepository).updateNicknameAll(any(), any());
+        doNothing().when(eventRepository).updateNicknameAll(newNickname, participant.getNickname(), groupId);
 
         //when
         participantService.modifyNickname(userId, groupId, newNickname);

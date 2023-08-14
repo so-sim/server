@@ -15,7 +15,7 @@ public enum ContentType {
     CHANGE_FULL_SITUATION("CHANGE_FULL_SITUATION", "납부여부 변경", "벌금을 모두 납부했습니다!", 1),
     CHANGE_NONE_SITUATION("CHANGE_NONE_SITUATION", "납부여부 변경", "내역이 \"납부 전\"으로 다시 변경되었습니다.", 1),
     CHANGE_CHECK_SITUATION("CHANGE_CHECK_SITUATION", "납부여부 변경", "승인대기 중인 내역이 있습니다.", 2),
-    CHANGE_ADMIN("CHANGE_ADMIN", "총무 변경", "총무가 변경되었습니다.", 0),
+    CHANGE_ADMIN("CHANGE_ADMIN", "총무 변경", "총무가 변경되었습니다.", 1),
     ;
 
     private final String type;

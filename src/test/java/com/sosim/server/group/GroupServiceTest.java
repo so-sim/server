@@ -2,6 +2,7 @@ package com.sosim.server.group;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
+import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
 import com.sosim.server.group.domain.util.MyGroupPaginationUtil;
@@ -53,7 +54,10 @@ class GroupServiceTest {
     @Mock
     ParticipantRepository participantRepository;
     @Mock
+    EventRepository eventRepository;
+    @Mock
     NotificationUtil notificationUtil;
+
 
     @DisplayName("그룹 생성 / 성공")
     @Test

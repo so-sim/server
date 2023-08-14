@@ -30,6 +30,8 @@ public class EventRepositoryTest {
 
     private long eventId;
 
+    private Group group;
+
     private List<Long> eventIdList;
 
     @Autowired
@@ -48,6 +50,8 @@ public class EventRepositoryTest {
     void setUp() {
         eventRepository.deleteAll();
         eventIdList = new ArrayList<>();
+        group = Group.builder().build();
+        groupRepository.save(group);
         em.flush();
         em.clear();
     }
@@ -80,7 +84,8 @@ public class EventRepositoryTest {
 
         // when
         System.out.println("=============================");
-        eventRepository.updateNicknameAll(newNickname, preNickname);
+        eventRepository.updateNicknameAll(newNickname, preNickname, 1L);
+        em.clear();
         List<Event> events = eventRepository.findAllById(eventIdList);
 
         // then
@@ -163,8 +168,6 @@ public class EventRepositoryTest {
     private Event makeEvent(Situation situation, String nickname) {
         User user = User.builder().build();
         userRepository.save(user);
-        Group group = Group.builder().build();
-        groupRepository.save(group);
         return Event.builder()
                 .situation(situation)
                 .date(LocalDate.of(2023, 8, 1))

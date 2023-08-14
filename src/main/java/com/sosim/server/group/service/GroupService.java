@@ -1,6 +1,7 @@
 package com.sosim.server.group.service;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
 import com.sosim.server.group.domain.util.MyGroupPaginationUtil;
@@ -35,6 +36,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final ParticipantRepository participantRepository;
+    private final EventRepository eventRepository;
     private final NotificationUtil notificationUtil;
 
     @Transactional
@@ -96,7 +98,10 @@ public class GroupService {
 
     private void changeAdminNickname(Group group, String newNickname) {
         Participant admin = group.getAdminParticipant();
+        String preNickname = admin.getNickname();
         admin.modifyNickname(group, newNickname);
+        eventRepository.updateNicknameAll(newNickname, preNickname, group.getId());
+        notificationUtil.modifyNickname(group.getId(), preNickname, newNickname);
     }
 
     private List<MyGroupDto> toMyGroupDtoList(long userId, Slice<Group> myGroups) {
