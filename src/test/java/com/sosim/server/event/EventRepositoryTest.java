@@ -7,6 +7,8 @@ import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.event.dto.request.FilterEventRequest;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
+import com.sosim.server.user.domain.entity.User;
+import com.sosim.server.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
@@ -34,6 +37,9 @@ public class EventRepositoryTest {
 
     @Autowired
     GroupRepository groupRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     EntityManager em;
@@ -155,6 +161,8 @@ public class EventRepositoryTest {
     }
 
     private Event makeEvent(Situation situation, String nickname) {
+        User user = User.builder().build();
+        userRepository.save(user);
         Group group = Group.builder().build();
         groupRepository.save(group);
         return Event.builder()
@@ -162,6 +170,7 @@ public class EventRepositoryTest {
                 .date(LocalDate.of(2023, 8, 1))
                 .group(group)
                 .nickname(nickname)
+                .user(user)
                 .build();
     }
 
