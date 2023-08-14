@@ -134,6 +134,9 @@ public class EventService {
     }
 
     private void validSituation(long userId, Group group, Situation preSituation, Situation newSituation) {
+        if (preSituation.equals(newSituation)) {
+            throw new CustomException(BINDING_ERROR, "situation", "동일 납부 여부 상태로 변경 불가능 합니다.");
+        }
         if (preSituation.canModifyToCheck(newSituation)) {
             throw new CustomException(NOT_FULL_TO_CHECK);
         }
