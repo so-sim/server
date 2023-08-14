@@ -68,7 +68,7 @@ public class EventService {
 
         boolean participantIsWithdraw = participant.isWithdrawGroup();
         Situation newSituation = modifyEventRequest.getSituation();
-        if (!participantIsWithdraw && preSituation != newSituation) {
+        if (!group.isAdminUser(userId) && !participantIsWithdraw && preSituation != newSituation) {
             notificationUtil.sendModifySituationNotifications(List.of(event), preSituation, newSituation);
         }
         return GetEventResponse.toDto(event);
