@@ -44,9 +44,9 @@ public class WeekNotificationSettingInfo extends NotificationSettingInfo {
     @Override
     public LocalDateTime calculateNextSendDateTime() {
         LocalDateTime sendDateTime = LocalDateTime.of(nextSendDateTime.toLocalDate(), sendTime);
-
         DayOfWeek currentWeek = sendDateTime.getDayOfWeek();
         int diffCycle = 0;
+
         while (!isSendCondition(currentWeek, diffCycle, sendDateTime)) {
             if (SUNDAY.equals(currentWeek)) {
                 diffCycle++;
@@ -83,7 +83,10 @@ public class WeekNotificationSettingInfo extends NotificationSettingInfo {
 
     private boolean isAfterOrEqualsNow(LocalDateTime sendDateTime) {
         LocalDateTime now = LocalDateTime.now();
-        return sendDateTime.isAfter(now) || sendDateTime.isEqual(now);
+        if (sendDateTime.toLocalDate().isBefore(startDate)) {
+            return false;
+        }
+        return sendDateTime.isEqual(now) || sendDateTime.isAfter(now);
     }
 }
 
