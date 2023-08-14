@@ -1,6 +1,7 @@
 package com.sosim.server.event.service;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.event.domain.entity.Event;
 import com.sosim.server.event.domain.entity.Situation;
 import com.sosim.server.event.domain.repository.EventRepository;
@@ -177,7 +178,7 @@ public class EventService {
 
     private List<String> getWithdrawNickname(List<Event> events, Group group) {
         List<String> nicknames = events.stream().map(Event::getNickname).collect(Collectors.toList());
-        return participantRepository.findAllByNicknameInAndGroup(nicknames, group).stream()
+        return participantRepository.findAllByNicknameInAndGroupAndStatus(nicknames, group, Status.DELETED).stream()
                 .map(Participant::getNickname)
                 .collect(Collectors.toList());
     }
