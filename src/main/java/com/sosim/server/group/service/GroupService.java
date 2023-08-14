@@ -100,7 +100,7 @@ public class GroupService {
         Participant admin = group.getAdminParticipant();
         String preNickname = admin.getNickname();
         admin.modifyNickname(group, newNickname);
-        eventRepository.updateNicknameAll(newNickname, preNickname);
+        eventRepository.updateNicknameAll(newNickname, preNickname, group.getId());
         notificationUtil.modifyNickname(group.getId(), preNickname, newNickname);
     }
 

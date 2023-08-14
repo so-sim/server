@@ -71,7 +71,7 @@ public class ParticipantService {
         String preNickname = participant.getNickname();
         participant.modifyNickname(group, newNickname);
 
-        eventRepository.updateNicknameAll(newNickname, preNickname);
+        eventRepository.updateNicknameAll(newNickname, preNickname, groupId);
         notificationUtil.modifyNickname(groupId, preNickname, newNickname);
     }
 

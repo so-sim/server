@@ -23,8 +23,9 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
 
     @Modifying
     @Query("UPDATE Event e SET e.nickname = :newNickname " +
-            "WHERE e.nickname IN (:nickname)")
-    void updateNicknameAll(@Param("newNickname") String newNickname, @Param("nickname") String nickname);
+            "WHERE e.nickname IN (:nickname) AND " +
+            "e.group.id = :groupId")
+    void updateNicknameAll(@Param("newNickname") String newNickname, @Param("nickname") String nickname, @Param("groupId") long groupId);
 
     @Query("SELECT e FROM Event e JOIN FETCH e.group " +
             "WHERE e.id = :eventId AND e.status = 'ACTIVE'")
