@@ -52,6 +52,9 @@ public class Event extends BaseTimeEntity {
     @Column(name = "NICKNAME")
     private String nickname;
 
+    @Column(name = "MADE_BY")
+    private long madeByUserId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "GROUP_ID")
     private Group group;
@@ -71,6 +74,7 @@ public class Event extends BaseTimeEntity {
         this.nickname = nickname;
         this.group = group;
         this.user = user;
+        this.madeByUserId = user.getId();
         status = ACTIVE;
     }
 

@@ -1,6 +1,7 @@
 package com.sosim.server.event.service;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.event.domain.entity.Event;
 import com.sosim.server.event.domain.entity.Situation;
 import com.sosim.server.event.domain.repository.EventRepository;
@@ -68,7 +69,7 @@ public class EventService {
 
         boolean participantIsWithdraw = participant.isWithdrawGroup();
         Situation newSituation = modifyEventRequest.getSituation();
-        if (!participantIsWithdraw && preSituation != newSituation) {
+        if (!group.isAdminUser(userId) && !participantIsWithdraw && preSituation != newSituation) {
             notificationUtil.sendModifySituationNotifications(List.of(event), preSituation, newSituation);
         }
         return GetEventResponse.toDto(event);
@@ -134,6 +135,9 @@ public class EventService {
     }
 
     private void validSituation(long userId, Group group, Situation preSituation, Situation newSituation) {
+        if (preSituation.equals(newSituation)) {
+            throw new CustomException(BINDING_ERROR, "situation", "동일 납부 여부 상태로 변경 불가능 합니다.");
+        }
         if (preSituation.canModifyToCheck(newSituation)) {
             throw new CustomException(NOT_FULL_TO_CHECK);
         }
@@ -174,7 +178,7 @@ public class EventService {
 
     private List<String> getWithdrawNickname(List<Event> events, Group group) {
         List<String> nicknames = events.stream().map(Event::getNickname).collect(Collectors.toList());
-        return participantRepository.findAllByNicknameInAndGroup(nicknames, group).stream()
+        return participantRepository.findAllByNicknameInAndGroupAndStatus(nicknames, group, Status.DELETED).stream()
                 .map(Participant::getNickname)
                 .collect(Collectors.toList());
     }
