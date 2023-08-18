@@ -17,11 +17,11 @@ public class FilterEventRequest {
     private long groupId;
 
     @NotBlank
-    @DateTimeFormat(pattern = "yyyy.MM.dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
     @NotBlank
-    @DateTimeFormat(pattern = "yyyy.MM.dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
     private String nickname;

@@ -18,7 +18,7 @@ public class NotificationSettingResponse {
 
     private String settingType;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YY.MM.dd", timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YY-MM-dd", timezone = "Asia/Seoul")
     private LocalDate startDate;
 
     private int repeatCycle;
