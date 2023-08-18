@@ -551,8 +551,8 @@ public class EventControllerTest {
         String url = "/api/event/penalty/calendar";
         ResultActions resultActions = mvc.perform(get(url)
                 .param("groupId", String.valueOf(groupId))
-                .param("startDate", "2023.01.01")
-                .param("endDate", "2023.01.01")
+                .param("startDate", "2023-01-01")
+                .param("endDate", "2023-01-01")
         );
 
         // then
@@ -577,8 +577,8 @@ public class EventControllerTest {
                 .param("page", "0")
                 .param("size", "15")
                 .param("groupId", String.valueOf(groupId))
-                .param("startDate", "2023.01.01")
-                .param("endDate", "2023.01.01")
+                .param("startDate", "2023-01-01")
+                .param("endDate", "2023-01-01")
         );
 
         //then
