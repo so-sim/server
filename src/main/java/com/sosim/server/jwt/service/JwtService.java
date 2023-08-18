@@ -10,6 +10,8 @@ import com.sosim.server.jwt.domain.util.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class JwtService {
@@ -19,8 +21,15 @@ public class JwtService {
     private final JwtProvider jwtProvider;
 
     public JwtResponse createToken(Long userId) {
-        String refreshToken = jwtFactory.createRefreshToken();
-        jwtRepository.save(RefreshToken.create(userId, refreshToken));
+        String refreshToken;
+        Optional<RefreshToken> optional = jwtRepository.findById(userId);
+
+        if (optional.isEmpty()) {
+            refreshToken = jwtFactory.createRefreshToken();
+            jwtRepository.save(RefreshToken.create(userId, refreshToken));
+        } else {
+            refreshToken = optional.get().getRefreshToken();
+        }
 
         return JwtResponse.create(jwtFactory.createAccessToken(userId), refreshToken);
     }
