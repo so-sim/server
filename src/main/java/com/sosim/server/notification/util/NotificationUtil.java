@@ -1,6 +1,7 @@
 package com.sosim.server.notification.util;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.event.domain.entity.Event;
 import com.sosim.server.event.domain.entity.Situation;
@@ -149,6 +150,12 @@ public class NotificationUtil {
         notificationRepository.updateAllGroupTitleByGroupId(groupId, newTitle);
     }
 
+    @Async
+    @Transactional
+    public void lockNotification(String nickname, long groupId) {
+        notificationRepository.updateAllStatusByNicknameAndGroupId(Status.LOCK, nickname, groupId);
+    }
+
     private Notification makeChangeAdminNotification(Group group, Participant participant) {
         return Notification.toEntity(participant.getUser().getId(), group, Content.create(CHANGE_ADMIN, group.getAdminParticipant().getNickname()));
     }
@@ -211,5 +218,4 @@ public class NotificationUtil {
         return groupRepository.findByIdWithParticipants(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
-
 }
