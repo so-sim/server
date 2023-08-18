@@ -1,5 +1,6 @@
 package com.sosim.server.notification.domain.repository;
 
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.notification.domain.entity.Notification;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -42,11 +43,18 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Notification n SET n.content.data1 = :newNickname " +
             "WHERE n.content.data1 = :nickname " +
-            "AND n.groupInfo.groupId = :groupId")
+            "AND n.groupInfo.groupId = :groupId " +
+            "AND n.status <> 'LOCK'")
     void updateAllNicknameByGroupIdAndNickname(@Param("groupId") long groupId, @Param("nickname") String nickname, @Param("newNickname") String newNickname);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Notification n SET n.groupInfo.groupTitle = :title " +
             "WHERE n.groupInfo.groupId = :groupId")
     void updateAllGroupTitleByGroupId(@Param("groupId") long groupId, @Param("title") String title);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Notification n SET n.status = :status " +
+            "WHERE n.content.data1 = :nickname " +
+            "AND n.groupInfo.groupId = :groupId")
+    void updateAllStatusByNicknameAndGroupId(@Param("status") Status status, @Param("nickname") String nickname, @Param("groupId") long groupId);
 }
