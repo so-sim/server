@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 public class NotificationResponse {
 
-    @JsonFormat(pattern = "yyyy.MM.dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     private String type;

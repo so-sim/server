@@ -22,7 +22,7 @@ public class NotificationSettingRequest {
 
     private String settingType;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
     private LocalDate startDate;
 
     private int repeatCycle;

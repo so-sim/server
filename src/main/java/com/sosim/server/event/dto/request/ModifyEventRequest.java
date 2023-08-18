@@ -21,7 +21,7 @@ public class ModifyEventRequest {
 
     private String nickname;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
     private LocalDate date;
 
     @Max(value = 1_000_000, message = "최대 1,000,000원 까지 입력 가능합니다.")

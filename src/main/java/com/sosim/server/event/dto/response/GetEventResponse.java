@@ -13,7 +13,7 @@ public class GetEventResponse {
 
     private long eventId;
 
-    @JsonFormat(pattern = "yyyy.MM.dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     private int amount;
