@@ -21,9 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.sosim.server.common.response.ResponseCode.*;
@@ -104,7 +102,6 @@ public class NotificationUtil {
     @Async
     @Transactional
     public void sendModifyAdminNotification(Group group) {
-        //TODO: 총무 변경 시 알림을 기존 총무, 새 총무한테도 보내야 하는지?
         List<Notification> notifications = group.getParticipantList().stream()
                 .map(participant -> makeChangeAdminNotification(group, participant))
                 .collect(Collectors.toList());
@@ -130,9 +127,22 @@ public class NotificationUtil {
     @Async
     @Transactional
     public void sendModifySituationNotifications(List<Event> events, Situation preSituation, Situation newSituation) {
-        List<Notification> notifications = events.stream()
-                .map(event -> makeModifySituationNotification(event, preSituation, newSituation))
-                .collect(Collectors.toList());
+        events.sort(Comparator.comparing(e -> e.getUser().getId()));
+        Group group = events.get(0).getGroup();
+        long id = events.get(0).getUser().getId();
+        List<Notification> notifications = new ArrayList<>();
+        List<Long> eventIdList = new ArrayList<>();
+
+        for (Event event : events) {
+            if (id != event.getUser().getId()) {
+                notifications.add(makeModifySituationNotification(id, group, preSituation, newSituation, eventIdList));
+                id = event.getUser().getId();
+                eventIdList = new ArrayList<>();
+            }
+            eventIdList.add(event.getId());
+        }
+        notifications.add(makeModifySituationNotification(id, group, preSituation, newSituation, eventIdList));
+
         notificationRepository.saveAll(notifications);
         sendNotifications(notifications);
     }
@@ -153,10 +163,10 @@ public class NotificationUtil {
         return Notification.toEntity(participant.getUser().getId(), group, Content.create(CHANGE_ADMIN, group.getAdminParticipant().getNickname()));
     }
 
-    private Notification makeModifySituationNotification(Event event, Situation preSituation, Situation newSituation) {
-        return Notification.toEntity(event.getUser().getId(),
-                        event.getGroup(),
-                        Content.create(getSituationType(newSituation), preSituation.getComment(), newSituation.getComment()));
+    private Notification makeModifySituationNotification(long id, Group group, Situation preSituation, Situation newSituation, List<Long> eventIdList) {
+        return Notification.toEntity(id, group,
+                Content.create(getSituationType(newSituation), preSituation.getComment(), newSituation.getComment()),
+                eventIdList);
     }
 
     private Set<Long> makeGroupIdSet(List<Notification> reservedNotifications) {

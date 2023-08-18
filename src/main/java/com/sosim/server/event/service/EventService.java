@@ -97,7 +97,9 @@ public class EventService {
 
         if (group.isAdminUser(userId)) {
             List<String> withdrawNicknames = getWithdrawNickname(events, group);
-            events = events.stream().filter(e -> !withdrawNicknames.contains(e.getNickname())).collect(Collectors.toList());
+            events = events.stream()
+                    .filter(e -> !withdrawNicknames.contains(e.getNickname()) && !e.getUser().getId().equals(userId))
+                    .collect(Collectors.toList());
             notificationUtil.sendModifySituationNotifications(events, preSituation, newSituation);
         } else {
             //TODO: events에 여러 사용자가 섞이는 경우 체크해야 하는지?
