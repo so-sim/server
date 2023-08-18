@@ -120,7 +120,7 @@ public class MonthNotificationSettingInfo extends NotificationSettingInfo {
     private LocalDateTime findSendDateTime(List<LocalDate> availableDates) {
         LocalDate sendDate = availableDates.get(0);
         for (LocalDate availableDate : availableDates) {
-            if (canNotSend(availableDate)) {
+            if (!canNotSend(availableDate)) {
                 sendDate = availableDate;
                 break;
             }
