@@ -1,6 +1,7 @@
 package com.sosim.server.user.service;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.notification.util.NotificationUtil;
 import com.sosim.server.oauth.dto.request.OAuthUserRequest;
 import com.sosim.server.participant.domain.entity.Participant;
 import com.sosim.server.participant.domain.repository.ParticipantRepository;
@@ -22,6 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ParticipantRepository participantRepository;
+    private final NotificationUtil notificationUtil;
 
     @Transactional
     public User save(OAuthUserRequest oAuthUserRequest) {
@@ -51,6 +53,7 @@ public class UserService {
 
         user.delete(withdrawReason);
         myParticipants.forEach(Participant::withdrawGroup);
+        myParticipants.forEach(p -> notificationUtil.lockNotification(p.getNickname(), p.getGroup().getId()));
     }
 
     private void checkAlreadyExistUser(OAuthUserRequest oAuthUserRequest) {

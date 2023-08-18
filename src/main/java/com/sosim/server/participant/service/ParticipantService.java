@@ -61,6 +61,7 @@ public class ParticipantService {
         Participant participant = findParticipant(userId, groupId);
 
         participant.withdrawGroup(group);
+        notificationUtil.lockNotification(participant.getNickname(), groupId);
     }
 
     @Transactional
