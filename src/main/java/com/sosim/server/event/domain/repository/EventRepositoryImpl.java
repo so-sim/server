@@ -48,7 +48,7 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
     }
 
     private BooleanExpression equalsGroup(long groupId) {
-        return groupId == 0 ? null : event.group.id.stringValue().contains(String.valueOf(groupId));
+        return groupId == 0 ? null : event.group.id.stringValue().eq(String.valueOf(groupId));
     }
 
     private BooleanExpression betweenTime(LocalDate startDate, LocalDate endDate) {
