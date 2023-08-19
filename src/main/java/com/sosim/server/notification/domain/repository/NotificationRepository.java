@@ -16,7 +16,8 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     @Query("SELECT COUNT(*) FROM Notification n " +
             "WHERE n.userId = :userId AND n.createDate >= :time " +
-            "AND n.view = false")
+            "AND n.view = false " +
+            "AND n.reserved = false")
     Long countByUserIdBetweenMonth(@Param("userId") long userId, @Param("time") LocalDateTime time);
 
     @Modifying(clearAutomatically = true)
