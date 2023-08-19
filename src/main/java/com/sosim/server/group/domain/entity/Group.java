@@ -11,7 +11,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -51,6 +50,9 @@ public class Group extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL}, orphanRemoval = true)
     @JoinColumn(name = "NOTIFICATION_SETTING_INFO_ID")
     private NotificationSettingInfo notificationSettingInfo;
+
+    @Column
+    private LocalDateTime reservedSendNotificationDateTime;
 
     @Builder
     private Group(String title, String coverColor, String groupType) {
@@ -158,6 +160,10 @@ public class Group extends BaseTimeEntity {
     public void changeNotificationSettingInfo(long userId, NotificationSettingInfo settingInfo) {
         checkIsAdmin(userId);
         notificationSettingInfo = settingInfo;
+    }
+
+    public void setNextSendNotificationTime() {
+        this.reservedSendNotificationDateTime = notificationSettingInfo.calculateNextSendDateTime();
     }
 
     private boolean noSettingInfo() {

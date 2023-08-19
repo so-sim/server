@@ -55,6 +55,7 @@ public class NotificationUtil {
     @Transactional
     @Scheduled(cron = "0 */30 * * * *") //30분 마다
     public void sendRegularNotification() {
+        //TODO 로직 전면수정 필요
         List<Notification> reservedNotifications = notificationRepository.findReservedNotifications();
         reservedNotifications.forEach(this::sendReservedNotification);
 
@@ -178,14 +179,13 @@ public class NotificationUtil {
                 .groupId(group.getId())
                 .groupTitle(group.getTitle())
                 .content(Content.create(PAYMENT_DATE))
-                .reserved(true)
-                .sendDateTime(group.getNextNotifyDateTime())
                 .build();
     }
 
     private void sendReservedNotification(Notification notification) {
+
         sendNotification(notification);
-        notification.sendComplete();
+
     }
 
     private Response<?> makeNotificationResponse(Notification notification) {
