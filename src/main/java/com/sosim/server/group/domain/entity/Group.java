@@ -166,6 +166,10 @@ public class Group extends BaseTimeEntity {
         this.reservedSendNotificationDateTime = notificationSettingInfo.calculateNextSendDateTime();
     }
 
+    public boolean isReserveNotificationOn() {
+        return notificationSettingInfo.isEnableNotification();
+    }
+
     private boolean noSettingInfo() {
         return notificationSettingInfo == null;
     }

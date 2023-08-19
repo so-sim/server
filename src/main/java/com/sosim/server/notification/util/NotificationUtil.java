@@ -1,10 +1,10 @@
 package com.sosim.server.notification.util;
 
-import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
 import com.sosim.server.common.response.Response;
 import com.sosim.server.event.domain.entity.Event;
 import com.sosim.server.event.domain.entity.Situation;
+import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
 import com.sosim.server.notification.domain.entity.Content;
@@ -22,10 +22,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.sosim.server.common.response.ResponseCode.*;
+import static com.sosim.server.common.response.ResponseCode.SUCCESS_SEND_NOTIFICATION;
+import static com.sosim.server.common.response.ResponseCode.SUCCESS_SUBSCRIBE;
 import static com.sosim.server.event.domain.entity.Situation.CHECK;
 import static com.sosim.server.notification.domain.entity.ContentType.*;
 
@@ -37,6 +40,8 @@ public class NotificationUtil {
     private final NotificationRepository notificationRepository;
 
     private final GroupRepository groupRepository;
+
+    private final EventRepository eventRepository;
 
     private final SseEmitterRepository sseEmitterRepository;
 
@@ -53,37 +58,12 @@ public class NotificationUtil {
     @Transactional
     @Scheduled(cron = "0 */30 * * * *") //30분 마다
     public void sendRegularNotification() {
-        //TODO 로직 전면수정 필요
-        List<Notification> reservedNotifications = notificationRepository.findReservedNotifications();
-        reservedNotifications.forEach(this::sendReservedNotification);
+        List<Group> groups = findNowReservedGroups();
+        List<Event> events = eventRepository.findNoneEventsInGroups(groups);
 
-        if (!reservedNotifications.isEmpty()) {
-            Set<Long> groupIdSet = makeGroupIdSet(reservedNotifications);
-            groupIdSet.forEach(this::reserveNextRegularNotifications);
-        }
-    }
-
-    @Async
-    @Transactional
-    public void reserveNextRegularNotifications(Group group) {
-        List<Notification> notifications = new ArrayList<>();
-        group.getParticipantList()
-                .forEach(p -> notifications.add(makeReservedNotification(group, p)));
+        List<Notification> notifications = makeReservedNotifications(events);
+        sendNotifications(notifications);
         notificationRepository.saveAll(notifications);
-    }
-
-    @Async
-    @Transactional
-    public void reserveNextRegularNotifications(long groupId) {
-        Group group = getGroup(groupId);
-        reserveNextRegularNotifications(group);
-    }
-
-    @Async
-    @Transactional
-    public void changeReservedRegularNotifications(Group group) {
-        notificationRepository.deleteReservedNotifications(group.getId());
-        reserveNextRegularNotifications(group);
     }
 
     @Async
@@ -167,6 +147,16 @@ public class NotificationUtil {
         notificationRepository.updateAllStatusByNicknameAndGroupId(Status.LOCK, nickname, groupId);
     }
 
+    private List<Group> findNowReservedGroups() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Group> groups = groupRepository
+                .findToSendReservationNotification(now.minusMinutes(1), now.plusMinutes(1));
+        groups = groups.stream()
+                .filter(Group::isReserveNotificationOn)
+                .collect(Collectors.toList());
+        return groups;
+    }
+
     private Notification makeChangeAdminNotification(Group group, Participant participant) {
         return Notification.toEntity(participant.getUser().getId(), group, Content.create(CHANGE_ADMIN, group.getAdminParticipant().getNickname()));
     }
@@ -177,25 +167,36 @@ public class NotificationUtil {
                 eventIdList);
     }
 
-    private Set<Long> makeGroupIdSet(List<Notification> reservedNotifications) {
-        return reservedNotifications.stream()
-                .map(Notification::getGroupId)
-                .collect(Collectors.toSet());
-    }
+    private List<Notification> makeReservedNotifications(List<Event> events) {
+        List<Notification> notificationList = new ArrayList<>();
+        List<Long> eventIdList = new ArrayList<>();
+        long currentUserId = events.get(0).getUser().getId();
+        Group currentGroup = events.get(0).getGroup();
 
-    private Notification makeReservedNotification(Group group, Participant p) {
-        return Notification.builder()
-                .userId(p.getUser().getId())
-                .groupId(group.getId())
-                .groupTitle(group.getTitle())
-                .content(Content.create(PAYMENT_DATE))
-                .build();
-    }
+        for (Event event : events) {
+            if (!(event.isMine(currentUserId) && event.included(currentGroup))) {
+                notificationList.add(Notification
+                        .toEntity(currentUserId, currentGroup, Content.create(PAYMENT_DATE), eventIdList));
 
-    private void sendReservedNotification(Notification notification) {
-
-        sendNotification(notification);
-
+                currentUserId = event.getUser().getId();
+                currentGroup.setNextSendNotificationTime();
+                currentGroup = event.getGroup();
+                eventIdList = new ArrayList<>();
+            }
+            if (currentGroup.hasParticipant(currentUserId)) {
+                eventIdList.add(event.getId());
+            }
+        }
+        return notificationList;
+        /*
+        * event리스트 순회
+        * userId, groupId로 정렬되어있음
+        * 둘중 하나가 달라지면 바로 알림 생성
+        * eventIDList 초기화
+        * group, userid 초기화
+        * group에 현재 currentuserId포함 안되면 리스트에 넣지 말기
+        *
+        * */
     }
 
     private Response<?> makeNotificationResponse(Notification notification) {
@@ -224,8 +225,4 @@ public class NotificationUtil {
         }
     }
 
-    private Group getGroup(long groupId) {
-        return groupRepository.findByIdWithParticipants(groupId)
-                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
-    }
 }

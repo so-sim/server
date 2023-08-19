@@ -2,6 +2,7 @@ package com.sosim.server.event.domain.repository;
 
 import com.sosim.server.event.domain.entity.Situation;
 import com.sosim.server.event.domain.entity.Event;
+import com.sosim.server.group.domain.entity.Group;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -54,4 +55,12 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
             "AND e.id IN (:eventIdList) ")
     @EntityGraph(attributePaths = {"user", "group"})
     List<Event> findAllByEventIdList(@Param("userId") long userId, @Param("groupId") long groupId, @Param("eventIdList") List<Long> eventIdList);
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.status = 'ACTIVE' " +
+            "AND e.situation = 'NONE' " +
+            "AND e.group IN (:groups) " +
+            "ORDER BY e.user.id ASC AND e.group.id ASC")
+    @EntityGraph(attributePaths = {"user", "group"})
+    List<Event> findNoneEventsInGroups(@Param("groups") List<Group> groups);
 }
