@@ -27,8 +27,9 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
             "e.group.id = :groupId")
     void updateNicknameAll(@Param("newNickname") String newNickname, @Param("nickname") String nickname, @Param("groupId") long groupId);
 
-    @Query("SELECT e FROM Event e JOIN FETCH e.group " +
+    @Query("SELECT e FROM Event e " +
             "WHERE e.id = :eventId AND e.status = 'ACTIVE'")
+    @EntityGraph(attributePaths = {"user", "group"})
     Optional<Event> findByIdWithGroup(@Param("eventId") long eventId);
 
     @Query("SELECT e FROM Event e " +
