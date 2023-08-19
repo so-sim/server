@@ -98,7 +98,7 @@ public class EventService {
         if (group.isAdminUser(userId)) {
             List<String> withdrawNicknames = getWithdrawNickname(events, group);
             events = events.stream()
-                    .filter(e -> !withdrawNicknames.contains(e.getNickname()) && !e.getUser().getId().equals(userId))
+                    .filter(e -> isNotAdminAndNotWithdraw(userId, e, withdrawNicknames))
                     .collect(Collectors.toList());
             notificationUtil.sendModifySituationNotifications(events, preSituation, newSituation);
         } else {
@@ -134,6 +134,10 @@ public class EventService {
             events = eventRepository.findAllByEventIdList(userId, groupId, getEventIdListRequest.getEventIdList());
         }
         return GetEventIdListResponse.toDto(events);
+    }
+
+    private boolean isNotAdminAndNotWithdraw(long adminId, Event e, List<String> withdrawNicknames) {
+        return !withdrawNicknames.contains(e.getNickname()) && !e.isMine(adminId);
     }
 
     private void validSituation(long userId, Group group, Situation preSituation, Situation newSituation) {

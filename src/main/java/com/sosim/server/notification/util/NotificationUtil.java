@@ -129,19 +129,19 @@ public class NotificationUtil {
     public void sendModifySituationNotifications(List<Event> events, Situation preSituation, Situation newSituation) {
         events.sort(Comparator.comparing(e -> e.getUser().getId()));
         Group group = events.get(0).getGroup();
-        long id = events.get(0).getUser().getId();
+        long userId = events.get(0).getUser().getId();
         List<Notification> notifications = new ArrayList<>();
         List<Long> eventIdList = new ArrayList<>();
 
         for (Event event : events) {
-            if (id != event.getUser().getId()) {
-                notifications.add(makeModifySituationNotification(id, group, preSituation, newSituation, eventIdList));
-                id = event.getUser().getId();
+            if (!event.isMine(userId)) {
+                notifications.add(makeModifySituationNotification(userId, group, preSituation, newSituation, eventIdList));
+                userId = event.getUser().getId();
                 eventIdList = new ArrayList<>();
             }
             eventIdList.add(event.getId());
         }
-        notifications.add(makeModifySituationNotification(id, group, preSituation, newSituation, eventIdList));
+        notifications.add(makeModifySituationNotification(userId, group, preSituation, newSituation, eventIdList));
 
         notificationRepository.saveAll(notifications);
         sendNotifications(notifications);

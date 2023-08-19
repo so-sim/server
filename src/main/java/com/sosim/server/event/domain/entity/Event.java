@@ -102,6 +102,10 @@ public class Event extends BaseTimeEntity {
         this.situation = situation;
     }
 
+    public boolean isMine(long userId) {
+        return userId == user.getId();
+    }
+
     private void validSituation(Situation situation) {
         boolean isAdminUser = group.isAdminUser(user.getId());
         if (!isAdminUser && !situation.canModifyByParticipant()) {
