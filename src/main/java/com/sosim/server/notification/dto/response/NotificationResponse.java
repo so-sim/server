@@ -33,7 +33,7 @@ public class NotificationResponse {
 
     public static NotificationResponse toDto(Notification notification) {
         return NotificationResponse.builder()
-                .date(notification.getSendDateTime().toLocalDate())
+                .date(notification.getCreateDate().toLocalDate())
                 .type(notification.getType())
                 .groupId(notification.getGroupId())
                 .groupTitle(notification.getGroupTitle())
