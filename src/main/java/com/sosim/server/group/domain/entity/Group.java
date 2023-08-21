@@ -51,9 +51,6 @@ public class Group extends BaseTimeEntity {
     @JoinColumn(name = "NOTIFICATION_SETTING_INFO_ID")
     private NotificationSettingInfo notificationSettingInfo;
 
-    @Column
-    private LocalDateTime reservedSendNotificationDateTime;
-
     @Builder
     private Group(String title, String coverColor, String groupType) {
         this.title = title;
@@ -163,11 +160,7 @@ public class Group extends BaseTimeEntity {
     }
 
     public void setNextSendNotificationTime() {
-        this.reservedSendNotificationDateTime = notificationSettingInfo.calculateNextSendDateTime();
-    }
-
-    public boolean isReserveNotificationOn() {
-        return notificationSettingInfo.isEnableNotification();
+        this.notificationSettingInfo.nextSendDateTime = notificationSettingInfo.calculateNextSendDateTime();
     }
 
     private boolean noSettingInfo() {

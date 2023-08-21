@@ -28,6 +28,8 @@ public interface GroupRepository extends JpaRepository<Group, Long>, GroupReposi
 
     @Query("SELECT g FROM Group g " +
             "WHERE g.status = 'ACTIVE' " +
-            "AND g.reservedSendNotificationDateTime BETWEEN :before AND :after")
-    List<Group> findToSendReservationNotification(@Param("before") LocalDateTime before, @Param("after") LocalDateTime after);
+            "AND g.notificationSettingInfo.nextSendDateTime = :now " +
+            "AND g.notificationSettingInfo.enableNotification = true")
+    @EntityGraph(attributePaths = {"notificationSettingInfo"})
+    List<Group> findToNextSendDateTime(@Param("now") LocalDateTime now);
 }
