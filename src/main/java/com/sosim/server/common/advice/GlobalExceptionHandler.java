@@ -3,15 +3,19 @@ package com.sosim.server.common.advice;
 import com.sosim.server.common.advice.dto.ExceptionContent;
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.response.Response;
+import com.sosim.server.common.response.ResponseCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import static com.sosim.server.common.response.ResponseCode.BINDING_ERROR;
+import static com.sosim.server.common.response.ResponseCode.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,6 +33,11 @@ public class GlobalExceptionHandler {
 
         ExceptionContent content = new ExceptionContent(field, message);
         return new ResponseEntity<>(Response.create(BINDING_ERROR, content), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({RequestRejectedException.class, HttpRequestMethodNotSupportedException.class, IllegalArgumentException.class, MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<?> Exception(BindException e) {
+        return new ResponseEntity<>(Response.create(BAD_REQUEST, null), HttpStatus.NOT_FOUND);
     }
 
     private String getDefaultMessage(BindingResult bindingResult) {
