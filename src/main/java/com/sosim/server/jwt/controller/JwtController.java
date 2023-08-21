@@ -32,8 +32,7 @@ public class JwtController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        jwtService.delete(CookieUtil.getRefreshToken(request));
+    public ResponseEntity<?> logout(HttpServletResponse response) {
         CookieUtil.deleteRefreshToken(response);
         ResponseCode successLogout = ResponseCode.SUCCESS_LOGOUT;
 

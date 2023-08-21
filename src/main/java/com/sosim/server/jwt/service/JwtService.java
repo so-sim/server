@@ -48,11 +48,6 @@ public class JwtService {
         return JwtResponse.create(jwtFactory.createAccessToken(refreshTokenEntity.getUserId()), refreshToken);
     }
 
-    public void delete(String refreshToken) {
-        if (refreshToken == null) return;
-        jwtRepository.deleteById(getRefreshTokenEntity(refreshToken).getUserId());
-    }
-
     private RefreshToken getRefreshTokenEntity(String refreshToken) {
         return jwtRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new CustomException(ResponseCode.MODULATION_JWT));
