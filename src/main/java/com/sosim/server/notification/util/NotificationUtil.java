@@ -60,10 +60,11 @@ public class NotificationUtil {
     public void sendRegularNotification() {
         List<Group> groups = findNowReservedGroups();
         List<Event> events = eventRepository.findNoneEventsInGroups(groups);
+        if (events.isEmpty()) return;
 
         List<Notification> notifications = makeReservedNotifications(events);
-        sendNotifications(notifications);
         notificationRepository.saveAll(notifications);
+        sendNotifications(notifications);
     }
 
     @Async
@@ -175,6 +176,11 @@ public class NotificationUtil {
         Group currentGroup = events.get(0).getGroup();
 
         for (Event event : events) {
+
+            if (!currentGroup.existThatNickname(event.getNickname())) {
+                 continue;
+            }
+
             if (!(event.isMine(currentUserId) && event.included(currentGroup))) {
                 notificationList.add(Notification
                         .toEntity(currentUserId, currentGroup, Content.create(PAYMENT_DATE), eventIdList));
@@ -183,20 +189,13 @@ public class NotificationUtil {
                 currentGroup = event.getGroup();
                 eventIdList = new ArrayList<>();
             }
-            if (currentGroup.hasParticipant(currentUserId)) {
-                eventIdList.add(event.getId());
-            }
+            eventIdList.add(event.getId());
         }
+
+        notificationList.add(Notification
+                .toEntity(currentUserId, currentGroup, Content.create(PAYMENT_DATE), eventIdList));
+
         return notificationList;
-        /*
-        * event리스트 순회
-        * userId, groupId로 정렬되어있음
-        * 둘중 하나가 달라지면 바로 알림 생성
-        * eventIDList 초기화
-        * group, userid 초기화
-        * group에 현재 currentuserId포함 안되면 리스트에 넣지 말기
-        *
-        * */
     }
 
     private Response<?> makeNotificationResponse(Notification notification) {

@@ -106,7 +106,7 @@ public class Event extends BaseTimeEntity {
     }
 
     public boolean included(Group group) {
-        return group.getId() == this.group.getId();
+        return group.getId().longValue() == this.group.getId().longValue();
     }
 
     private void validSituation(Situation situation) {
