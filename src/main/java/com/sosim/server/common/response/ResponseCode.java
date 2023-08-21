@@ -48,7 +48,8 @@ public enum ResponseCode {
     VIEW_NOTIFICATION(successCode(), HttpStatus.OK, "해당 알림이 성공적으로 읽음 처리되었습니다."),
     GET_MY_NOTIFICATIONS(successCode(), HttpStatus.OK, "성공적으로 알림 목록이 조회되었습니다."),
 
-    BINDING_ERROR(2000, HttpStatus.BAD_REQUEST, "입력값 중 검증에 실패한 값이 있습니다"),
+    BINDING_ERROR(2000, HttpStatus.BAD_REQUEST, "입력값 중 검증에 실패한 값이 있습니다."),
+    BAD_REQUEST(2001, HttpStatus.BAD_REQUEST, "올바르지 않은 요청입니다."),
 
     NOT_SUPPORTED_OAUTH(1400, HttpStatus.BAD_REQUEST, "지원하지 않는 소셜 로그인 서비스입니다."),
     INCORRECT_OAUTH_CODE(1401, HttpStatus.BAD_REQUEST, "올바르지 않은 Authorization 코드입니다."),
