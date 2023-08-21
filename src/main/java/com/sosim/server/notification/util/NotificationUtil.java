@@ -148,12 +148,13 @@ public class NotificationUtil {
     }
 
     private List<Group> findNowReservedGroups() {
-        LocalDateTime now = LocalDateTime.now();
-        List<Group> groups = groupRepository
-                .findToSendReservationNotification(now.minusMinutes(1), now.plusMinutes(1));
-        groups = groups.stream()
-                .filter(Group::isReserveNotificationOn)
-                .collect(Collectors.toList());
+        LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+        List<Group> groups = groupRepository.findToNextSendDateTime(now);
+
+        for (Group group : groups) {
+            group.setNextSendNotificationTime();
+        }
+
         return groups;
     }
 
@@ -179,7 +180,6 @@ public class NotificationUtil {
                         .toEntity(currentUserId, currentGroup, Content.create(PAYMENT_DATE), eventIdList));
 
                 currentUserId = event.getUser().getId();
-                currentGroup.setNextSendNotificationTime();
                 currentGroup = event.getGroup();
                 eventIdList = new ArrayList<>();
             }
