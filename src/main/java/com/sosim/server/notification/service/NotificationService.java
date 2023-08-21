@@ -46,7 +46,7 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public MyNotificationsResponse getMyNotifications(long userId, Pageable pageable) {
-        Slice<Notification> myNotifications = notificationRepository.findMyNotifications(userId, LocalDateTime.now().minusMonths(3), pageable);
+        Slice<Notification> myNotifications = notificationRepository.findMyNotifications(userId, pageable);
         List<NotificationResponse> notificationDtoList = toNotificationResponseList(myNotifications);
 
         return MyNotificationsResponse.toDto(notificationDtoList, myNotifications.hasNext());

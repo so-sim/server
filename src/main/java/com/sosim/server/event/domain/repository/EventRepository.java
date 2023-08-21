@@ -60,7 +60,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
             "WHERE e.status = 'ACTIVE' " +
             "AND e.situation = 'NONE' " +
             "AND e.group IN (:groups) " +
-            "ORDER BY e.user.id ASC AND e.group.id ASC")
+            "ORDER BY e.user.id ASC, e.group.id ASC")
     @EntityGraph(attributePaths = {"user", "group"})
     List<Event> findNoneEventsInGroups(@Param("groups") List<Group> groups);
 }
