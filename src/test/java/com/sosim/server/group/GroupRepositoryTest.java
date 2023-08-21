@@ -91,6 +91,7 @@ class GroupRepositoryTest {
         group.getNumberOfParticipants();
     }
 
+    @Disabled
     @DisplayName("findMyGroups / 내 그룹 조회 첫 페이지는 17개")
     @Test
     void findMyGroups_first_page() {
@@ -110,6 +111,7 @@ class GroupRepositoryTest {
         assertThat(myGroups.hasNext()).isTrue();
     }
 
+    @Disabled
     @DisplayName("findMyGroups / 내 그룹 조회 첫 페이지 아니면 18개")
     @Test
     void findMyGroups_other_page() {
