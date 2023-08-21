@@ -8,7 +8,6 @@ import com.sosim.server.user.domain.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -104,6 +103,10 @@ public class Event extends BaseTimeEntity {
 
     public boolean isMine(long userId) {
         return userId == user.getId();
+    }
+
+    public boolean included(Group group) {
+        return group.getId().longValue() == this.group.getId().longValue();
     }
 
     private void validSituation(Situation situation) {

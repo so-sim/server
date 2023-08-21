@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.sosim.server.common.response.ResponseCode.IS_NOT_NOTIFICATION_RECEIVER;
@@ -37,24 +36,16 @@ public class Notification extends BaseTimeEntity {
     @Column(name = "VIEW")
     private boolean view;
 
-    @Column(name = "SEND_DATETIME")
-    private LocalDateTime sendDateTime;
-
-    @Column(name = "RESERVED")
-    private boolean reserved;
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "event_ids", joinColumns = @JoinColumn(name = "notification_id"))
     @OrderColumn(name = "line_idx")
     private List<Long> eventIdList;
 
     @Builder
-    public Notification(long userId, long groupId, String groupTitle, Content content, LocalDateTime sendDateTime, boolean reserved, List<Long> eventIdList) {
+    public Notification(long userId, long groupId, String groupTitle, Content content, List<Long> eventIdList) {
         this.userId = userId;
         this.groupInfo = setGroupInfo(groupId, groupTitle);
         this.content = content;
-        this.sendDateTime = setSendDateTime(sendDateTime);
-        this.reserved = reserved;
         this.eventIdList = eventIdList;
     }
 
@@ -74,10 +65,6 @@ public class Notification extends BaseTimeEntity {
                 .content(content)
                 .eventIdList(eventIdList)
                 .build();
-    }
-
-    public void sendComplete() {
-        reserved = false;
     }
 
     public void read(long userId) {
@@ -113,10 +100,6 @@ public class Notification extends BaseTimeEntity {
         if (this.userId != userId) {
             throw new CustomException(IS_NOT_NOTIFICATION_RECEIVER);
         }
-    }
-
-    private LocalDateTime setSendDateTime(LocalDateTime sendDateTime) {
-        return sendDateTime == null ? LocalDateTime.now() : sendDateTime;
     }
 
     private GroupInfo setGroupInfo(long groupId, String groupTitle) {

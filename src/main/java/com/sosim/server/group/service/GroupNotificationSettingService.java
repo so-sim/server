@@ -6,7 +6,6 @@ import com.sosim.server.group.domain.repository.GroupRepository;
 import com.sosim.server.group.domain.entity.NotificationSettingInfo;
 import com.sosim.server.group.dto.request.NotificationSettingRequest;
 import com.sosim.server.group.dto.response.NotificationSettingResponse;
-import com.sosim.server.notification.util.NotificationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +17,6 @@ import static com.sosim.server.common.response.ResponseCode.NOT_FOUND_GROUP;
 public class GroupNotificationSettingService {
 
     private final GroupRepository groupRepository;
-    private final NotificationUtil notificationUtil;
 
     @Transactional(readOnly = true)
     public NotificationSettingResponse getNotificationSetting(long userId, long groupId) {
@@ -34,7 +32,6 @@ public class GroupNotificationSettingService {
 
         Group group = findGroupWithNotificationSettingInfo(groupId);
         group.changeNotificationSettingInfo(userId, settingInfo);
-        notificationUtil.changeReservedRegularNotifications(group);
     }
 
     private Group findGroupWithNotificationSettingInfo(long groupId) {

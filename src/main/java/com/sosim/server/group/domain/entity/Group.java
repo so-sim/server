@@ -11,7 +11,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -158,6 +157,10 @@ public class Group extends BaseTimeEntity {
     public void changeNotificationSettingInfo(long userId, NotificationSettingInfo settingInfo) {
         checkIsAdmin(userId);
         notificationSettingInfo = settingInfo;
+    }
+
+    public void setNextSendNotificationTime() {
+        this.notificationSettingInfo.nextSendDateTime = notificationSettingInfo.calculateNextSendDateTime();
     }
 
     private boolean noSettingInfo() {

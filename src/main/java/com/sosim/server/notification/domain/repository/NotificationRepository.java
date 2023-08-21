@@ -16,8 +16,7 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     @Query("SELECT COUNT(*) FROM Notification n " +
             "WHERE n.userId = :userId AND n.createDate >= :time " +
-            "AND n.view = false " +
-            "AND n.reserved = false")
+            "AND n.view = false")
     Long countByUserIdBetweenMonth(@Param("userId") long userId, @Param("time") LocalDateTime time);
 
     @Modifying(clearAutomatically = true)
@@ -26,19 +25,17 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     void updateViewByUserId(@Param("userId") long userId);
 
     @Query("SELECT n FROM Notification n " +
-            "WHERE n.userId = :userId " +
-            "AND n.reserved = false " +
-            "AND n.sendDateTime >= :time")
-    Slice<Notification> findMyNotifications(@Param("userId") long userId, @Param("time") LocalDateTime time, Pageable pageable);
+            "WHERE n.userId = :userId ")
+    Slice<Notification> findMyNotifications(@Param("userId") long userId, Pageable pageable);
 
     @Query(value = "SELECT * FROM notifications n " +
-            "WHERE n.send_dateTime <= CURRENT_TIMESTAMP AND n.reserved = true ", nativeQuery = true)
+            "WHERE n.send_dateTime <= CURRENT_TIMESTAMP", nativeQuery = true)
     List<Notification> findReservedNotifications();
 
     @Modifying
     @Transactional
     @Query("DELETE FROM Notification n " +
-            "WHERE n.groupInfo.groupId = :groupId AND n.reserved = true")
+            "WHERE n.groupInfo.groupId = :groupId")
     void deleteReservedNotifications(@Param("groupId") long groupId);
 
     @Modifying(clearAutomatically = true)
