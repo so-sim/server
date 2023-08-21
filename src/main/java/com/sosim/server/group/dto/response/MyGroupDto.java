@@ -2,10 +2,13 @@ package com.sosim.server.group.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sosim.server.group.domain.entity.Group;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class MyGroupDto {
     private long groupId;
 
@@ -18,9 +21,7 @@ public class MyGroupDto {
     private String adminNickname;
 
     @JsonProperty("isAdmin")
-    private boolean isAdmin;
-
-    private int size;
+    private Boolean isAdmin;
 
 
     @Builder
@@ -31,7 +32,6 @@ public class MyGroupDto {
         this.type = type;
         this.adminNickname = adminNickname;
         this.isAdmin = isAdmin;
-        this.size = size;
     }
 
     public static MyGroupDto toDto(Group group, boolean isAdmin) {
