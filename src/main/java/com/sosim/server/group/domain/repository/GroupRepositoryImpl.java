@@ -34,6 +34,7 @@ public class GroupRepositoryImpl implements GroupRepositoryDsl {
                 .join(group.participantList, admin)
                 .join(group.participantList, participant)
                 .where(participant.user.id.eq(userId),
+                        participant.status.eq(ACTIVE),
                         admin.isAdmin.eq(true),
                         group.status.eq(ACTIVE))
                 .orderBy(group.id.desc())
