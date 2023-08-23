@@ -22,8 +22,8 @@ public class GetEventIdListController {
     private final EventService eventService;
 
     @GetMapping("/events")
-    public ResponseEntity<?> getEventsByEventIdList(@AuthUserId long userId, @Validated GetEventIdListRequest getEventIdListRequest) {
-        GetEventIdListResponse response = eventService.getEventsByEventIdList(userId, getEventIdListRequest);
+    public ResponseEntity<?> getEventsByEventIdList(@Validated GetEventIdListRequest getEventIdListRequest) {
+        GetEventIdListResponse response = eventService.getEventsByEventIdList(getEventIdListRequest);
 
         return new ResponseEntity<>(Response.create(GET_EVENTS, response), GET_EVENTS.getHttpStatus());
     }
