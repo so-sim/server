@@ -45,11 +45,9 @@ public class NotificationUtil {
 
     private final SseEmitterRepository sseEmitterRepository;
 
-    public SseEmitter subscribe(long userId) {
+    public SseEmitter subscribe(long userId, NotificationCountResponse count) {
         SseEmitter sseEmitter = sseEmitterRepository.save(userId);
-        long userNotificationCount = notificationRepository.countByUserIdBetweenMonth(userId, LocalDateTime.now().minusMonths(3));
-        NotificationCountResponse notificationCount = NotificationCountResponse.toDto(userNotificationCount);
-        Response<?> subscribeResponse = Response.create(SUCCESS_SUBSCRIBE, notificationCount);
+        Response<?> subscribeResponse = Response.create(SUCCESS_SUBSCRIBE, count);
         sendToClient(sseEmitter, userId, "subscribe", subscribeResponse);
 
         return sseEmitter;

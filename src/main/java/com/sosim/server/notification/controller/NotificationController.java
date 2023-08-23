@@ -2,6 +2,7 @@ package com.sosim.server.notification.controller;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
+import com.sosim.server.notification.dto.response.NotificationCountResponse;
 import com.sosim.server.notification.service.NotificationService;
 import com.sosim.server.notification.dto.response.MyNotificationsResponse;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,13 @@ public class NotificationController {
         MyNotificationsResponse myNotifications = notificationService.getMyNotifications(userId, pageable);
 
         return new ResponseEntity<>(Response.create(GET_MY_NOTIFICATIONS, myNotifications), GET_MY_NOTIFICATIONS.getHttpStatus());
+    }
+
+    @GetMapping("/notification/count")
+    public ResponseEntity<?> getMyNotificationCount(@AuthUserId long userId) {
+        NotificationCountResponse count = notificationService.getMyNotificationCount(userId);
+
+        return new ResponseEntity<>(Response.create(GET_MY_NOTIFICATION_COUNT, count), GET_MY_NOTIFICATION_COUNT.getHttpStatus());
     }
 
 }
