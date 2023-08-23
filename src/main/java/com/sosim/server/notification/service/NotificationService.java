@@ -4,6 +4,7 @@ import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.notification.domain.entity.Notification;
 import com.sosim.server.notification.domain.repository.NotificationRepository;
 import com.sosim.server.notification.dto.response.MyNotificationsResponse;
+import com.sosim.server.notification.dto.response.NotificationCountResponse;
 import com.sosim.server.notification.dto.response.NotificationResponse;
 import com.sosim.server.notification.util.NotificationUtil;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public SseEmitter subscribe(long userId) {
-        return notificationUtil.subscribe(userId);
+        return notificationUtil.subscribe(userId, getNotificationCountByUserId(userId));
     }
 
     @Transactional
@@ -52,10 +53,20 @@ public class NotificationService {
         return MyNotificationsResponse.toDto(notificationDtoList, myNotifications.hasNext());
     }
 
+    @Transactional(readOnly = true)
+    public NotificationCountResponse getMyNotificationCount(long userId) {
+        return getNotificationCountByUserId(userId);
+    }
+
     private List<NotificationResponse> toNotificationResponseList(Slice<Notification> myNotifications) {
         return myNotifications.stream()
                 .map(NotificationResponse::toDto)
                 .collect(Collectors.toList());
     }
 
+    private NotificationCountResponse getNotificationCountByUserId(long userId) {
+        long count = notificationRepository.countByUserIdBetweenMonth(userId, LocalDateTime.now().minusMonths(3));
+
+        return NotificationCountResponse.toDto(count);
+    }
 }
