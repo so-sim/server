@@ -90,10 +90,9 @@ public class GroupService {
     @Transactional(readOnly = true)
     public MyGroupsResponse getMyGroups(long userId, int page) {
         MyGroupPageDto pageDto = MyGroupPaginationUtil.calculateOffsetAndSize(page);
-        Slice<Group> myGroups = groupRepository.findMyGroups(userId, pageDto.getOffset(), pageDto.getLimit());
+        Slice<MyGroupDto> myGroups = groupRepository.findMyGroups(userId, pageDto.getOffset(), pageDto.getLimit());
 
-        List<MyGroupDto> myGroupDtoList = toMyGroupDtoList(userId, myGroups);
-        return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroupDtoList);
+        return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroups.getContent());
     }
 
     private void changeAdminNickname(Group group, String newNickname) {

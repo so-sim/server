@@ -1,7 +1,8 @@
 package com.sosim.server.group.domain.repository;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sosim.server.group.domain.entity.Group;
+import com.sosim.server.group.dto.response.MyGroupDto;
 import com.sosim.server.participant.domain.entity.QParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -21,12 +22,20 @@ public class GroupRepositoryImpl implements GroupRepositoryDsl {
 
 
     @Override
-    public Slice<Group> findMyGroups(long userId, long offset, long limit) {
-        QParticipant participant2 = new QParticipant("participant2");
-        List<Group> contents = jpaQueryFactory.selectFrom(group)
-                .join(group.participantList, participant).fetchJoin()
-                .join(group.participantList, participant2)
-                .where(participant2.user.id.eq(userId), participant.status.eq(ACTIVE),
+    public Slice<MyGroupDto> findMyGroups(long userId, long offset, long limit) {
+        QParticipant admin = new QParticipant("participant2");
+        List<MyGroupDto> contents = jpaQueryFactory
+                .select(
+                        Projections.constructor(MyGroupDto.class,
+                        group.id, group.title, group.coverColor, group.groupType,
+                        admin.nickname, participant.isAdmin)
+                )
+                .from(group)
+                .join(group.participantList, admin)
+                .join(group.participantList, participant)
+                .where(participant.user.id.eq(userId),
+                        participant.status.eq(ACTIVE),
+                        admin.isAdmin.eq(true),
                         group.status.eq(ACTIVE))
                 .orderBy(group.id.desc())
                 .offset(offset)
@@ -35,7 +44,7 @@ public class GroupRepositoryImpl implements GroupRepositoryDsl {
         return toSlice(limit, contents);
     }
 
-    private Slice<Group> toSlice(long limit, List<Group> contents) {
+    private Slice<MyGroupDto> toSlice(long limit, List<MyGroupDto> contents) {
         boolean hasNext = contents.size() > limit;
         if (hasNext) {
             contents = contents.subList(0, (int) limit);
