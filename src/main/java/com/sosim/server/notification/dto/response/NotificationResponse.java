@@ -12,6 +12,8 @@ import java.util.List;
 @Builder
 public class NotificationResponse {
 
+    private long notificationId;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
@@ -33,6 +35,7 @@ public class NotificationResponse {
 
     public static NotificationResponse toDto(Notification notification) {
         return NotificationResponse.builder()
+                .notificationId(notification.getId())
                 .date(notification.getCreateDate().toLocalDate())
                 .type(notification.getType())
                 .groupId(notification.getGroupId())
