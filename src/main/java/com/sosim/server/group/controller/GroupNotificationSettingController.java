@@ -22,8 +22,8 @@ public class GroupNotificationSettingController {
     private final GroupNotificationSettingService groupSettingService;
 
     @GetMapping("/group/{groupId}/notification-info")
-    public ResponseEntity<?> getNotificationSetting(@AuthUserId long userId, @PathVariable long groupId) {
-        NotificationSettingResponse response = groupSettingService.getNotificationSetting(userId, groupId);
+    public ResponseEntity<?> getNotificationSetting(@PathVariable long groupId) {
+        NotificationSettingResponse response = groupSettingService.getNotificationSetting(groupId);
         return new ResponseEntity<>(Response.create(GET_GROUP_NOTIFICATION_SETTING, response), GET_GROUP_NOTIFICATION_SETTING.getHttpStatus());
     }
 

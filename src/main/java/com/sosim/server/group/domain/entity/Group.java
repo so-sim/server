@@ -22,7 +22,7 @@ import static com.sosim.server.common.auditing.Status.ACTIVE;
 import static com.sosim.server.common.response.ResponseCode.*;
 
 @Entity
-@Getter()
+@Getter
 @NoArgsConstructor
 @Table(name = "`GROUPS`")
 public class Group extends BaseTimeEntity {
@@ -46,7 +46,6 @@ public class Group extends BaseTimeEntity {
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<Participant> participantList = new ArrayList<>();
 
-    @Getter(AccessLevel.NONE)
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL}, orphanRemoval = true)
     @JoinColumn(name = "NOTIFICATION_SETTING_INFO_ID")
     private NotificationSettingInfo notificationSettingInfo;
@@ -120,11 +119,6 @@ public class Group extends BaseTimeEntity {
                 .filter(Participant::isAdmin)
                 .findFirst()
                 .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_ADMIN));
-    }
-
-    public NotificationSettingInfo getNotificationSettingInfo(long userId) {
-        checkIsAdmin(userId);
-        return notificationSettingInfo;
     }
 
     public LocalDateTime getNextNotifyDateTime() {
