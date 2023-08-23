@@ -123,16 +123,10 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public GetEventIdListResponse getEventsByEventIdList(long userId, GetEventIdListRequest getEventIdListRequest) {
+    public GetEventIdListResponse getEventsByEventIdList(GetEventIdListRequest getEventIdListRequest) {
         long groupId = getEventIdListRequest.getGroupId();
-        Group group = findGroupWithParticipants(groupId);
+        List<Event> events = eventRepository.findAllByEventIdList(groupId, getEventIdListRequest.getEventIdList());
 
-        List<Event> events = null;
-        if (group.isAdminUser(userId)) {
-            events = eventRepository.findAllByEventIdList(groupId, getEventIdListRequest.getEventIdList());
-        } else {
-            events = eventRepository.findAllByEventIdList(userId, groupId, getEventIdListRequest.getEventIdList());
-        }
         return GetEventIdListResponse.toDto(events);
     }
 
