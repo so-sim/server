@@ -19,9 +19,9 @@ public class GroupNotificationSettingService {
     private final GroupRepository groupRepository;
 
     @Transactional(readOnly = true)
-    public NotificationSettingResponse getNotificationSetting(long userId, long groupId) {
+    public NotificationSettingResponse getNotificationSetting(long groupId) {
         Group group = findGroupWithNotificationSettingInfo(groupId);
-        NotificationSettingInfo settingInfo = group.getNotificationSettingInfo(userId);
+        NotificationSettingInfo settingInfo = group.getNotificationSettingInfo();
 
         return NotificationSettingResponse.toResponse(settingInfo);
     }
