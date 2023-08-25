@@ -67,11 +67,12 @@ public enum ResponseCode {
     NOT_FOUND_GROUP(1001, HttpStatus.NOT_FOUND, "해당 모임을 찾을 수 없습니다."),
     NONE_ADMIN(1002, HttpStatus.FORBIDDEN, "모임 관리자 권한이 필요합니다."),
     NOT_FOUND_PARTICIPANT(1003, HttpStatus.NOT_FOUND, "존재하지 않는 참가자 정보입니다."),
-    ALREADY_USE_NICKNAME(1004, HttpStatus.BAD_REQUEST, "모임에서 이미 사용중인 닉네임입니다."),
+    ALREADY_USE_NICKNAME(1004, HttpStatus.BAD_REQUEST, "모임 내 다른 팀원이 사용 중인 이름입니다."),
     NO_MORE_GROUP(1005, HttpStatus.BAD_REQUEST, "더 이상 조회할 모임이 없습니다."),
     ALREADY_INTO_GROUP(1006, HttpStatus.BAD_REQUEST, "이미 참여중인 모임입니다."),
     NONE_ZERO_PARTICIPANT(1007, HttpStatus.BAD_REQUEST, "모임에 다른 참가자가 존재합니다."),
     NOT_FOUND_ADMIN(1008, HttpStatus.NOT_FOUND, "모임의 총무를 찾을 수 없습니다."),
+    USED_NICKNAME(1009, HttpStatus.NOT_FOUND, "탈퇴 이력이 존재한 닉네임으로 변경 불가능 합니다."),
 
     NOT_FOUND_EVENT(1300, HttpStatus.BAD_REQUEST, "해당 상세 내역을 찾을 수 없습니다."),
     FAIL_TO_CHECK(1301, HttpStatus.BAD_REQUEST, "완납인 상세 내역은 확인중으로 변경 불가능합니다."),

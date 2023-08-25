@@ -61,7 +61,7 @@ public class GroupService {
 
     @Transactional
     public GroupIdResponse updateGroup(long userId, long groupId, ModifyGroupRequest modifyGroupRequest) {
-        Group group = findGroup(groupId);
+        Group group = findGroupWithParticipantsIgnoreStatus(groupId);
         group.update(userId, modifyGroupRequest);
 
         notificationUtil.modifyGroupTitle(groupId, group.getTitle());
@@ -124,6 +124,11 @@ public class GroupService {
 
     private Group findGroup(long groupId) {
         return groupRepository.findByIdWithParticipants(groupId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
+    }
+
+    private Group findGroupWithParticipantsIgnoreStatus(long groupId) {
+        return groupRepository.findByIdWithParticipantsIgnoreStatus(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
 
