@@ -66,7 +66,7 @@ class ParticipantServiceTest {
         String nickname = "닉네임";
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         participantService.createParticipant(userId, groupId, nickname);
@@ -99,7 +99,7 @@ class ParticipantServiceTest {
         String nickname = "닉네임";
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -120,7 +120,7 @@ class ParticipantServiceTest {
         String nickname = "닉네임";
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         CustomException exception = assertThrows(CustomException.class, () ->
@@ -141,7 +141,7 @@ class ParticipantServiceTest {
         addParticipantInGroup(group, userId + 2, false);
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         CustomException exception = assertThrows(CustomException.class, () ->
@@ -330,7 +330,7 @@ class ParticipantServiceTest {
 
         String newNickname = "새닉네임";
 
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
         doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
         doNothing().when(eventRepository).updateNicknameAll(newNickname, participant.getNickname(), groupId);
 
@@ -347,7 +347,7 @@ class ParticipantServiceTest {
         //given
         String newNickname = "새닉네임";
 
-        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -364,7 +364,7 @@ class ParticipantServiceTest {
         String newNickname = "새닉네임";
         Group group = makeGroup();
 
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
         doReturn(Optional.empty()).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
 
         //when
@@ -386,7 +386,7 @@ class ParticipantServiceTest {
         group.getParticipantList().add(participant1);
         group.getParticipantList().add(participant2);
 
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
         doReturn(Optional.of(participant1)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
 
         //when

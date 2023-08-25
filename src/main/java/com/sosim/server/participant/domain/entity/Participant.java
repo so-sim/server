@@ -12,8 +12,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
-import static com.sosim.server.common.response.ResponseCode.ALREADY_USE_NICKNAME;
-import static com.sosim.server.common.response.ResponseCode.CANNOT_WITHDRAWAL_BY_GROUP_ADMIN;
+import static com.sosim.server.common.response.ResponseCode.*;
 
 @Entity
 @Getter
@@ -54,6 +53,9 @@ public class Participant extends BaseTimeEntity {
         }
         if (group.existThatNickname(newNickname)) {
             throw new CustomException(ALREADY_USE_NICKNAME);
+        }
+        if (group.existThatNicknameIgnoreStatus(newNickname)) {
+            throw new CustomException(USED_NICKNAME);
         }
         nickname = newNickname;
     }

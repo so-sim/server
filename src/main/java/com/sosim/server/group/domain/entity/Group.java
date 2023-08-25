@@ -137,6 +137,11 @@ public class Group extends BaseTimeEntity {
                 .anyMatch(p -> p.isActive() && p.getNickname().equals(nickname));
     }
 
+    public boolean existThatNicknameIgnoreStatus(String nickname) {
+        return getParticipantList().stream()
+                .anyMatch(p -> p.getNickname().equals(nickname));
+    }
+
     public boolean isAdminUser(long userId) {
         Participant admin = getAdminParticipant();
         return admin.isMine(userId);
@@ -196,7 +201,7 @@ public class Group extends BaseTimeEntity {
     }
 
     private void checkUsedNickname(String nickname) {
-        if (existThatNickname(nickname)) {
+        if (existThatNicknameIgnoreStatus(nickname)) {
             throw new CustomException(ALREADY_USE_NICKNAME);
         }
     }
