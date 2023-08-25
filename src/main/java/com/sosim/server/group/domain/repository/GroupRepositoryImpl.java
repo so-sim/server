@@ -37,7 +37,7 @@ public class GroupRepositoryImpl implements GroupRepositoryDsl {
                         participant.status.eq(ACTIVE),
                         admin.isAdmin.eq(true),
                         group.status.eq(ACTIVE))
-                .orderBy(group.id.desc())
+                .orderBy(participant.id.desc())
                 .offset(offset)
                 .limit(limit + 1)
                 .fetch();
