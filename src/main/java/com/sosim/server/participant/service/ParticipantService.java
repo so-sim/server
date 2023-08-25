@@ -37,7 +37,7 @@ public class ParticipantService {
     @Transactional
     public void createParticipant(long userId, long groupId, String nickname) {
         User user = findUser(userId);
-        Group group = findGroupWithParticipants(groupId);
+        Group group = findGroupWithParticipantsIgnoreStatus(groupId);
 
         Participant participant = group.createParticipant(user, nickname, false);
         participantRepository.save(participant);
@@ -61,12 +61,13 @@ public class ParticipantService {
         Participant participant = findParticipant(userId, groupId);
 
         participant.withdrawGroup(group);
+        eventRepository.lockEvent(participant.getNickname(), group);
         notificationUtil.lockNotification(participant.getNickname(), groupId);
     }
 
     @Transactional
     public void modifyNickname(long userId, long groupId, String newNickname) {
-        Group group = findGroupWithParticipants(groupId);
+        Group group = findGroupWithParticipantsIgnoreStatus(groupId);
         Participant participant = findParticipant(userId, groupId);
 
         String preNickname = participant.getNickname();
@@ -152,6 +153,11 @@ public class ParticipantService {
 
     private Group findGroupWithParticipants(long groupId) {
         return groupRepository.findByIdWithParticipants(groupId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
+    }
+
+    private Group findGroupWithParticipantsIgnoreStatus(long groupId) {
+        return groupRepository.findByIdWithParticipantsIgnoreStatus(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
 
