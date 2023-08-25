@@ -25,7 +25,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
     @Modifying
     @Query("UPDATE Event e SET e.nickname = :newNickname " +
             "WHERE e.nickname IN (:nickname) AND " +
-            "e.group.id = :groupId")
+            "e.group.id = :groupId AND e.status <> 'LOCK'")
     void updateNicknameAll(@Param("newNickname") String newNickname, @Param("nickname") String nickname, @Param("groupId") long groupId);
 
     @Query("SELECT e FROM Event e " +
@@ -63,4 +63,10 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
             "ORDER BY e.user.id ASC, e.group.id ASC")
     @EntityGraph(attributePaths = {"user", "group", "group.participantList"})
     List<Event> findNoneEventsInGroups(@Param("groups") List<Group> groups);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Event e SET " +
+            "e.status = 'LOCK' " +
+            "WHERE e.nickname = :nickname AND e.group = :group")
+    void lockEvent(@Param("nickname") String nickname, @Param("group") Group group);
 }
