@@ -54,6 +54,6 @@ public class JwtService {
 
     private RefreshToken getRefreshTokenEntity(String refreshToken) {
         return jwtRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new CustomException(ResponseCode.MODULATION_JWT));
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUNT_REFRESH));
     }
 }
