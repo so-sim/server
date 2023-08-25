@@ -88,8 +88,8 @@ public class EventService {
     @Transactional
     public ModifySituationResponse modifyEventSituation(long userId, ModifySituationRequest modifySituationRequest) {
         List<Event> events = eventRepository.findAllById(modifySituationRequest.getEventIdList());
-        Group group = events.get(0).getGroup();
-        Situation preSituation = events.get(0).getSituation();
+        Group group = getGroup(events);
+        Situation preSituation = getPreSituation(events);
         Situation newSituation = modifySituationRequest.getSituation();
 
         validSituation(userId, group, preSituation, newSituation);
@@ -181,6 +181,34 @@ public class EventService {
         return participantRepository.findAllByNicknameInAndGroupAndStatus(nicknames, group, Status.DELETED).stream()
                 .map(Participant::getNickname)
                 .collect(Collectors.toList());
+    }
+
+    private Group getGroup(List<Event> events) {
+        Group group = events.get(0).getGroup();
+        if (isAllSame(events, group)) {
+            throw new CustomException(BAD_REQUEST);
+        }
+
+        return group;
+    }
+
+    private Situation getPreSituation(List<Event> events) {
+        Situation situation = events.get(0).getSituation();
+        if (isAllSame(events, situation)) {
+            throw new CustomException(NOT_SAME_SITUATION);
+        }
+
+        return situation;
+    }
+
+    private boolean isAllSame(List<Event> events, Situation situation) {
+        return events.stream()
+                .anyMatch(e -> !e.getSituation().equals(situation));
+    }
+
+    private boolean isAllSame(List<Event> events, Group group) {
+        return events.stream()
+                .anyMatch(e -> !e.getGroup().equals(group));
     }
 
 }
