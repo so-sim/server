@@ -175,7 +175,7 @@ public class NotificationUtil {
 
         for (Event event : events) {
 
-            if (!currentGroup.existThatNickname(event.getNickname())) {
+            if (event.isLock()) {
                  continue;
             }
 

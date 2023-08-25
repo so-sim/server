@@ -2,6 +2,7 @@ package com.sosim.server.event.domain.entity;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.BaseTimeEntity;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.event.dto.request.ModifyEventRequest;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.user.domain.entity.User;
@@ -108,6 +109,8 @@ public class Event extends BaseTimeEntity {
     public boolean included(Group group) {
         return group.getId().longValue() == this.group.getId().longValue();
     }
+
+    public boolean isLock() {return this.status.equals(Status.LOCK);}
 
     private void validSituation(Situation situation) {
         boolean isAdminUser = group.isAdminUser(user.getId());
