@@ -79,6 +79,7 @@ public enum ResponseCode {
     NOT_FULL_OR_NON_SITUATION(1303, HttpStatus.BAD_REQUEST, "미납 또는 완납 상태로만 변경 가능합니다."),
     ONLY_CAN_HAVE_NONE_PAYMENT(1304, HttpStatus.BAD_REQUEST, "납부 요청은 미납 상태의 내역만 가능합니다."),
     NOT_FULL_TO_CHECK(1305, HttpStatus.BAD_REQUEST, "미납인 내역만 확인 중으로 변경 가능합니다."),
+    NOT_SAME_SITUATION(1306, HttpStatus.BAD_REQUEST, "모든 상세 내역이 동일한 납부 여부 상태가 아닙니다."),
 
     MUST_NEED_NOTIFICATION_MESSAGE_DATA(1306, HttpStatus.BAD_REQUEST, "알림 메시지 데이터가 반드시 필요합니다."),
     NOT_FOUND_NOTIFICATION(1307, HttpStatus.NOT_FOUND, "해당 알림을 찾을 수 없습니다."),
