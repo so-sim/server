@@ -58,6 +58,10 @@ public class PaymentNotificationService {
         Map<Long, NotificationDataDto> map = new HashMap<>();
         for (Event event : events) {
 
+            if (event.isLock()) {
+                continue;
+            }
+
             Long userId = event.getUser().getId();
             NotificationDataDto dataDto = map.compute(userId, (k, v) -> v == null ? new NotificationDataDto() : v);
             dataDto.addAmount(event.getAmount());
