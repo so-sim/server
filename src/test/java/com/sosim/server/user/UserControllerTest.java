@@ -2,6 +2,7 @@ package com.sosim.server.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.jwt.service.JwtService;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import com.sosim.server.user.controller.UserController;
@@ -9,6 +10,7 @@ import com.sosim.server.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,6 +36,9 @@ class UserControllerTest {
     @MockBean
     @Autowired
     UserService userService;
+
+    @MockBean
+    JwtService jwtService;
 
     MockMvc mvc;
 

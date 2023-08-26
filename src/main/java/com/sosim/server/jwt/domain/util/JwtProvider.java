@@ -20,28 +20,31 @@ public class JwtProvider {
 
     public boolean checkRenewRefreshToken(String refreshToken) {
         try {
-            getClaims(refreshKey, refreshToken);
+            getClaims(refreshKey, refreshToken, true);
         } catch (CustomException e) {
-            if (e.getResponseCode().equals(EXPIRATION_JWT)) return true;
+            if (e.getResponseCode().equals(EXPIRATION_ACCESS)) return true;
             else throw e;
         }
         return false;
     }
 
     public Long getUserId(String accessToken) {
-        return Long.valueOf(getClaims(accessKey, accessToken).getSubject());
+        return Long.valueOf(getClaims(accessKey, accessToken, false).getSubject());
     }
 
-    private Claims getClaims(String key, String token) {
+    private Claims getClaims(String key, String token, boolean isRefresh) {
         try {
             return Jwts.parser()
                     .setSigningKey(key.getBytes(StandardCharsets.UTF_8))
                     .parseClaimsJws(token)
                     .getBody();
         } catch (SignatureException | MalformedJwtException | MissingClaimException ex) {
-            throw new CustomException(MODULATION_JWT);
+            if (isRefresh) {
+                throw new CustomException(MODULATION_REFRESH);
+            }
+            throw new CustomException(MODULATION_ACCESS);
         } catch (ExpiredJwtException ex) {
-            throw new CustomException(EXPIRATION_JWT);
+            throw new CustomException(EXPIRATION_ACCESS);
         }
     }
 }

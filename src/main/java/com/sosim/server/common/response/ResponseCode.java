@@ -55,10 +55,12 @@ public enum ResponseCode {
     NOT_SUPPORTED_OAUTH(1400, HttpStatus.BAD_REQUEST, "지원하지 않는 소셜 로그인 서비스입니다."),
     INCORRECT_OAUTH_CODE(1401, HttpStatus.BAD_REQUEST, "올바르지 않은 Authorization 코드입니다."),
 
-    NOT_EXIST_TOKEN_COOKIE(1200, HttpStatus.BAD_REQUEST, "리프레시 토큰이 존재하지 않습니다."),
-    MODULATION_JWT(1201, HttpStatus.UNAUTHORIZED, "변조된 JWT 토큰 입니다."),
-    EXPIRATION_JWT(1202, HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰 입니다."),
-    NOT_EXIST_TOKEN(1203, HttpStatus.FORBIDDEN, "엑세스 토큰이 존재하지 않습니다."),
+    NOT_EXIST_TOKEN_COOKIE(1200, HttpStatus.FORBIDDEN, "리프레시 토큰이 존재하지 않습니다."),
+    MODULATION_REFRESH(1201, HttpStatus.UNAUTHORIZED, "변조된 리프레시 토큰입니다."),
+    NOT_FOUNT_REFRESH(1202, HttpStatus.UNAUTHORIZED, "존재하지 않는 리프레시 토큰 데이터입니다."),
+    MODULATION_ACCESS(1203, HttpStatus.UNAUTHORIZED, "변조된 엑세스 토큰입니다."),
+    EXPIRATION_ACCESS(1204, HttpStatus.UNAUTHORIZED, "만료된 엑세스 토큰입니다."),
+    NOT_EXIST_TOKEN(1205, HttpStatus.FORBIDDEN, "엑세스 토큰이 존재하지 않습니다."),
 
     NOT_FOUND_USER(1100, HttpStatus.NOT_FOUND, "존재하지 않는 회원 정보입니다."),
     USER_ALREADY_EXIST(1101, HttpStatus.BAD_REQUEST, "이미 존재하는 회원 정보입니다."),
@@ -72,7 +74,7 @@ public enum ResponseCode {
     ALREADY_INTO_GROUP(1006, HttpStatus.BAD_REQUEST, "이미 참여중인 모임입니다."),
     NONE_ZERO_PARTICIPANT(1007, HttpStatus.BAD_REQUEST, "모임에 다른 참가자가 존재합니다."),
     NOT_FOUND_ADMIN(1008, HttpStatus.NOT_FOUND, "모임의 총무를 찾을 수 없습니다."),
-    USED_NICKNAME(1009, HttpStatus.NOT_FOUND, "탈퇴 이력이 존재한 닉네임으로 변경 불가능 합니다."),
+    USED_NICKNAME(1009, HttpStatus.BAD_REQUEST, "탈퇴 이력이 존재한 닉네임으로 변경 불가능 합니다."),
 
     NOT_FOUND_EVENT(1300, HttpStatus.BAD_REQUEST, "해당 상세 내역을 찾을 수 없습니다."),
     FAIL_TO_CHECK(1301, HttpStatus.BAD_REQUEST, "완납인 상세 내역은 확인중으로 변경 불가능합니다."),
