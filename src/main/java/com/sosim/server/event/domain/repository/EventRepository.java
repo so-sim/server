@@ -64,7 +64,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
     @EntityGraph(attributePaths = {"user", "group", "group.participantList"})
     List<Event> findNoneEventsInGroups(@Param("groups") List<Group> groups);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Query("UPDATE Event e SET " +
             "e.status = 'LOCK' " +
             "WHERE e.nickname = :nickname AND e.group = :group")
