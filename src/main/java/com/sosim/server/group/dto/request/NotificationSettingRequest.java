@@ -160,7 +160,7 @@ public class NotificationSettingRequest {
 
     private boolean isValidInput(int[] ordinalNumbers) {
         for (int ordinalNumber : ordinalNumbers) {
-            if (ordinalNumber <= 0 || ordinalNumber >= 6) {
+            if (ordinalNumber <= 0 || ordinalNumber > 6) {
                 return false;
             }
         }
