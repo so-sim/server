@@ -48,4 +48,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     List<Long> getReceiverUserIdList(@Param("groupId") long groupId);
 
     List<Participant> findAllByNicknameInAndGroupAndStatus(List<String> nicknames, Group group, Status status);
+
+    boolean existsByGroupAndNickname(Group group, String nickname);
 }

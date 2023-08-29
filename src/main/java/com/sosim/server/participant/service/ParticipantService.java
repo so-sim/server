@@ -39,6 +39,8 @@ public class ParticipantService {
         User user = findUser(userId);
         Group group = findGroupWithParticipantsIgnoreStatus(groupId);
 
+        checkAlreadyUsedNickname(nickname, group);
+
         Participant participant = group.createParticipant(user, nickname, false);
         participantRepository.save(participant);
     }
@@ -71,6 +73,8 @@ public class ParticipantService {
         Participant participant = findParticipant(userId, groupId);
 
         String preNickname = participant.getNickname();
+
+        checkAlreadyUsedNickname(newNickname, group);
         participant.modifyNickname(group, newNickname);
 
         eventRepository.updateNicknameAll(newNickname, preNickname, groupId);
@@ -90,6 +94,12 @@ public class ParticipantService {
         List<Participant> participantList = participantRepository.findByGroupAndNicknameContainsIgnoreCase(group, searchRequest.getKeyword());
 
         return NicknameSearchResponse.toDto(participantList);
+    }
+
+    private void checkAlreadyUsedNickname(String nickname, Group group) {
+        if (participantRepository.existsByGroupAndNickname(group, nickname)) {
+            throw new CustomException(ALREADY_USE_NICKNAME);
+        }
     }
 
     private Participant findParticipant(long userId, long groupId) {
