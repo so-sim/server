@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
@@ -84,12 +83,13 @@ public class EventRepositoryTest {
 
         // when
         System.out.println("=============================");
-        eventRepository.updateNicknameAll(newNickname, preNickname, 1L);
+        eventRepository.updateNicknameAll(newNickname, preNickname, group.getId());
         em.clear();
         List<Event> events = eventRepository.findAllById(eventIdList);
 
         // then
         for (Event event : events) {
+            System.out.println("event.getNickname() = " + event.getNickname());
             assertThat(event.getNickname()).isEqualTo(newNickname);
         }
     }

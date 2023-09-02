@@ -8,7 +8,6 @@ import com.sosim.server.user.domain.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
@@ -51,12 +50,13 @@ public class Participant extends BaseTimeEntity {
         if (nickname.equals(newNickname)) {
             return;
         }
-        if (group.existThatNickname(newNickname)) {
-            throw new CustomException(ALREADY_USE_NICKNAME);
-        }
-        if (group.existThatNicknameIgnoreStatus(newNickname)) {
-            throw new CustomException(USED_NICKNAME);
-        }
+//        if (group.existThatNickname(newNickname)) {
+//            throw new CustomException(ALREADY_USE_NICKNAME);
+//        }
+//
+//        if (group.existThatNicknameIgnoreStatus(newNickname)) {
+//            throw new CustomException(USED_NICKNAME);
+//        }
         nickname = newNickname;
     }
 
