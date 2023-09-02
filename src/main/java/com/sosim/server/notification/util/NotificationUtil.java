@@ -168,17 +168,18 @@ public class NotificationUtil {
     }
 
     private List<Notification> makeReservedNotifications(List<Event> events) {
+        List<Event> notWithdrawEvents = events.stream()
+                .filter(e -> e.getGroup().hasParticipant(e.getUser().getId()))
+                .collect(Collectors.toList());
         List<Notification> notificationList = new ArrayList<>();
         List<Long> eventIdList = new ArrayList<>();
-        long currentUserId = events.get(0).getUser().getId();
-        Group currentGroup = events.get(0).getGroup();
+        long currentUserId = notWithdrawEvents.get(0).getUser().getId();
+        Group currentGroup = notWithdrawEvents.get(0).getGroup();
 
-        for (Event event : events) {
-
+        for (Event event : notWithdrawEvents) {
             if (event.isLock()) {
                  continue;
             }
-
             if (!(event.isMine(currentUserId) && event.included(currentGroup))) {
                 notificationList.add(Notification
                         .toEntity(currentUserId, currentGroup, Content.create(PAYMENT_DATE), eventIdList));

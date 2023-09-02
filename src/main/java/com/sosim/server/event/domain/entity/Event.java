@@ -103,11 +103,11 @@ public class Event extends BaseTimeEntity {
     }
 
     public boolean isMine(long userId) {
-        return userId == user.getId();
+        return  user.getId().equals(userId);
     }
 
     public boolean included(Group group) {
-        return group.getId().longValue() == this.group.getId().longValue();
+        return this.group.getId().equals(group.getId());
     }
 
     public boolean isLock() {return this.status.equals(Status.LOCK);}

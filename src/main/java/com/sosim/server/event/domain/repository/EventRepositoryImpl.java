@@ -1,5 +1,6 @@
 package com.sosim.server.event.domain.repository;
 
+import com.nimbusds.oauth2.sdk.util.StringUtils;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -56,7 +57,7 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
     }
 
     private BooleanExpression equalsNickname(String nickname) {
-        return nickname == null ? null : event.nickname.eq(nickname);
+        return StringUtils.isBlank(nickname) ? null : event.nickname.eq(nickname);
     }
 
     private BooleanExpression equalsSituation(Situation situation) {
