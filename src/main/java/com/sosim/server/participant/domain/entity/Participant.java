@@ -53,9 +53,10 @@ public class Participant extends BaseTimeEntity {
 //        if (group.existThatNickname(newNickname)) {
 //            throw new CustomException(ALREADY_USE_NICKNAME);
 //        }
-        if (group.existThatNicknameIgnoreStatus(newNickname)) {
-            throw new CustomException(USED_NICKNAME);
-        }
+//
+//        if (group.existThatNicknameIgnoreStatus(newNickname)) {
+//            throw new CustomException(USED_NICKNAME);
+//        }
         nickname = newNickname;
     }
 
