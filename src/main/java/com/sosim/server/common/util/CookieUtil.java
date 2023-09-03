@@ -40,7 +40,7 @@ public class CookieUtil {
     public static String getRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(REFRESH_HEADER)) {
+            if (REFRESH_HEADER.equals(cookie.getName())) {
                 return cookie.getValue();
             }
         }
