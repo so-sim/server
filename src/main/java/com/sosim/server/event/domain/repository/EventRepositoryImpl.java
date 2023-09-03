@@ -43,7 +43,7 @@ public class EventRepositoryImpl implements EventRepositoryDsl {
                         betweenTime(filterEventRequest.getStartDate(), filterEventRequest.getEndDate()),
                         equalsNickname(filterEventRequest.getNickname()),
                         equalsSituation(filterEventRequest.getSituation()),
-                        event.status.eq(Status.ACTIVE)
+                        event.status.ne(Status.DELETED)
                 )
                 .orderBy(event.date.asc(), event.id.asc());
     }
