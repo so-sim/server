@@ -73,9 +73,6 @@ public class ParticipantService {
         Participant participant = findParticipant(userId, groupId);
         String preNickname = participant.getNickname();
 
-        checkAlreadyUsedNickname(group, newNickname);
-        checkUsedWithdrawNickname(group, newNickname);
-
         participant.modifyNickname(group, newNickname);
 
         eventRepository.updateNicknameAll(newNickname, preNickname, groupId);
