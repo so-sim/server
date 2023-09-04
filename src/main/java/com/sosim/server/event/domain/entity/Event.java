@@ -81,6 +81,7 @@ public class Event extends BaseTimeEntity {
         if (isDiffUser(modifyEventRequest.getNickname())) {
             this.nickname = modifyEventRequest.getNickname();
             this.user = user;
+            this.status = ACTIVE;
         }
         this.date = modifyEventRequest.getDate();
         this.amount = modifyEventRequest.getAmount();
