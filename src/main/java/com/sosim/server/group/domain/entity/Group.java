@@ -132,12 +132,12 @@ public class Group extends BaseTimeEntity {
     }
 
     public boolean existThatNickname(String nickname) {
-        return getParticipantList().stream()
+        return participantList.stream()
                 .anyMatch(p -> p.isActive() && p.getNickname().equals(nickname));
     }
 
     public boolean existThatNicknameIgnoreStatus(String nickname) {
-        return getParticipantList().stream()
+        return participantList.stream()
                 .anyMatch(p -> p.getNickname().equals(nickname));
     }
 
