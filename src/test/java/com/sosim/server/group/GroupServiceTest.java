@@ -2,16 +2,22 @@ package com.sosim.server.group;
 
 import com.sosim.server.common.advice.exception.CustomException;
 import com.sosim.server.common.auditing.Status;
+import com.sosim.server.event.domain.repository.EventRepository;
+import com.sosim.server.group.domain.entity.Group;
+import com.sosim.server.group.domain.repository.GroupRepository;
+import com.sosim.server.group.domain.util.MyGroupPaginationUtil;
 import com.sosim.server.group.dto.MyGroupPageDto;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupsResponse;
-import com.sosim.server.participant.Participant;
-import com.sosim.server.participant.ParticipantRepository;
-import com.sosim.server.user.User;
-import com.sosim.server.user.UserRepository;
+import com.sosim.server.group.service.GroupService;
+import com.sosim.server.notification.util.NotificationUtil;
+import com.sosim.server.participant.domain.entity.Participant;
+import com.sosim.server.participant.domain.repository.ParticipantRepository;
+import com.sosim.server.user.domain.entity.User;
+import com.sosim.server.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,6 +53,11 @@ class GroupServiceTest {
     UserRepository userRepository;
     @Mock
     ParticipantRepository participantRepository;
+    @Mock
+    EventRepository eventRepository;
+    @Mock
+    NotificationUtil notificationUtil;
+
 
     @DisplayName("그룹 생성 / 성공")
     @Test
@@ -104,7 +115,7 @@ class GroupServiceTest {
         ReflectionTestUtils.setField(user, "id", userId);
 
         String nickname = "닉네임";
-        Participant admin = Participant.create(user, group, nickname, true);
+        Participant admin = group.createParticipant(user, nickname, true);
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
 
@@ -184,7 +195,7 @@ class GroupServiceTest {
         ReflectionTestUtils.setField(group, "id", groupId);
         addParticipantInGroup(group, userId, true);
 
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         GroupIdResponse response = groupService.updateGroup(userId, groupId, request);
@@ -207,7 +218,7 @@ class GroupServiceTest {
         addParticipantInGroup(group, userId + 1, true);
         addParticipantInGroup(group, userId, false);
 
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -305,7 +316,7 @@ class GroupServiceTest {
     private Participant addParticipantInGroup(Group group, long userId, boolean isAdmin) {
         User user = new User();
         ReflectionTestUtils.setField(user, "id", userId);
-        return Participant.create(user, group, "닉네임" + userId, isAdmin);
+        return group.createParticipant(user, "닉네임" + userId, isAdmin);
     }
 
     private static ModifyGroupRequest makeUpdateGroupRequest(String title, String groupType, String colorType, String nickname) {

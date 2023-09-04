@@ -2,17 +2,20 @@ package com.sosim.server.group;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.group.controller.GroupController;
+import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
 import com.sosim.server.group.dto.response.GetGroupResponse;
 import com.sosim.server.group.dto.response.GroupIdResponse;
 import com.sosim.server.group.dto.response.MyGroupDto;
 import com.sosim.server.group.dto.response.MyGroupsResponse;
-import com.sosim.server.participant.Participant;
+import com.sosim.server.group.service.GroupService;
+import com.sosim.server.participant.domain.entity.Participant;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
-import com.sosim.server.user.User;
+import com.sosim.server.user.domain.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -523,7 +526,7 @@ class GroupControllerTest {
     private Participant addParticipantInGroup(Group group, long userId, boolean isAdmin) {
         User user = new User();
         ReflectionTestUtils.setField(user, "id", userId);
-        return Participant.create(user, group, "닉네임" + userId, isAdmin);
+        return group.createParticipant(user, "닉네임" + userId, isAdmin);
     }
 
     @WithMockCustomUser

@@ -1,18 +1,16 @@
 package com.sosim.server.event.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sosim.server.event.Event;
-import lombok.AccessLevel;
+import com.sosim.server.event.domain.entity.Event;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 public class EventIdResponse {
-    @JsonProperty("eventId")
-    private Long eventId;
 
-    public static EventIdResponse create(Event event) {
+    private long eventId;
+
+    public static EventIdResponse toDto(Event event) {
         return EventIdResponse.builder()
                 .eventId(event.getId())
                 .build();

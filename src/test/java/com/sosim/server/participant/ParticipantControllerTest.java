@@ -2,9 +2,14 @@ package com.sosim.server.participant;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.participant.controller.ParticipantController;
+import com.sosim.server.participant.dto.NicknameDto;
+import com.sosim.server.participant.dto.NicknameSearchRequest;
+import com.sosim.server.participant.dto.NicknameSearchResponse;
 import com.sosim.server.participant.dto.request.ParticipantNicknameRequest;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
+import com.sosim.server.participant.service.ParticipantService;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -419,6 +424,35 @@ class ParticipantControllerTest {
                 .andExpect(jsonPath("$.status.code").value(NOT_FOUND_PARTICIPANT.getCode()))
                 .andExpect(jsonPath("$.status.message").value(NOT_FOUND_PARTICIPANT.getMessage()))
                 .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @DisplayName("참가자 검색 / 정상")
+    @Test
+    void search_participant() throws Exception {
+        //given
+        NicknameSearchRequest request = new NicknameSearchRequest();
+        String keyword = "닉네임";
+        request.setKeyword(keyword);
+
+        List<NicknameDto> list = List.of(new NicknameDto("닉네임1", false), new NicknameDto("닉네임2", false));
+        NicknameSearchResponse response = new NicknameSearchResponse(list);
+
+        doReturn(response).when(participantService).searchParticipants(groupId, request);
+
+        //when
+        String url = URI_PREFIX.concat(String.format("/%d/participants-nickname", groupId));
+        ResultActions resultActions = mvc.perform(get(url)
+                .param("keyword", keyword));
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.status.code").value(SEARCH_PARTICIPANTS.getCode()))
+                .andExpect(jsonPath("$.status.message").value(SEARCH_PARTICIPANTS.getMessage()))
+                .andExpect(jsonPath("$.content.nicknameList").isArray())
+                .andExpect(jsonPath("$.content.nicknameList[0].nickname").value("닉네임1"))
+                .andExpect(jsonPath("$.content.nicknameList[0].withdraw").value(false))
+                .andExpect(jsonPath("$.content.nicknameList[1].nickname").value("닉네임2"))
+                .andExpect(jsonPath("$.content.nicknameList[1].withdraw").value(false));
     }
 
     private static GetParticipantListResponse makeGetParticipantsResponse(String adminNickname) {

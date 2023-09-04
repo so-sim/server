@@ -2,16 +2,18 @@ package com.sosim.server.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.jwt.service.JwtService;
 import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
-import com.sosim.server.user.dto.request.WithdrawRequest;
+import com.sosim.server.user.controller.UserController;
+import com.sosim.server.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -34,6 +36,9 @@ class UserControllerTest {
     @MockBean
     @Autowired
     UserService userService;
+
+    @MockBean
+    JwtService jwtService;
 
     MockMvc mvc;
 
@@ -87,9 +92,8 @@ class UserControllerTest {
     void user_withdraw() throws Exception {
         //given
         String withdrawReason = "탈퇴 사유";
-        WithdrawRequest request = makeWithdrawRequest(withdrawReason);
 
-        doNothing().when(userService).withdrawUser(userId, request);
+        doNothing().when(userService).withdrawUser(userId, withdrawReason);
 
         //when
         ResultActions actions = withdrawAction(withdrawReason);
@@ -106,10 +110,9 @@ class UserControllerTest {
     void user_withdraw_has_admin_data() throws Exception {
         //given
         String withdrawReason = "탈퇴 사유";
-        WithdrawRequest request = makeWithdrawRequest(withdrawReason);
 
         CustomException e = new CustomException(CANNOT_WITHDRAWAL_BY_GROUP_ADMIN);
-        doThrow(e).when(userService).withdrawUser(userId, request);
+        doThrow(e).when(userService).withdrawUser(userId, withdrawReason);
 
         //when
         ResultActions actions = withdrawAction(withdrawReason);
@@ -126,10 +129,9 @@ class UserControllerTest {
     void user_withdraw_no_user() throws Exception {
         //given
         String withdrawReason = "탈퇴 사유";
-        WithdrawRequest request = makeWithdrawRequest(withdrawReason);
 
         CustomException e = new CustomException(NOT_FOUND_USER);
-        doThrow(e).when(userService).withdrawUser(userId, request);
+        doThrow(e).when(userService).withdrawUser(userId, withdrawReason);
 
         //when
         ResultActions actions = withdrawAction(withdrawReason);
@@ -142,14 +144,8 @@ class UserControllerTest {
 
     private ResultActions withdrawAction(String withdrawReason) throws Exception {
         ResultActions actions = mvc.perform(delete(URI_PREFIX)
-                .param("withdrawReason", withdrawReason));
+                .param("reason", withdrawReason));
         return actions;
-    }
-
-    private static WithdrawRequest makeWithdrawRequest(String withdrawReason) {
-        WithdrawRequest request = new WithdrawRequest();
-        ReflectionTestUtils.setField(request, "withdrawReason", withdrawReason);
-        return request;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.sosim.server.event.dto.response;
 
+import com.sosim.server.event.domain.entity.Situation;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,9 +14,9 @@ public class ModifySituationResponse {
 
     private List<Long> eventIdList;
 
-    public static ModifySituationResponse toDto(String situation, List<Long> eventIdList) {
+    public static ModifySituationResponse toDto(Situation situation, List<Long> eventIdList) {
         return ModifySituationResponse.builder()
-                .situation(situation)
+                .situation(situation.getComment())
                 .eventIdList(eventIdList)
                 .build();
     }

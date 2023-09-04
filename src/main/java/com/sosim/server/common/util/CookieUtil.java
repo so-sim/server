@@ -1,7 +1,5 @@
 package com.sosim.server.common.util;
 
-import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.common.response.ResponseCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -9,6 +7,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 @Component
 public class CookieUtil {
@@ -38,9 +37,15 @@ public class CookieUtil {
     }
 
     public static String getRefreshToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
+        Optional<Cookie[]> cookiesOp = Optional.of(request.getCookies());
+        return cookiesOp
+                .map(CookieUtil::findRefreshTokenInCookies)
+                .orElse(null);
+    }
+
+    private static String findRefreshTokenInCookies(Cookie[] cookies) {
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(REFRESH_HEADER)) {
+            if (cookie != null && REFRESH_HEADER.equals(cookie.getName())) {
                 return cookie.getValue();
             }
         }

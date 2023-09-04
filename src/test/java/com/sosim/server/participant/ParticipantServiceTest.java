@@ -1,12 +1,20 @@
 package com.sosim.server.participant;
 
 import com.sosim.server.common.advice.exception.CustomException;
-import com.sosim.server.group.Group;
-import com.sosim.server.group.GroupRepository;
+import com.sosim.server.event.domain.repository.EventRepository;
+import com.sosim.server.group.domain.entity.Group;
+import com.sosim.server.group.domain.repository.GroupRepository;
+import com.sosim.server.notification.util.NotificationUtil;
+import com.sosim.server.participant.domain.entity.Participant;
+import com.sosim.server.participant.domain.repository.ParticipantRepository;
+import com.sosim.server.participant.dto.NicknameDto;
+import com.sosim.server.participant.dto.NicknameSearchRequest;
+import com.sosim.server.participant.dto.NicknameSearchResponse;
 import com.sosim.server.participant.dto.response.GetNicknameResponse;
 import com.sosim.server.participant.dto.response.GetParticipantListResponse;
-import com.sosim.server.user.User;
-import com.sosim.server.user.UserRepository;
+import com.sosim.server.participant.service.ParticipantService;
+import com.sosim.server.user.domain.entity.User;
+import com.sosim.server.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +23,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static com.sosim.server.common.auditing.Status.ACTIVE;
 import static com.sosim.server.common.response.ResponseCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,6 +51,12 @@ class ParticipantServiceTest {
     @Mock
     UserRepository userRepository;
 
+    @Mock
+    EventRepository eventRepository;
+
+    @Mock
+    NotificationUtil notificationUtil;
+
     @DisplayName("참가자 가입 / 정상")
     @Test
     void create_participant() {
@@ -51,7 +66,7 @@ class ParticipantServiceTest {
         String nickname = "닉네임";
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         participantService.createParticipant(userId, groupId, nickname);
@@ -84,7 +99,7 @@ class ParticipantServiceTest {
         String nickname = "닉네임";
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -105,7 +120,7 @@ class ParticipantServiceTest {
         String nickname = "닉네임";
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         CustomException exception = assertThrows(CustomException.class, () ->
@@ -126,7 +141,7 @@ class ParticipantServiceTest {
         addParticipantInGroup(group, userId + 2, false);
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         CustomException exception = assertThrows(CustomException.class, () ->
@@ -315,8 +330,9 @@ class ParticipantServiceTest {
 
         String newNickname = "새닉네임";
 
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
         doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+        doNothing().when(eventRepository).updateNicknameAll(newNickname, participant.getNickname(), groupId);
 
         //when
         participantService.modifyNickname(userId, groupId, newNickname);
@@ -331,7 +347,7 @@ class ParticipantServiceTest {
         //given
         String newNickname = "새닉네임";
 
-        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.empty()).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -348,7 +364,7 @@ class ParticipantServiceTest {
         String newNickname = "새닉네임";
         Group group = makeGroup();
 
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
         doReturn(Optional.empty()).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
 
         //when
@@ -370,7 +386,7 @@ class ParticipantServiceTest {
         group.getParticipantList().add(participant1);
         group.getParticipantList().add(participant2);
 
-        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
+        doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
         doReturn(Optional.of(participant1)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
 
         //when
@@ -412,6 +428,60 @@ class ParticipantServiceTest {
         assertThat(e.getResponseCode()).isEqualTo(NOT_FOUND_PARTICIPANT);
     }
 
+    @DisplayName("참가자 검색 / 정상")
+    @Test
+    void search_participant() {
+        //given
+        Group group = makeGroup();
+        String nicknamePrefix = "닉";
+        NicknameSearchRequest request = new NicknameSearchRequest();
+        request.setKeyword(nicknamePrefix);
+
+        String nickname1 = "닉네임1";
+        String nickname2 = "닉네임2";
+        List<Participant> participants = List.of(
+                makeParticipant(1L, userId, nickname1),
+                makeParticipant(2L, userId + 1, nickname2));
+
+        doReturn(Optional.of(group)).when(groupRepository)
+                .findById(groupId);
+        doReturn(participants).when(participantRepository)
+                .findByGroupAndNicknameContainsIgnoreCase(group, nicknamePrefix);
+
+        //when
+        NicknameSearchResponse response = participantService.searchParticipants(groupId, request);
+
+        //then
+        List<NicknameDto> list = response.getNicknameList();
+        assertThat(list.size()).isEqualTo(2);
+        assertThat(list.get(0).getNickname()).isEqualTo(nickname1);
+        assertThat(list.get(1).getNickname()).isEqualTo(nickname2);
+    }
+
+    @DisplayName("참가자 검색 / 결과 없을 시 빈 배열 리턴")
+    @Test
+    void search_participant_no_result() {
+        //given
+        Group group = makeGroup();
+        String nicknamePrefix = "닉";
+        NicknameSearchRequest request = new NicknameSearchRequest();
+        request.setKeyword(nicknamePrefix);
+
+        List<Participant> participants = new ArrayList<>();
+        doReturn(Optional.of(group)).when(groupRepository)
+                .findById(groupId);
+        doReturn(participants).when(participantRepository)
+                .findByGroupAndNicknameContainsIgnoreCase(group, nicknamePrefix);
+
+        //when
+        NicknameSearchResponse response = participantService.searchParticipants(groupId, request);
+
+        //then
+        List<NicknameDto> list = response.getNicknameList();
+        assertThat(list).isNotNull();
+        assertThat(list.size()).isEqualTo(0);
+    }
+
     private Group makeGroup() {
         Group group = Group.builder().build();
         ReflectionTestUtils.setField(group, "id", groupId);
@@ -437,7 +507,7 @@ class ParticipantServiceTest {
     private Participant addParticipantInGroup(Group group, long userId, boolean isAdmin) {
         User user = new User();
         ReflectionTestUtils.setField(user, "id", userId);
-        return Participant.create(user, group, "닉네임" + userId, isAdmin);
+        return group.createParticipant(user, "닉네임" + userId, isAdmin);
     }
 
 }
