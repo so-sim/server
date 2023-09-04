@@ -59,7 +59,7 @@ public class Group extends BaseTimeEntity {
 
     public Participant createParticipant(User user, String nickname, boolean isAdmin) {
         checkAlreadyIntoGroup(user.getId());
-        //checkUsedNickname(nickname);
+        checkUsedNickname(nickname);
 
         Participant participant = Participant.builder()
                 .user(user)
