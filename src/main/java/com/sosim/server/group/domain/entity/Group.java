@@ -58,7 +58,6 @@ public class Group extends BaseTimeEntity {
     }
 
     public Participant createParticipant(User user, String nickname, boolean isAdmin) {
-        checkAlreadyIntoGroup(user.getId());
         checkUsedNickname(nickname);
 
         Participant participant = Participant.builder()
@@ -106,6 +105,12 @@ public class Group extends BaseTimeEntity {
     public boolean hasParticipant(long userId) {
         return participantList.stream()
                 .anyMatch(p -> p.isActive() && p.isMine(userId));
+    }
+
+    public void checkAlreadyInto(long userId) {
+        if (participantList.stream().anyMatch(p -> p.isMine(userId))) {
+            throw new CustomException(ALREADY_INTO_GROUP);
+        }
     }
 
     public boolean hasMoreNormalParticipant() {

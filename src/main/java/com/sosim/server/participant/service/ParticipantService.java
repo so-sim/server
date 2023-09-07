@@ -40,6 +40,7 @@ public class ParticipantService {
         User user = findUser(userId);
         Group group = findGroupWithParticipantsIgnoreStatus(groupId);
 
+        group.checkAlreadyInto(userId);
         checkAlreadyUsedNickname(group, nickname);
 
         Participant participant = group.createParticipant(user, nickname, false);
