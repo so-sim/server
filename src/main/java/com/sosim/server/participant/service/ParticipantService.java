@@ -60,7 +60,7 @@ public class ParticipantService {
     @Transactional
     public void deleteParticipant(long userId, long groupId) {
         Group group = findGroupWithParticipants(groupId);
-        Participant participant = findParticipant(userId, groupId);
+        Participant participant = findActiveParticipant(userId, groupId);
 
         participant.withdrawGroup(group);
         eventRepository.lockEvent(participant.getNickname(), group);
@@ -70,7 +70,7 @@ public class ParticipantService {
     @Transactional
     public void modifyNickname(long userId, long groupId, String newNickname) {
         Group group = findGroupWithParticipantsIgnoreStatus(groupId);
-        Participant participant = findParticipant(userId, groupId);
+        Participant participant = findActiveParticipant(userId, groupId);
         String preNickname = participant.getNickname();
 
         participant.modifyNickname(group, newNickname);
@@ -81,7 +81,7 @@ public class ParticipantService {
 
     @Transactional(readOnly = true)
     public GetNicknameResponse getMyNickname(long userId, long groupId) {
-        Participant participant = findParticipant(userId, groupId);
+        Participant participant = findActiveParticipant(userId, groupId);
 
         return GetNicknameResponse.toDto(participant);
     }
@@ -106,8 +106,8 @@ public class ParticipantService {
         }
     }
 
-    private Participant findParticipant(long userId, long groupId) {
-        return participantRepository.findByUserIdAndGroupId(userId, groupId)
+    private Participant findActiveParticipant(long userId, long groupId) {
+        return participantRepository.findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
     }
 
