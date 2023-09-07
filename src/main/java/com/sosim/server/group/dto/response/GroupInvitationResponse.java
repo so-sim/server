@@ -14,10 +14,10 @@ public class GroupInvitationResponse {
 
     private String coverColor;
 
-    @JsonProperty("IsInto")
+    @JsonProperty("isInto")
     private boolean into;
 
-    @JsonProperty("IsWithdraw")
+    @JsonProperty("isWithdraw")
     private boolean withdraw;
 
     private String nickname;
