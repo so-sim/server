@@ -40,6 +40,7 @@ public class ParticipantService {
         User user = findUser(userId);
         Group group = findGroupWithParticipantsIgnoreStatus(groupId);
 
+        group.checkAlreadyInto(userId);
         checkAlreadyUsedNickname(group, nickname);
 
         Participant participant = group.createParticipant(user, nickname, false);
@@ -94,7 +95,9 @@ public class ParticipantService {
         return NicknameSearchResponse.toDto(participantList);
     }
 
+    @Transactional
     public void reActiveParticipant(long userId, long groupId) {
+        findGroup(groupId);
         Participant participant = findDeletedParticipant(userId, groupId);
         participant.reActive();
         eventRepository.updateEventStatus(userId, groupId, Status.ACTIVE);
@@ -118,7 +121,7 @@ public class ParticipantService {
     }
     
     private Participant findDeletedParticipant(long userId, long groupId) {
-        return participantRepository.findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE)
+        return participantRepository.findByUserIdAndGroupIdAndStatus(userId, groupId, Status.DELETED)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
     }
 

@@ -1,5 +1,6 @@
 package com.sosim.server.group.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sosim.server.group.domain.entity.Group;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,19 +14,21 @@ public class GroupInvitationResponse {
 
     private String coverColor;
 
-    private boolean isInto;
+    @JsonProperty("isInto")
+    private boolean into;
 
-    private boolean isWithdraw;
+    @JsonProperty("isWithdraw")
+    private boolean withdraw;
 
     private String nickname;
 
-    public static GroupInvitationResponse toDto(Group group, boolean isInto, boolean isWithdraw, String nickname) {
+    public static GroupInvitationResponse toDto(Group group, boolean into, boolean withdraw, String nickname) {
         return GroupInvitationResponse.builder()
                 .groupId(group.getId())
                 .title(group.getTitle())
                 .coverColor(group.getCoverColor())
-                .isInto(isInto)
-                .isWithdraw(isWithdraw)
+                .into(into)
+                .withdraw(withdraw)
                 .nickname(nickname)
                 .build();
     }
