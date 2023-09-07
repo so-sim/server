@@ -55,8 +55,7 @@ public class GroupService {
 
         boolean isAdmin = group.isAdminUser(userId);
         boolean isInto = group.hasParticipant(userId);
-        int numberOfParticipants = group.getNumberOfParticipants();
-        return GetGroupResponse.toDto(group, isAdmin, numberOfParticipants, isInto);
+        return GetGroupResponse.toDto(group, isAdmin, isInto);
     }
 
     @Transactional
