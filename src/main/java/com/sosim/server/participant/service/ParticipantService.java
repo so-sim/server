@@ -94,7 +94,9 @@ public class ParticipantService {
         return NicknameSearchResponse.toDto(participantList);
     }
 
+    @Transactional
     public void reActiveParticipant(long userId, long groupId) {
+        findGroup(groupId);
         Participant participant = findDeletedParticipant(userId, groupId);
         participant.reActive();
         eventRepository.updateEventStatus(userId, groupId, Status.ACTIVE);
