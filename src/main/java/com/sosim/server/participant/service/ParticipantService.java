@@ -118,7 +118,7 @@ public class ParticipantService {
     }
     
     private Participant findDeletedParticipant(long userId, long groupId) {
-        return participantRepository.findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE)
+        return participantRepository.findByUserIdAndGroupIdAndStatus(userId, groupId, Status.DELETED)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
     }
 
