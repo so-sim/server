@@ -1,6 +1,7 @@
 package com.sosim.server.participant.service;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
@@ -64,7 +65,6 @@ public class ParticipantService {
 
         participant.withdrawGroup(group);
         eventRepository.lockEvent(participant.getNickname(), group);
-        notificationUtil.lockNotification(participant.getNickname(), groupId);
     }
 
     @Transactional
