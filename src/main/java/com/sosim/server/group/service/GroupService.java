@@ -8,10 +8,7 @@ import com.sosim.server.group.domain.util.MyGroupPaginationUtil;
 import com.sosim.server.group.dto.MyGroupPageDto;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
-import com.sosim.server.group.dto.response.GetGroupResponse;
-import com.sosim.server.group.dto.response.GroupIdResponse;
-import com.sosim.server.group.dto.response.MyGroupDto;
-import com.sosim.server.group.dto.response.MyGroupsResponse;
+import com.sosim.server.group.dto.response.*;
 import com.sosim.server.notification.util.NotificationUtil;
 import com.sosim.server.participant.domain.entity.Participant;
 import com.sosim.server.participant.domain.repository.ParticipantRepository;
@@ -24,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.sosim.server.common.response.ResponseCode.NOT_FOUND_GROUP;
@@ -55,8 +53,7 @@ public class GroupService {
 
         boolean isAdmin = group.isAdminUser(userId);
         boolean isInto = group.hasParticipant(userId);
-        int numberOfParticipants = group.getNumberOfParticipants();
-        return GetGroupResponse.toDto(group, isAdmin, numberOfParticipants, isInto);
+        return GetGroupResponse.toDto(group, isAdmin, isInto);
     }
 
     @Transactional
@@ -95,6 +92,15 @@ public class GroupService {
         return MyGroupsResponse.toResponseDto(myGroups.hasNext(), myGroups.getContent());
     }
 
+    @Transactional(readOnly = true)
+    public GroupInvitationResponse getGroupForInvitation(long userId, long groupId) {
+        Group group = findGroup(groupId);
+        Optional<Participant> participant = participantRepository.findByUserIdAndGroupId(userId, groupId);
+        boolean isInto = group.hasParticipant(userId);
+
+        return GroupInvitationResponse.toDto(group, isInto, participant.isPresent(), participant.map(Participant::getNickname).orElse(null));
+    }
+
     private void changeAdminNickname(Group group, String newNickname) {
         Participant admin = group.getAdminParticipant();
         String preNickname = admin.getNickname();
@@ -131,5 +137,4 @@ public class GroupService {
         return groupRepository.findByIdWithParticipantsIgnoreStatus(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
-
 }
