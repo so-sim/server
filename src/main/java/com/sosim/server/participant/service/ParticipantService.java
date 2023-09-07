@@ -64,7 +64,7 @@ public class ParticipantService {
         Participant participant = findActiveParticipant(userId, groupId);
 
         participant.withdrawGroup(group);
-        eventRepository.lockEvent(participant.getNickname(), group);
+        eventRepository.updateEventStatus(userId, groupId, Status.LOCK);
     }
 
     @Transactional
@@ -97,6 +97,7 @@ public class ParticipantService {
     public void reActiveParticipant(long userId, long groupId) {
         Participant participant = findDeletedParticipant(userId, groupId);
         participant.reActive();
+        eventRepository.updateEventStatus(userId, groupId, Status.ACTIVE);
     }
 
     private void checkUsedWithdrawNickname(Group group, String nickname) {

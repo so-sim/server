@@ -1,5 +1,6 @@
 package com.sosim.server.event.domain.repository;
 
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.event.domain.entity.Situation;
 import com.sosim.server.event.domain.entity.Event;
 import com.sosim.server.group.domain.entity.Group;
@@ -66,7 +67,8 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
 
     @Modifying
     @Query("UPDATE Event e SET " +
-            "e.status = 'LOCK' " +
-            "WHERE e.nickname = :nickname AND e.group = :group")
-    void lockEvent(@Param("nickname") String nickname, @Param("group") Group group);
+            "e.status = :status " +
+            "WHERE e.user.id = :userId " +
+            "AND e.group.id = :groupId")
+    void updateEventStatus(@Param("userId") long userId, @Param("groupId") long groupId, @Param("status") Status statuss);
 }
