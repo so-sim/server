@@ -13,9 +13,7 @@ import java.util.Optional;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
 
-    @Query("select p from Participant p where p.user.id = :userId " +
-            "and p.group.id = :groupId and p.status = 'ACTIVE'")
-    Optional<Participant> findByUserIdAndGroupId(@Param("userId") Long userId, @Param("groupId") Long groupId);
+    Optional<Participant> findByUserIdAndGroupIdAndStatus(long userId, long groupId, Status status);
 
     @Query("select p from Participant p where p.nickname = :nickname " +
            "and p.group.id = :groupId")

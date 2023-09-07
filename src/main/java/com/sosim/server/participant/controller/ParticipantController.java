@@ -50,6 +50,13 @@ public class ParticipantController {
         return new ResponseEntity<>(Response.create(INTO_GROUP, null), INTO_GROUP.getHttpStatus());
     }
 
+    @PutMapping("/participant")
+    public ResponseEntity<?> reActiveParticipant(@AuthUserId long userId, @PathVariable long groupId) {
+        participantService.reActiveParticipant(userId, groupId);
+
+        return new ResponseEntity<>(Response.create(INTO_GROUP, null), INTO_GROUP.getHttpStatus());
+    }
+
     @DeleteMapping("/participant")
     public ResponseEntity<?> withdrawGroup(@AuthUserId long userId, @PathVariable long groupId) {
         participantService.deleteParticipant(userId, groupId);
