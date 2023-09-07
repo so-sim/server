@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-import static com.sosim.server.common.auditing.Status.ACTIVE;
+import static com.sosim.server.common.auditing.Status.*;
 
 @Getter
 @MappedSuperclass
@@ -30,11 +30,16 @@ public class BaseTimeEntity {
     protected Status status;
 
     public void delete() {
-        status = Status.DELETED;
+        status = DELETED;
         deleteDate = LocalDateTime.now();
     }
 
     public boolean isActive() {
         return ACTIVE.equals(status);
+    }
+
+    public void reActive() {
+        status = ACTIVE;
+        deleteDate = null;
     }
 }
