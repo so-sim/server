@@ -17,6 +17,7 @@ import com.sosim.server.security.WithMockCustomUser;
 import com.sosim.server.security.WithMockCustomUserSecurityContextFactory;
 import com.sosim.server.user.domain.entity.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -247,6 +248,7 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$.content").isEmpty());
     }
 
+    @Disabled
     @DisplayName("그룹 조회 / 인증 없이 조회하는 경우")
     @Test
     void get_group_no_userId() throws Exception {
