@@ -94,6 +94,11 @@ public class ParticipantService {
         return NicknameSearchResponse.toDto(participantList);
     }
 
+    public void reActiveParticipant(long userId, long groupId) {
+        Participant participant = findDeletedParticipant(userId, groupId);
+        participant.reActive();
+    }
+
     private void checkUsedWithdrawNickname(Group group, String nickname) {
         if (participantRepository.existsByGroupAndNickname(group, nickname)) {
             throw new CustomException(USED_NICKNAME);
@@ -107,6 +112,11 @@ public class ParticipantService {
     }
 
     private Participant findActiveParticipant(long userId, long groupId) {
+        return participantRepository.findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
+    }
+    
+    private Participant findDeletedParticipant(long userId, long groupId) {
         return participantRepository.findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
     }
@@ -179,5 +189,4 @@ public class ParticipantService {
         return groupRepository.findById(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
-
 }
