@@ -15,6 +15,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     Optional<Participant> findByUserIdAndGroupId(long userId, long groupId);
 
+    Optional<Participant> findByUserIdAndGroupIdAndStatus(long userId, long groupId, Status status);
+
     @Query("select p from Participant p where p.nickname = :nickname " +
            "and p.group.id = :groupId")
     @EntityGraph(attributePaths = {"user"})
