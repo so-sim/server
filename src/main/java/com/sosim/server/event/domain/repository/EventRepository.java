@@ -57,7 +57,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
     List<Event> findAllByEventIdList(@Param("userId") long userId, @Param("groupId") long groupId, @Param("eventIdList") List<Long> eventIdList);
 
     @Query("SELECT e FROM Event e " +
-            "WHERE e.status <> 'DELETED' " +
+            "WHERE e.status = 'ACTIVE' " +
             "AND e.situation = 'NONE' " +
             "AND e.group IN (:groups) " +
             "ORDER BY e.user.id ASC, e.group.id ASC")
