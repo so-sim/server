@@ -1,6 +1,7 @@
 package com.sosim.server.participant;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
@@ -259,7 +260,7 @@ class ParticipantServiceTest {
         group.getParticipantList().add(makeParticipant(2L, userId + 1, "닉네임" + 1));
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
-        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE);
 
         //when
         participantService.deleteParticipant(userId, groupId);
@@ -278,7 +279,7 @@ class ParticipantServiceTest {
         group.getParticipantList().add(participant);
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
-        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE);
 
         //when
         participantService.deleteParticipant(userId, groupId);
@@ -310,7 +311,7 @@ class ParticipantServiceTest {
         Group group = makeGroup();
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipants(groupId);
-        doReturn(Optional.empty()).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+        doReturn(Optional.empty()).when(participantRepository).findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -331,7 +332,7 @@ class ParticipantServiceTest {
         String newNickname = "새닉네임";
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
-        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE);
         doNothing().when(eventRepository).updateNicknameAll(newNickname, participant.getNickname(), groupId);
 
         //when
@@ -365,7 +366,7 @@ class ParticipantServiceTest {
         Group group = makeGroup();
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
-        doReturn(Optional.empty()).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+        doReturn(Optional.empty()).when(participantRepository).findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -387,7 +388,7 @@ class ParticipantServiceTest {
         group.getParticipantList().add(participant2);
 
         doReturn(Optional.of(group)).when(groupRepository).findByIdWithParticipantsIgnoreStatus(groupId);
-        doReturn(Optional.of(participant1)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+        doReturn(Optional.of(participant1)).when(participantRepository).findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->
@@ -404,7 +405,7 @@ class ParticipantServiceTest {
         String nickname = "닉네임";
         Participant participant = makeParticipant(1L, userId, nickname);
 
-        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+        doReturn(Optional.of(participant)).when(participantRepository).findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE);
 
         //when
         GetNicknameResponse response = participantService.getMyNickname(userId, groupId);
@@ -418,7 +419,7 @@ class ParticipantServiceTest {
     @Test
     void get_my_nickname_no_group_or_participant() {
         //given
-        doReturn(Optional.empty()).when(participantRepository).findByUserIdAndGroupId(userId, groupId);
+        doReturn(Optional.empty()).when(participantRepository).findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE);
 
         //when
         CustomException e = assertThrows(CustomException.class, () ->

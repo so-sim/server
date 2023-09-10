@@ -2,6 +2,7 @@ package com.sosim.server.group.controller;
 
 import com.sosim.server.common.resolver.AuthUserId;
 import com.sosim.server.common.response.Response;
+import com.sosim.server.group.dto.response.GroupInvitationResponse;
 import com.sosim.server.group.service.GroupService;
 import com.sosim.server.group.dto.request.CreateGroupRequest;
 import com.sosim.server.group.dto.request.ModifyGroupRequest;
@@ -31,7 +32,7 @@ public class GroupController {
     }
 
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<?> getGroup(@AuthUserId(required = false) long userId, @PathVariable long groupId) {
+    public ResponseEntity<?> getGroup(@AuthUserId long userId, @PathVariable long groupId) {
         GetGroupResponse getGroupResponse = groupService.getGroup(userId, groupId);
 
         return new ResponseEntity<>(Response.create(GET_GROUP, getGroupResponse), GET_GROUP.getHttpStatus());
@@ -68,4 +69,10 @@ public class GroupController {
         return new ResponseEntity<>(Response.create(GET_MY_GROUPS, myGroups), GET_MY_GROUPS.getHttpStatus());
     }
 
+    @GetMapping("group/{groupId}/invitation")
+    public ResponseEntity<?> getGroupForInvitation(@AuthUserId(required = false) long userId, @PathVariable long groupId) {
+        GroupInvitationResponse groupForInvitation = groupService.getGroupForInvitation(userId, groupId);
+
+        return new ResponseEntity<>(Response.create(GET_GROUP, groupForInvitation), GET_GROUP.getHttpStatus());
+    }
 }

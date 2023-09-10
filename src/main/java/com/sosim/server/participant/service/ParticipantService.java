@@ -1,6 +1,7 @@
 package com.sosim.server.participant.service;
 
 import com.sosim.server.common.advice.exception.CustomException;
+import com.sosim.server.common.auditing.Status;
 import com.sosim.server.event.domain.repository.EventRepository;
 import com.sosim.server.group.domain.entity.Group;
 import com.sosim.server.group.domain.repository.GroupRepository;
@@ -39,6 +40,7 @@ public class ParticipantService {
         User user = findUser(userId);
         Group group = findGroupWithParticipantsIgnoreStatus(groupId);
 
+        group.checkAlreadyInto(userId);
         checkAlreadyUsedNickname(group, nickname);
 
         Participant participant = group.createParticipant(user, nickname, false);
@@ -60,17 +62,16 @@ public class ParticipantService {
     @Transactional
     public void deleteParticipant(long userId, long groupId) {
         Group group = findGroupWithParticipants(groupId);
-        Participant participant = findParticipant(userId, groupId);
+        Participant participant = findActiveParticipant(userId, groupId);
 
         participant.withdrawGroup(group);
-        eventRepository.lockEvent(participant.getNickname(), group);
-        notificationUtil.lockNotification(participant.getNickname(), groupId);
+        eventRepository.updateEventStatus(userId, groupId, Status.LOCK);
     }
 
     @Transactional
     public void modifyNickname(long userId, long groupId, String newNickname) {
         Group group = findGroupWithParticipantsIgnoreStatus(groupId);
-        Participant participant = findParticipant(userId, groupId);
+        Participant participant = findActiveParticipant(userId, groupId);
         String preNickname = participant.getNickname();
 
         participant.modifyNickname(group, newNickname);
@@ -81,7 +82,7 @@ public class ParticipantService {
 
     @Transactional(readOnly = true)
     public GetNicknameResponse getMyNickname(long userId, long groupId) {
-        Participant participant = findParticipant(userId, groupId);
+        Participant participant = findActiveParticipant(userId, groupId);
 
         return GetNicknameResponse.toDto(participant);
     }
@@ -92,6 +93,14 @@ public class ParticipantService {
         List<Participant> participantList = participantRepository.findByGroupAndNicknameContainsIgnoreCase(group, searchRequest.getKeyword());
 
         return NicknameSearchResponse.toDto(participantList);
+    }
+
+    @Transactional
+    public void reActiveParticipant(long userId, long groupId) {
+        findGroup(groupId);
+        Participant participant = findDeletedParticipant(userId, groupId);
+        participant.reActive();
+        eventRepository.updateEventStatus(userId, groupId, Status.ACTIVE);
     }
 
     private void checkUsedWithdrawNickname(Group group, String nickname) {
@@ -106,8 +115,13 @@ public class ParticipantService {
         }
     }
 
-    private Participant findParticipant(long userId, long groupId) {
-        return participantRepository.findByUserIdAndGroupId(userId, groupId)
+    private Participant findActiveParticipant(long userId, long groupId) {
+        return participantRepository.findByUserIdAndGroupIdAndStatus(userId, groupId, Status.ACTIVE)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
+    }
+    
+    private Participant findDeletedParticipant(long userId, long groupId) {
+        return participantRepository.findByUserIdAndGroupIdAndStatus(userId, groupId, Status.DELETED)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_PARTICIPANT));
     }
 
@@ -179,5 +193,4 @@ public class ParticipantService {
         return groupRepository.findById(groupId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_GROUP));
     }
-
 }

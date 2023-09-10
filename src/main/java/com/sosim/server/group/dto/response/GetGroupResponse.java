@@ -21,8 +21,6 @@ public class GetGroupResponse {
     @JsonProperty("isAdmin")
     private boolean admin;
 
-    private int size;
-
     @JsonProperty("isInto")
     private boolean into;
 
@@ -34,11 +32,10 @@ public class GetGroupResponse {
         this.groupType = groupType;
         this.adminNickname = adminNickname;
         this.admin = admin;
-        this.size = size;
         this.into = into;
     }
 
-    public static GetGroupResponse toDto(Group group, boolean admin, int size, boolean into) {
+    public static GetGroupResponse toDto(Group group, boolean admin, boolean into) {
         return GetGroupResponse.builder()
                 .id(group.getId())
                 .title(group.getTitle())
@@ -46,7 +43,6 @@ public class GetGroupResponse {
                 .groupType(group.getGroupType())
                 .adminNickname(group.getAdminParticipant().getNickname())
                 .admin(admin)
-                .size(size)
                 .into(into)
                 .build();
     }

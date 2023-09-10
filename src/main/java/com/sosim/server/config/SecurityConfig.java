@@ -44,7 +44,7 @@ public class SecurityConfig {
         // 요청에 대한 권한 체크 파트
         http
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/group/{groupId}").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/group/{groupId}/invitation").permitAll()
                 .antMatchers("/api/**").authenticated()
                 .antMatchers("/**").permitAll();
 

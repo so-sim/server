@@ -127,7 +127,6 @@ class GroupServiceTest {
         assertThat(response.getGroupId()).isEqualTo(groupId);
         assertThat(response.getTitle()).isEqualTo(title);
         assertThat(response.getAdminNickname()).isEqualTo(admin.getNickname());
-        assertThat(response.getSize()).isEqualTo(1);
         assertThat(response.isInto()).isTrue();
     }
 
