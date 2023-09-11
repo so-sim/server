@@ -13,7 +13,7 @@
 # 🔍 Organize
 
 
-- 📓<a href="https://github.com/so-sim/server/wiki">Tech Blog</a> <br>
+- 📓<a href="https://velog.io/@perpose12/series/%EC%86%8C%EC%8B%AC%ED%95%9C-%EC%B4%9D%EB%AC%B4">Tech Blog</a> <br>
 
 
 # 📖 API Specification
