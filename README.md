@@ -8,7 +8,7 @@
 
 # 🔍 Organize
 
-- 📓<a href="https://velog.io/@perpose12/series/%EC%86%8C%EC%8B%AC%ED%95%9C-%EC%B4%9D%EB%AC%B4">Tech Blog</a> <br> - Park Jae Min
+- 📓<a href="https://velog.io/@perpose12/series/%EC%86%8C%EC%8B%AC%ED%95%9C-%EC%B4%9D%EB%AC%B4">Tech Blog</a> - Park Jae Min<br>
 
 # ✨ Wiki
 
