@@ -20,3 +20,9 @@ spring:
       hibernate:
         format_sql: false
         show-sql: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
